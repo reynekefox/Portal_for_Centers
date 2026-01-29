@@ -255,5 +255,177 @@ export const Store = {
         localStorage.removeItem('currentStudent');
         window.location.hash = '';
         window.location.reload();
+    },
+
+    // ==================== LESSONS CRUD ====================
+    async getLessons(schoolId) {
+        try {
+            const res = await fetch(`${API_BASE}/lessons?school_id=${schoolId}`);
+            return await res.json();
+        } catch (err) {
+            console.error('Failed to fetch lessons:', err);
+            return [];
+        }
+    },
+
+    async getLesson(lessonId) {
+        try {
+            const res = await fetch(`${API_BASE}/lessons/${lessonId}`);
+            return await res.json();
+        } catch (err) {
+            console.error('Failed to fetch lesson:', err);
+            return null;
+        }
+    },
+
+    async createLesson(lessonData) {
+        try {
+            const res = await fetch(`${API_BASE}/lessons`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(lessonData)
+            });
+            return await res.json();
+        } catch (err) {
+            console.error('Failed to create lesson:', err);
+            return null;
+        }
+    },
+
+    async updateLesson(lessonId, lessonData) {
+        try {
+            const res = await fetch(`${API_BASE}/lessons/${lessonId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(lessonData)
+            });
+            return await res.json();
+        } catch (err) {
+            console.error('Failed to update lesson:', err);
+            return null;
+        }
+    },
+
+    async deleteLesson(lessonId) {
+        try {
+            await fetch(`${API_BASE}/lessons/${lessonId}`, { method: 'DELETE' });
+            return true;
+        } catch (err) {
+            console.error('Failed to delete lesson:', err);
+            return false;
+        }
+    },
+
+    // ==================== EXERCISES CRUD ====================
+    async addExercise(lessonId, exerciseData) {
+        try {
+            const res = await fetch(`${API_BASE}/lessons/${lessonId}/exercises`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(exerciseData)
+            });
+            return await res.json();
+        } catch (err) {
+            console.error('Failed to add exercise:', err);
+            return null;
+        }
+    },
+
+    async updateExercise(lessonId, exerciseId, exerciseData) {
+        try {
+            const res = await fetch(`${API_BASE}/lessons/${lessonId}/exercises/${exerciseId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(exerciseData)
+            });
+            return await res.json();
+        } catch (err) {
+            console.error('Failed to update exercise:', err);
+            return null;
+        }
+    },
+
+    async deleteExercise(lessonId, exerciseId) {
+        try {
+            await fetch(`${API_BASE}/lessons/${lessonId}/exercises/${exerciseId}`, { method: 'DELETE' });
+            return true;
+        } catch (err) {
+            console.error('Failed to delete exercise:', err);
+            return false;
+        }
+    },
+
+    // ==================== LESSON ASSIGNMENTS ====================
+    async assignLesson(lessonId, studentIds) {
+        try {
+            const res = await fetch(`${API_BASE}/lessons/${lessonId}/assign`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ student_ids: studentIds })
+            });
+            return await res.json();
+        } catch (err) {
+            console.error('Failed to assign lesson:', err);
+            return null;
+        }
+    },
+
+    async unassignLesson(lessonId, studentId) {
+        try {
+            await fetch(`${API_BASE}/lessons/${lessonId}/assign/${studentId}`, { method: 'DELETE' });
+            return true;
+        } catch (err) {
+            console.error('Failed to unassign lesson:', err);
+            return false;
+        }
+    },
+
+    // ==================== STUDENT PROGRESS ====================
+    async getStudentLessons(studentId) {
+        try {
+            const res = await fetch(`${API_BASE}/progress/student/${studentId}/lessons`);
+            return await res.json();
+        } catch (err) {
+            console.error('Failed to fetch student lessons:', err);
+            return [];
+        }
+    },
+
+    async getStudentLessonProgress(studentId, lessonId) {
+        try {
+            const res = await fetch(`${API_BASE}/progress/student/${studentId}/lessons/${lessonId}`);
+            return await res.json();
+        } catch (err) {
+            console.error('Failed to fetch lesson progress:', err);
+            return null;
+        }
+    },
+
+    async startExercise(assignmentId, exerciseId) {
+        try {
+            const res = await fetch(`${API_BASE}/progress/start`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ assignment_id: assignmentId, exercise_id: exerciseId })
+            });
+            return await res.json();
+        } catch (err) {
+            console.error('Failed to start exercise:', err);
+            return null;
+        }
+    },
+
+    async completeExercise(assignmentId, exerciseId, result = {}) {
+        try {
+            const res = await fetch(`${API_BASE}/progress/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ assignment_id: assignmentId, exercise_id: exerciseId, result })
+            });
+            return await res.json();
+        } catch (err) {
+            console.error('Failed to complete exercise:', err);
+            return null;
+        }
     }
 };

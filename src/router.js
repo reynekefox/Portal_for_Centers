@@ -5,15 +5,28 @@ import { AdminView } from './views/AdminView.js';
 import { SchoolLoginView } from './views/SchoolLoginView.js';
 import { SchoolDashboardView } from './views/SchoolDashboardView.js';
 import { StudentGamesView } from './views/StudentGamesView.js';
+import { LessonsManageView } from './views/LessonsManageView.js';
+import { LessonEditorView } from './views/LessonEditorView.js';
+import { StudentLessonView } from './views/StudentLessonView.js';
 
 const routes = {
     '': HomeView,
     'login': LoginView,
     'admin': AdminView,
     'school-login': SchoolLoginView,
-    'school': SchoolDashboardView,
-    'games': StudentGamesView,
+    'school-dashboard': SchoolDashboardView,
+    'school': SchoolDashboardView, // alias
+    'student-games': StudentGamesView,
+    'games': StudentGamesView, // alias
+    'school-dashboard/lessons': LessonsManageView,
+    // Dynamic routes handled separately
 };
+
+// Pattern routes for dynamic IDs
+const patternRoutes = [
+    { pattern: /^school-dashboard\/lessons\/(\d+)$/, view: LessonEditorView },
+    { pattern: /^student-lesson\/(\d+)$/, view: StudentLessonView },
+];
 
 export const Router = {
     init() {
@@ -33,18 +46,34 @@ export const Router = {
         }
 
         // School Auth Guard
-        if (hash === 'school' && !Store.isSchool()) {
+        if ((hash === 'school' || hash === 'school-dashboard' || hash.startsWith('school-dashboard/')) && !Store.isSchool()) {
             window.location.hash = '/school-login';
             return;
         }
 
-        // Student Auth Guard for games
-        if (hash === 'games' && !Store.isStudent()) {
+        // Student Auth Guard for games and lessons
+        if ((hash === 'games' || hash === 'student-games' || hash.startsWith('student-lesson/')) && !Store.isStudent()) {
             window.location.hash = '/school-login';
             return;
         }
 
-        const ViewComponent = routes[hash] || HomeView;
+        // Check static routes first
+        let ViewComponent = routes[hash];
+
+        // If not found, check pattern routes
+        if (!ViewComponent) {
+            for (const route of patternRoutes) {
+                if (route.pattern.test(hash)) {
+                    ViewComponent = route.view;
+                    break;
+                }
+            }
+        }
+
+        // Fallback to home
+        if (!ViewComponent) {
+            ViewComponent = HomeView;
+        }
 
         // Clear current view
         app.innerHTML = '';
@@ -57,5 +86,3 @@ export const Router = {
         }
     }
 };
-
-

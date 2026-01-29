@@ -1,5 +1,29 @@
 import { Store } from '../store.js';
 
+// List of available games
+const AVAILABLE_GAMES = [
+  { id: 'stroop-test', name: 'Тест Струпа' },
+  { id: 'schulte-table', name: 'Таблица Шульте' },
+  { id: 'munsterberg-test', name: 'Тест Мюнстенберга' },
+  { id: 'alphabet-game', name: 'Алфавит' },
+  { id: 'n-back', name: 'N-back' },
+  { id: 'correction-test', name: 'Корректурная проба' },
+  { id: 'calcudoku', name: 'Калькудоку' },
+  { id: 'counting-game', name: 'Считалка' },
+  { id: 'magic-forest', name: 'Волшебный лес' },
+  { id: 'speed-reading', name: 'Турбочтение' }
+];
+
+function renderGameCheckboxes(prefix = 'new', selectedGames = []) {
+  return AVAILABLE_GAMES.map(game => `
+    <label class="game-checkbox">
+      <input type="checkbox" name="${prefix}_games" value="${game.id}" 
+             ${selectedGames.includes(game.id) ? 'checked' : ''}>
+      <span>${game.name}</span>
+    </label>
+  `).join('');
+}
+
 export const SchoolDashboardView = {
   render() {
     const school = Store.getCurrentSchool();
@@ -14,7 +38,10 @@ export const SchoolDashboardView = {
     container.innerHTML = `
       <header class="admin-header">
         <h1>Личный кабинет: ${school.title}</h1>
-        <button id="school-logout-btn" class="btn btn-outline">Выйти</button>
+        <div class="header-actions">
+          <a href="#/school-dashboard/lessons" class="btn btn-secondary">📚 Занятия</a>
+          <button id="school-logout-btn" class="btn btn-outline">Выйти</button>
+        </div>
       </header>
       
       <div class="dashboard-content">
@@ -65,7 +92,16 @@ export const SchoolDashboardView = {
                 <input type="text" name="password" class="form-input" required placeholder="Пароль для входа">
               </div>
             </div>
-            <button type="submit" class="btn btn-primary mt-sm">Добавить ученика</button>
+            
+            <div class="form-group mt-md">
+              <label>Доступные игры:</label>
+              <div class="games-checkbox-grid">
+                ${renderGameCheckboxes('new')}
+              </div>
+              <button type="button" id="select-all-games" class="btn btn-link mt-sm">Выбрать все</button>
+            </div>
+            
+            <button type="submit" class="btn btn-primary mt-md">Добавить ученика</button>
           </form>
           
           <div id="student-list" class="student-list mt-lg">
@@ -82,9 +118,18 @@ export const SchoolDashboardView = {
     const profileForm = document.getElementById('school-profile-form');
     const studentForm = document.getElementById('create-student-form');
     const logoutBtn = document.getElementById('school-logout-btn');
+    const selectAllBtn = document.getElementById('select-all-games');
     const school = Store.getCurrentSchool();
 
     this.renderStudents(school.id);
+
+    // Select all games button
+    selectAllBtn.addEventListener('click', () => {
+      const checkboxes = studentForm.querySelectorAll('input[name="new_games"]');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      checkboxes.forEach(cb => cb.checked = !allChecked);
+      selectAllBtn.textContent = allChecked ? 'Выбрать все' : 'Снять все';
+    });
 
     profileForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -105,12 +150,18 @@ export const SchoolDashboardView = {
     studentForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(studentForm);
+
+      // Get selected games
+      const selectedGames = Array.from(studentForm.querySelectorAll('input[name="new_games"]:checked'))
+        .map(cb => cb.value);
+
       await Store.addStudent({
         school_id: school.id,
         first_name: formData.get('firstName'),
         last_name: formData.get('lastName'),
         login: formData.get('login'),
-        password: formData.get('password')
+        password: formData.get('password'),
+        allowed_games: selectedGames
       });
       studentForm.reset();
       this.renderStudents(school.id);
@@ -130,18 +181,23 @@ export const SchoolDashboardView = {
       return;
     }
 
-    list.innerHTML = students.map(student => `
+    list.innerHTML = students.map(student => {
+      const games = student.allowed_games || [];
+      const gameCount = games.length;
+      return `
           <div class="student-item card">
             <div class="student-info">
               <h4>${student.first_name} ${student.last_name}</h4>
               <p class="text-sm text-light">Логин: <strong>${student.login}</strong> | Пароль: <strong>${student.password}</strong></p>
+              <p class="text-sm text-light">Игры: <strong>${gameCount} из ${AVAILABLE_GAMES.length}</strong></p>
             </div>
             <div class="school-actions">
               <button class="btn-icon edit-student-btn" data-id="${student.id}" title="Редактировать">✎</button>
               <button class="btn-icon delete-student-btn" data-id="${student.id}" title="Удалить">✕</button>
             </div>
           </div>
-        `).join('');
+        `;
+    }).join('');
 
     // Delete listeners
     list.querySelectorAll('.delete-student-btn').forEach(btn => {
@@ -165,6 +221,8 @@ export const SchoolDashboardView = {
 
     const existingModal = document.getElementById('edit-modal');
     if (existingModal) existingModal.remove();
+
+    const selectedGames = student.allowed_games || [];
 
     const modal = document.createElement('div');
     modal.id = 'edit-modal';
@@ -194,6 +252,14 @@ export const SchoolDashboardView = {
                   <input type="text" name="password" class="form-input" value="${student.password}" required>
                 </div>
               </div>
+              
+              <div class="form-group mt-md">
+                <label>Доступные игры:</label>
+                <div class="games-checkbox-grid">
+                  ${renderGameCheckboxes('edit', selectedGames)}
+                </div>
+              </div>
+              
               <div class="modal-actions mt-md">
                 <button type="button" id="cancel-edit-btn" class="btn btn-outline">Отмена</button>
                 <button type="submit" class="btn btn-primary">Сохранить</button>
@@ -209,11 +275,17 @@ export const SchoolDashboardView = {
     document.getElementById('edit-student-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
+
+      // Get selected games
+      const selectedGames = Array.from(modal.querySelectorAll('input[name="edit_games"]:checked'))
+        .map(cb => cb.value);
+
       await Store.updateStudent(formData.get('id'), {
         first_name: formData.get('firstName'),
         last_name: formData.get('lastName'),
         login: formData.get('login'),
-        password: formData.get('password')
+        password: formData.get('password'),
+        allowed_games: selectedGames
       });
       modal.remove();
       this.renderStudents(schoolId);

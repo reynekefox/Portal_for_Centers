@@ -37,7 +37,7 @@ router.post('/student', async (req, res) => {
     try {
         const { login, password } = req.body;
         const result = await pool.query(
-            'SELECT id, school_id, first_name, last_name, login FROM students WHERE login = $1 AND password = $2',
+            'SELECT id, school_id, first_name, last_name, login, allowed_games FROM students WHERE login = $1 AND password = $2',
             [login, password]
         );
 
