@@ -146,8 +146,9 @@ export const AVAILABLE_GAMES = [
         name: 'Турбочтение',
         icon: '📖',
         settings: [
-            { key: 'letterCount', label: 'Количество букв', type: 'range', min: 3, max: 8, step: 1, default: 5 },
-            { key: 'displayTime', label: 'Скорость показа (сек)', type: 'range', min: 0.3, max: 2, step: 0.1, default: 0.5 },
+            { key: 'duration', label: 'Время выполнения (сек)', type: 'range', min: 30, max: 300, step: 30, default: 60 },
+            { key: 'letterCount', label: 'Букв в слове', type: 'range', min: 3, max: 8, step: 1, default: 5 },
+            { key: 'displayTime', label: 'Время показа', type: 'range', min: 0.3, max: 2, step: 0.1, default: 0.5 },
             { key: 'fontSize', label: 'Размер шрифта', type: 'range', min: 3, max: 10, step: 1, default: 6 }
         ]
     }
