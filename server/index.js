@@ -12,6 +12,7 @@ import schoolsRoutes from './routes/schools.js';
 import studentsRoutes from './routes/students.js';
 import lessonsRoutes from './routes/lessons.js';
 import progressRoutes from './routes/progress.js';
+import coursesRoutes from './routes/courses.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,6 +30,7 @@ app.use('/api/schools', schoolsRoutes);
 app.use('/api/students', studentsRoutes);
 app.use('/api/lessons', lessonsRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/courses', coursesRoutes);
 
 // Serve static frontend (production)
 app.use(express.static(path.join(__dirname, '../dist')));
@@ -128,6 +130,17 @@ async function initDB() {
                 completed_at TIMESTAMP,
                 result JSONB,
                 UNIQUE(assignment_id, exercise_id)
+            )
+        `);
+
+        // Course templates - stores saved course configurations
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS course_templates (
+                id SERIAL PRIMARY KEY,
+                school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+                name VARCHAR(255) NOT NULL,
+                days JSONB DEFAULT '[]',
+                created_at TIMESTAMP DEFAULT NOW()
             )
         `);
 
