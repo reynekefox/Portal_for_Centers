@@ -1,6 +1,2 @@
-import './style.css'
-import { Router } from './src/router.js';
-
-// Initialize Router
-Router.init();
-
+// Redirect to new React admin
+window.location.href = '/ScreenCreator/';
