@@ -1,0 +1,56 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'Montserrat', sans-serif;
+
+  --color-background: hsl(210 20% 98%);
+  --color-foreground: hsl(215 25% 27%);
+
+  --color-primary: hsl(205 45% 45%); /* Muted blue for buttons */
+  --color-primary-foreground: hsl(0 0% 100%);
+
+  --color-secondary: hsl(200 30% 90%); /* Light blue for inputs */
+  --color-secondary-foreground: hsl(215 25% 27%);
+
+  --color-accent: hsl(190 60% 40%); /* Teal accent */
+  --color-accent-foreground: hsl(0 0% 100%);
+
+  --color-muted: hsl(210 20% 90%);
+  --color-muted-foreground: hsl(215 20% 65%);
+
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(215 25% 27%);
+
+  --color-border: hsl(214 32% 91%);
+  --color-input: hsl(214 32% 91%);
+
+  --radius-lg: 1.5rem;
+  --radius-md: 1rem;
+  --radius-sm: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+  
+  .input-field {
+    @apply bg-secondary/50 border-transparent hover:bg-secondary/70 transition-colors rounded-full px-6 py-3 outline-none focus:ring-2 focus:ring-primary/20;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/20 rounded-full font-medium;
+  }
+}
