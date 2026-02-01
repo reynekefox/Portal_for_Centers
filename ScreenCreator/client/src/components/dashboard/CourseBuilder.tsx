@@ -91,7 +91,7 @@ export function CourseBuilder({
                 </div>
                 <button
                     onClick={onCreateCourse}
-                    disabled={courseData.days.length === 0 || isSaving}
+                    disabled={courseData.days.length === 0 || isSaving || courseData.studentId === 0}
                     className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white rounded-lg transition-all flex items-center gap-2"
                 >
                     <Check size={18} />
@@ -136,7 +136,7 @@ export function CourseBuilder({
                             {/* Start Course Button */}
                             <button
                                 onClick={onCreateCourse}
-                                disabled={courseData.days.length === 0 || isSaving}
+                                disabled={courseData.days.length === 0 || isSaving || courseData.studentId === 0}
                                 className="w-full mt-3 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2"
                             >
                                 {isSaving ? 'Создание...' : `Начать курс (${courseData.days.length} дней)`}
