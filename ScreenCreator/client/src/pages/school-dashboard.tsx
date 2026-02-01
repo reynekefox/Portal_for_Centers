@@ -2,6 +2,14 @@ import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { useAuth, authApi } from "@/lib/auth-store";
 import { ArrowLeft, Plus, Pencil, Trash2, LogOut, Users, Check, BookOpen, Calendar, BarChart2, AlertTriangle, Play, X, GripVertical, ChevronDown, ChevronUp, Folder, Save } from "lucide-react";
+import { ProgressTab } from "@/components/dashboard/ProgressTab";
+import { TrainingsTab } from "@/components/dashboard/TrainingsTab";
+import { StudentsTab } from "@/components/dashboard/StudentsTab";
+import { CoursesTab } from "@/components/dashboard/CoursesTab";
+import { AssignmentsTab } from "@/components/dashboard/AssignmentsTab";
+import { ConfirmDeleteModal } from "@/components/dashboard/ConfirmDeleteModal";
+import { StudentFormModal } from "@/components/dashboard/StudentFormModal";
+import { CourseBuilder } from "@/components/dashboard/CourseBuilder";
 
 interface Training {
     id: string;
@@ -561,291 +569,74 @@ export default function SchoolDashboard() {
                     <>
                         {/* Students Tab */}
                         {activeTab === 'students' && (
-                            <div>
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-2xl font-bold text-gray-800">Ученики</h2>
-                                    <button
-                                        onClick={() => {
-                                            setShowStudentForm(true);
-                                            setEditingStudentId(null);
-                                            setStudentFormData({ first_name: '', last_name: '', login: '', password: '', allowed_games: trainings.map(t => t.id) });
-                                        }}
-                                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all"
-                                    >
-                                        <Plus size={18} />
-                                        Добавить ученика
-                                    </button>
-                                </div>
-
-                                {students.length === 0 ? (
-                                    <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                                        <Users size={48} className="text-gray-300 mx-auto mb-4" />
-                                        <p className="text-gray-500">Нет добавленных учеников</p>
-                                    </div>
-                                ) : (
-                                    <div className="grid gap-4">
-                                        {students.map((student) => (
-                                            <div key={student.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-all">
-                                                <div className="flex items-center justify-between">
-                                                    <div>
-                                                        <h3 className="font-bold text-gray-800">{student.first_name} {student.last_name}</h3>
-                                                        <p className="text-sm text-gray-500">
-                                                            Логин: <span className="font-mono bg-gray-100 px-1 rounded">{student.login}</span>
-                                                            {' · '}
-                                                            Пароль: <span className="font-mono bg-gray-100 px-1 rounded">{student.password}</span>
-                                                        </p>
-                                                        <p className="text-sm text-gray-400 mt-1">
-                                                            Тренингов: {(student.allowed_games || []).length}
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => handleEditStudent(student)}
-                                                            className="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium rounded-lg transition-all"
-                                                        >
-                                                            Редактировать
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setDeleteConfirm({ type: 'student', id: student.id })}
-                                                            className="p-2 hover:bg-red-50 rounded-lg transition-all"
-                                                        >
-                                                            <Trash2 size={18} className="text-red-500" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                            <StudentsTab
+                                students={students}
+                                onAddStudent={() => {
+                                    setShowStudentForm(true);
+                                    setEditingStudentId(null);
+                                    setStudentFormData({ first_name: '', last_name: '', login: '', password: '', allowed_games: trainings.map(t => t.id) });
+                                }}
+                                onEditStudent={handleEditStudent}
+                                onDeleteStudent={(id) => setDeleteConfirm({ type: 'student', id })}
+                            />
                         )}
 
                         {/* Trainings Tab */}
                         {activeTab === 'trainings' && (
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Доступные тренинги</h2>
-                                {trainings.length === 0 ? (
-                                    <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                                        <BookOpen size={48} className="text-gray-300 mx-auto mb-4" />
-                                        <p className="text-gray-500">Нет доступных тренингов</p>
-                                        <p className="text-sm text-gray-400 mt-2">Администратор ещё не назначил тренинги вашей школе</p>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                        {trainings.map((training) => (
-                                            <Link key={training.id} href={training.path}>
-                                                <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
-                                                    <Play size={24} className="text-blue-600 mb-3" />
-                                                    <h3 className="font-bold text-gray-800">{training.name}</h3>
-                                                </div>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                            <TrainingsTab trainings={trainings} />
                         )}
 
                         {/* Assignments Tab */}
                         {activeTab === 'assignments' && (
-                            <div>
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-2xl font-bold text-gray-800">Занятия</h2>
-                                    <div className="flex gap-3">
-                                        <button
-                                            onClick={() => {
-                                                setCourseData(prev => ({
-                                                    ...prev,
-                                                    studentId: 0,
-                                                    days: [],
-                                                    nextDate: new Date().toISOString().split('T')[0]
-                                                }));
-                                                setShowCourseBuilder(true);
-                                            }}
-                                            disabled={students.length === 0}
-                                            className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white rounded-lg transition-all"
-                                        >
-                                            <Plus size={18} />
-                                            Создать курс
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setShowAssignmentForm(true);
-                                                setEditingAssignmentId(null);
-                                                setAssignmentFormData({
-                                                    studentId: 0,
-                                                    title: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-                                                    scheduledDate: new Date().toISOString().split('T')[0],
-                                                    exercises: []
-                                                });
-                                            }}
-                                            disabled={students.length === 0 || trainings.length === 0}
-                                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-lg transition-all"
-                                        >
-                                            <Plus size={18} />
-                                            Создать занятие
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {assignments.length === 0 ? (
-                                    <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                                        <Calendar size={48} className="text-gray-300 mx-auto mb-4" />
-                                        <p className="text-gray-500">Нет созданных занятий</p>
-                                    </div>
-                                ) : (
-                                    <div className="grid gap-4">
-                                        {assignments.map((assignment) => (
-                                            <div key={assignment.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-all">
-                                                <div className="flex items-center justify-between">
-                                                    <div>
-                                                        <h3 className="font-bold text-gray-800">{assignment.title}</h3>
-                                                        <p className="text-sm text-gray-500">
-                                                            Ученик: {getStudentName(assignment.studentId)}
-                                                            {' · '}
-                                                            Дата: {assignment.scheduledDate}
-                                                        </p>
-                                                        <p className="text-sm text-gray-400 mt-1">
-                                                            Упражнений: {assignment.exercises.length}
-                                                            {' · '}
-                                                            Статус: <span className={
-                                                                assignment.status === 'completed' ? 'text-green-600' :
-                                                                    assignment.status === 'in_progress' ? 'text-yellow-600' : 'text-gray-500'
-                                                            }>
-                                                                {assignment.status === 'completed' ? 'Завершено' :
-                                                                    assignment.status === 'in_progress' ? 'В процессе' : 'Ожидает'}
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => handleEditAssignment(assignment)}
-                                                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all flex items-center gap-2"
-                                                        >
-                                                            <Pencil size={16} />
-                                                            Редактировать
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setDeleteConfirm({ type: 'assignment', id: assignment.id })}
-                                                            className="p-2 hover:bg-red-50 rounded-lg transition-all"
-                                                        >
-                                                            <Trash2 size={18} className="text-red-500" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                            <AssignmentsTab
+                                assignments={assignments}
+                                canCreate={students.length > 0 && trainings.length > 0}
+                                getStudentName={getStudentName}
+                                onCreateAssignment={() => {
+                                    setShowAssignmentForm(true);
+                                    setEditingAssignmentId(null);
+                                    setAssignmentFormData({
+                                        studentId: 0,
+                                        title: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                                        scheduledDate: new Date().toISOString().split('T')[0],
+                                        exercises: []
+                                    });
+                                }}
+                                onEditAssignment={handleEditAssignment}
+                                onDeleteAssignment={(id) => setDeleteConfirm({ type: 'assignment', id })}
+                            />
                         )}
 
                         {/* Courses Tab */}
                         {activeTab === 'courses' && (
-                            <div>
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-2xl font-bold text-gray-800">Курсы</h2>
-                                    <button
-                                        onClick={() => {
-                                            setShowCourseBuilder(true);
-                                            setCourseData({
-                                                studentId: 0,
-                                                days: [],
-                                                templateId: null,
-                                                addMode: 'interval',
-                                                intervalDays: 2,
-                                                nextDate: new Date().toISOString().split('T')[0],
-                                                courseName: ''
-                                            });
-                                        }}
-                                        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all"
-                                    >
-                                        <Plus size={18} />
-                                        Создать курс
-                                    </button>
-                                </div>
-
-                                {savedCourses.length === 0 ? (
-                                    <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                                        <Folder size={48} className="text-gray-300 mx-auto mb-4" />
-                                        <p className="text-gray-500">Нет сохранённых курсов</p>
-                                        <p className="text-gray-400 text-sm mt-2">Создайте курс и сохраните его</p>
-                                    </div>
-                                ) : (
-                                    <div className="grid gap-4">
-                                        {savedCourses.map((course) => (
-                                            <div key={course.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-all">
-                                                <div className="flex items-center justify-between">
-                                                    <div>
-                                                        <h3 className="font-bold text-gray-800">{course.name}</h3>
-                                                        <p className="text-sm text-gray-500">{course.days?.length || 0} дней</p>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => {
-                                                                setCourseData(prev => ({ ...prev, days: course.days || [], courseName: course.name }));
-                                                                setShowCourseBuilder(true);
-                                                            }}
-                                                            className="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium rounded-lg transition-all"
-                                                        >
-                                                            Редактировать
-                                                        </button>
-                                                        <button
-                                                            onClick={async () => {
-                                                                await authApi.deleteCourseTemplate(course.id);
-                                                                setSavedCourses(prev => prev.filter(c => c.id !== course.id));
-                                                            }}
-                                                            className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium rounded-lg transition-all"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                            <CoursesTab
+                                savedCourses={savedCourses}
+                                onCreateCourse={() => {
+                                    setShowCourseBuilder(true);
+                                    setCourseData({
+                                        studentId: 0,
+                                        days: [],
+                                        templateId: null,
+                                        addMode: 'interval',
+                                        intervalDays: 2,
+                                        nextDate: new Date().toISOString().split('T')[0],
+                                        courseName: ''
+                                    });
+                                }}
+                                onEditCourse={(course) => {
+                                    setCourseData(prev => ({ ...prev, days: (course.days || []) as CourseDay[], courseName: course.name }));
+                                    setShowCourseBuilder(true);
+                                }}
+                                onDeleteCourse={async (id) => {
+                                    await authApi.deleteCourseTemplate(id);
+                                    setSavedCourses(prev => prev.filter(c => c.id !== id));
+                                }}
+                            />
                         )}
 
                         {/* Progress Tab */}
                         {activeTab === 'progress' && (
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Прогресс учеников</h2>
-                                {students.length === 0 ? (
-                                    <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                                        <BarChart2 size={48} className="text-gray-300 mx-auto mb-4" />
-                                        <p className="text-gray-500">Нет учеников для отслеживания</p>
-                                    </div>
-                                ) : (
-                                    <div className="grid gap-4">
-                                        {students.map((student) => {
-                                            const studentAssignments = assignments.filter(a => a.studentId === student.id);
-                                            const completed = studentAssignments.filter(a => a.status === 'completed').length;
-                                            const inProgress = studentAssignments.filter(a => a.status === 'in_progress').length;
-
-                                            return (
-                                                <div key={student.id} className="bg-white rounded-xl border border-gray-200 p-4">
-                                                    <h3 className="font-bold text-gray-800 mb-3">{student.first_name} {student.last_name}</h3>
-                                                    <div className="grid grid-cols-3 gap-4 text-center">
-                                                        <div className="bg-gray-50 rounded-lg p-3">
-                                                            <div className="text-2xl font-bold text-gray-800">{studentAssignments.length}</div>
-                                                            <div className="text-xs text-gray-500">Всего занятий</div>
-                                                        </div>
-                                                        <div className="bg-green-50 rounded-lg p-3">
-                                                            <div className="text-2xl font-bold text-green-600">{completed}</div>
-                                                            <div className="text-xs text-gray-500">Завершено</div>
-                                                        </div>
-                                                        <div className="bg-yellow-50 rounded-lg p-3">
-                                                            <div className="text-2xl font-bold text-yellow-600">{inProgress}</div>
-                                                            <div className="text-xs text-gray-500">В процессе</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
+                            <ProgressTab students={students} assignments={assignments} />
                         )}
                     </>
                 )}
