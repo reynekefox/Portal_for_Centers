@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { useAuth, authApi } from "@/lib/auth-store";
 import { formatRequiredResult } from "@/hooks/useLockedParams";
-import { ArrowLeft, LogOut, BookOpen, Calendar, Play, CheckCircle, Circle, Lock } from "lucide-react";
+import { ArrowLeft, LogOut, BookOpen, Calendar, Play, CheckCircle, Circle, Lock, BarChart2, Clock, XCircle, TrendingUp, Award } from "lucide-react";
 
 interface Training {
     id: string;
@@ -31,7 +31,7 @@ interface ExerciseResult {
     passed: boolean;
 }
 
-type TabType = 'trainings' | 'assignments';
+type TabType = 'trainings' | 'assignments' | 'statistics';
 
 export default function StudentDashboard() {
     const [, setLocation] = useLocation();
@@ -131,6 +131,7 @@ export default function StudentDashboard() {
     const tabs: { id: TabType; label: string; icon: typeof BookOpen }[] = [
         { id: 'assignments', label: 'Мои занятия', icon: Calendar },
         { id: 'trainings', label: 'Тренировки', icon: BookOpen },
+        { id: 'statistics', label: 'Статистика', icon: BarChart2 },
     ];
 
     return (
@@ -422,6 +423,207 @@ export default function StudentDashboard() {
                                             )}
                                         </div>
                                     )}
+
+                                    {/* Statistics Tab */}
+                                    {activeTab === 'statistics' && (() => {
+                                        // Calculate statistics
+                                        const today = new Date();
+                                        today.setHours(0, 0, 0, 0);
+
+                                        const completedAssignments = assignments.filter(a => a.status === 'completed').length;
+                                        const missedAssignments = assignments.filter(a => {
+                                            const scheduled = new Date(a.scheduledDate);
+                                            scheduled.setHours(0, 0, 0, 0);
+                                            return scheduled < today && a.status !== 'completed';
+                                        });
+                                        const upcomingAssignments = assignments.filter(a => {
+                                            const scheduled = new Date(a.scheduledDate);
+                                            scheduled.setHours(0, 0, 0, 0);
+                                            return scheduled >= today && a.status !== 'completed';
+                                        });
+
+                                        const totalExercises = assignments.reduce((sum, a) => sum + (a.exercises?.length || 0), 0);
+                                        const completedExercises = Object.entries(assignmentResults).reduce((sum, [assignmentId, results]) => {
+                                            const passedIndices = new Set(results.filter(r => r.passed).map(r => r.exerciseIndex));
+                                            return sum + passedIndices.size;
+                                        }, 0);
+                                        const missedExercises = missedAssignments.reduce((sum, a) => {
+                                            const results = assignmentResults[a.id] || [];
+                                            const passedIndices = new Set(results.filter(r => r.passed).map(r => r.exerciseIndex));
+                                            return sum + (a.exercises?.length || 0) - passedIndices.size;
+                                        }, 0);
+
+                                        const completionRate = totalExercises > 0 ? Math.round((completedExercises / totalExercises) * 100) : 0;
+
+                                        // Training breakdown
+                                        const trainingBreakdown = trainings.map(training => {
+                                            let total = 0;
+                                            let completed = 0;
+                                            assignments.forEach(assignment => {
+                                                const exercisesForTraining = assignment.exercises?.filter(e => e.trainingId === training.id) || [];
+                                                total += exercisesForTraining.length;
+                                                const results = assignmentResults[assignment.id] || [];
+                                                exercisesForTraining.forEach((_, idx) => {
+                                                    const originalIdx = assignment.exercises?.findIndex(e => e === exercisesForTraining[idx]) || 0;
+                                                    if (results.some(r => r.exerciseIndex === originalIdx && r.passed)) {
+                                                        completed++;
+                                                    }
+                                                });
+                                            });
+                                            return { training, total, completed };
+                                        }).filter(t => t.total > 0).sort((a, b) => b.total - a.total);
+
+                                        return (
+                                            <div className="space-y-6">
+                                                <h2 className="text-2xl font-bold text-gray-800">Моя статистика</h2>
+
+                                                {/* Summary Cards */}
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                    <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                                                        <div className="flex items-center gap-2 text-green-700 mb-1">
+                                                            <CheckCircle size={18} />
+                                                            <span className="text-sm font-medium">Выполнено</span>
+                                                        </div>
+                                                        <p className="text-3xl font-bold text-green-800">{completedAssignments}</p>
+                                                        <p className="text-xs text-green-600">занятий</p>
+                                                    </div>
+                                                    <div className="bg-red-50 rounded-xl p-4 border border-red-200">
+                                                        <div className="flex items-center gap-2 text-red-700 mb-1">
+                                                            <XCircle size={18} />
+                                                            <span className="text-sm font-medium">Пропущено</span>
+                                                        </div>
+                                                        <p className="text-3xl font-bold text-red-800">{missedAssignments.length}</p>
+                                                        <p className="text-xs text-red-600">занятий</p>
+                                                    </div>
+                                                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                                                        <div className="flex items-center gap-2 text-blue-700 mb-1">
+                                                            <Clock size={18} />
+                                                            <span className="text-sm font-medium">Впереди</span>
+                                                        </div>
+                                                        <p className="text-3xl font-bold text-blue-800">{upcomingAssignments.length}</p>
+                                                        <p className="text-xs text-blue-600">занятий</p>
+                                                    </div>
+                                                    <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                                                        <div className="flex items-center gap-2 text-purple-700 mb-1">
+                                                            <Award size={18} />
+                                                            <span className="text-sm font-medium">Всего</span>
+                                                        </div>
+                                                        <p className="text-3xl font-bold text-purple-800">{assignments.length}</p>
+                                                        <p className="text-xs text-purple-600">занятий</p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Overall Progress */}
+                                                <div className="bg-white rounded-xl p-6 border border-gray-200">
+                                                    <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                                        <TrendingUp size={20} className="text-blue-600" />
+                                                        Общий прогресс
+                                                    </h3>
+                                                    <div className="flex items-center gap-4 mb-2">
+                                                        <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden flex">
+                                                            <div
+                                                                className="bg-green-500 h-4 transition-all"
+                                                                style={{ width: `${completionRate}%` }}
+                                                            />
+                                                            {missedExercises > 0 && totalExercises > 0 && (
+                                                                <div
+                                                                    className="bg-red-400 h-4 transition-all"
+                                                                    style={{ width: `${(missedExercises / totalExercises) * 100}%` }}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                        <span className="text-2xl font-bold text-gray-800">{completionRate}%</span>
+                                                    </div>
+                                                    <p className="text-sm text-gray-500">
+                                                        {completedExercises} из {totalExercises} упражнений выполнено
+                                                        {missedExercises > 0 && <span className="text-red-600"> ({missedExercises} пропущено)</span>}
+                                                    </p>
+                                                </div>
+
+                                                {/* Exercise Breakdown */}
+                                                <div className="bg-white rounded-xl p-6 border border-gray-200">
+                                                    <h3 className="font-bold text-gray-800 mb-4">Упражнения</h3>
+                                                    <div className="grid grid-cols-3 gap-4 mb-4">
+                                                        <div className="text-center p-3 bg-green-50 rounded-lg">
+                                                            <p className="text-2xl font-bold text-green-700">{completedExercises}</p>
+                                                            <p className="text-xs text-green-600">Выполнено</p>
+                                                        </div>
+                                                        <div className="text-center p-3 bg-red-50 rounded-lg">
+                                                            <p className="text-2xl font-bold text-red-700">{missedExercises}</p>
+                                                            <p className="text-xs text-red-600">Пропущено</p>
+                                                        </div>
+                                                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                                                            <p className="text-2xl font-bold text-gray-700">{totalExercises - completedExercises - missedExercises}</p>
+                                                            <p className="text-xs text-gray-600">Впереди</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Training Progress */}
+                                                {trainingBreakdown.length > 0 && (
+                                                    <div className="bg-white rounded-xl p-6 border border-gray-200">
+                                                        <h3 className="font-bold text-gray-800 mb-4">Прогресс по тренингам</h3>
+                                                        <div className="space-y-4">
+                                                            {trainingBreakdown.map(({ training, total, completed }) => (
+                                                                <div key={training.id}>
+                                                                    <div className="flex items-center justify-between mb-1">
+                                                                        <span className="text-gray-700 font-medium">{training.name}</span>
+                                                                        <span className="text-sm text-gray-500">{completed} / {total}</span>
+                                                                    </div>
+                                                                    <div className="bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                                                                        <div
+                                                                            className="bg-blue-500 h-2.5 transition-all rounded-full"
+                                                                            style={{ width: total > 0 ? `${(completed / total) * 100}%` : '0%' }}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Missed Assignments Warning */}
+                                                {missedAssignments.length > 0 && (
+                                                    <div className="bg-red-50 rounded-xl p-4 border border-red-200">
+                                                        <h3 className="font-bold text-red-800 mb-3 flex items-center gap-2">
+                                                            <XCircle size={18} />
+                                                            Пропущенные занятия
+                                                        </h3>
+                                                        <div className="space-y-2">
+                                                            {missedAssignments.slice(0, 5).map(assignment => (
+                                                                <div key={assignment.id} className="flex items-center justify-between bg-white rounded-lg p-3">
+                                                                    <div>
+                                                                        <p className="font-medium text-gray-800">{assignment.title}</p>
+                                                                        <p className="text-sm text-red-600">
+                                                                            {new Date(assignment.scheduledDate).toLocaleDateString('ru-RU', {
+                                                                                day: 'numeric',
+                                                                                month: 'long'
+                                                                            })}
+                                                                        </p>
+                                                                    </div>
+                                                                    <span className="text-sm text-gray-500">{assignment.exercises?.length || 0} упр.</span>
+                                                                </div>
+                                                            ))}
+                                                            {missedAssignments.length > 5 && (
+                                                                <p className="text-sm text-red-600 text-center">
+                                                                    И ещё {missedAssignments.length - 5} пропущенных занятий
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Empty State */}
+                                                {assignments.length === 0 && (
+                                                    <div className="text-center py-8 text-gray-500">
+                                                        <BarChart2 size={48} className="mx-auto mb-4 text-gray-300" />
+                                                        <p>Нет данных для статистики</p>
+                                                        <p className="text-sm">Пока нет назначенных занятий</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
                                 </>
                             )}
                         </>
