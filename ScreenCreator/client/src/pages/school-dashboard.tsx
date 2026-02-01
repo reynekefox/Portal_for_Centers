@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { useAuth, authApi } from "@/lib/auth-store";
-import { ArrowLeft, LogOut, Users, BookOpen, Calendar, BarChart2, AlertTriangle, Folder } from "lucide-react";
+import { ArrowLeft, LogOut, Users, BookOpen, Calendar, BarChart2, Folder } from "lucide-react";
 import { ProgressTab } from "@/components/dashboard/ProgressTab";
 import { TrainingsTab } from "@/components/dashboard/TrainingsTab";
 import { StudentsTab } from "@/components/dashboard/StudentsTab";
@@ -9,6 +9,7 @@ import { CoursesTab } from "@/components/dashboard/CoursesTab";
 import { AssignmentsTab } from "@/components/dashboard/AssignmentsTab";
 import { ConfirmDeleteModal } from "@/components/dashboard/ConfirmDeleteModal";
 import { StudentFormModal } from "@/components/dashboard/StudentFormModal";
+import { OverwriteCourseModal } from "@/components/dashboard/OverwriteCourseModal";
 import { CourseBuilder } from "@/components/dashboard/CourseBuilder";
 import { AssignmentBuilder } from "@/components/dashboard/AssignmentBuilder";
 
@@ -603,42 +604,24 @@ export default function SchoolDashboard() {
 
             {/* Overwrite Course Confirmation Modal */}
             {overwriteConfirm.show && overwriteConfirm.existingCourse && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
-                        <AlertTriangle size={48} className="text-orange-500 mx-auto mb-4" />
-                        <h3 className="text-xl font-bold mb-2">ÐŸÐµÑ€ÐµÐ·Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ ÐºÑƒÑ€Ñ?</h3>
-                        <p className="text-gray-500 mb-6">
-                            ÐšÑƒÑ€Ñ "{overwriteConfirm.existingCourse.name}" ÑƒÐ¶Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚. ÐŸÐµÑ€ÐµÐ·Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ ÐµÐ³Ð¾?
-                        </p>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setOverwriteConfirm({ show: false, existingCourse: null })}
-                                className="flex-1 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all"
-                            >
-                                ÐžÑ‚Ð¼ÐµÐ½Ð°
-                            </button>
-                            <button
-                                onClick={async () => {
-                                    if (overwriteConfirm.existingCourse && user?.id) {
-                                        await authApi.updateCourseTemplate(overwriteConfirm.existingCourse.id, {
-                                            name: courseData.courseName.trim(),
-                                            days: courseData.days
-                                        });
-                                        setSavedCourses(prev => prev.map(c =>
-                                            c.id === overwriteConfirm.existingCourse!.id
-                                                ? { ...c, name: courseData.courseName.trim(), days: courseData.days }
-                                                : c
-                                        ));
-                                        setOverwriteConfirm({ show: false, existingCourse: null });
-                                    }
-                                }}
-                                className="flex-1 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-all"
-                            >
-                                ÐŸÐµÑ€ÐµÐ·Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <OverwriteCourseModal
+                    courseName={overwriteConfirm.existingCourse.name}
+                    onConfirm={async () => {
+                        if (overwriteConfirm.existingCourse && user?.id) {
+                            await authApi.updateCourseTemplate(overwriteConfirm.existingCourse.id, {
+                                name: courseData.courseName.trim(),
+                                days: courseData.days
+                            });
+                            setSavedCourses(prev => prev.map(c =>
+                                c.id === overwriteConfirm.existingCourse!.id
+                                    ? { ...c, name: courseData.courseName.trim(), days: courseData.days }
+                                    : c
+                            ));
+                            setOverwriteConfirm({ show: false, existingCourse: null });
+                        }
+                    }}
+                    onCancel={() => setOverwriteConfirm({ show: false, existingCourse: null })}
+                />
             )}
         </div>
     );
