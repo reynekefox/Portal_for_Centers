@@ -578,7 +578,14 @@ export default function SchoolDashboard() {
                     editingAssignmentId={editingAssignmentId}
                     isSaving={isSaving}
                     onAssignmentFormDataChange={setAssignmentFormData}
-                    onClose={() => { setShowAssignmentForm(false); setEditingAssignmentId(null); }}
+                    onClose={() => {
+                        setShowAssignmentForm(false);
+                        setEditingAssignmentId(null);
+                        // Return to StudentEditor if we came from there
+                        if (editingStudent) {
+                            setShowStudentEditor(true);
+                        }
+                    }}
                     onSubmit={handleAssignmentSubmit}
                     onSaveAsTemplate={saveAsTemplate}
                     onLoadTemplate={loadTemplate}
@@ -617,7 +624,7 @@ export default function SchoolDashboard() {
                     }}
                     onEditAssignment={(assignment) => {
                         setShowStudentEditor(false);
-                        setEditingStudent(null);
+                        // Keep editingStudent to return later
                         setEditingAssignmentId(assignment.id);
                         setAssignmentFormData({
                             studentId: assignment.studentId,
