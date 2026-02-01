@@ -281,11 +281,11 @@ export function formatRequiredResult(
                 const minutes = Math.floor(totalSeconds / 60);
                 const seconds = totalSeconds % 60;
                 if (minutes > 0 && seconds > 0) {
-                    return `Выполняйте упражнение ${minutes}:${seconds.toString().padStart(2, '0')} (${totalSeconds} сек)`;
+                    return `Выполняйте ${minutes} мин ${seconds} сек`;
                 } else if (minutes > 0) {
-                    return `Выполняйте упражнение ${minutes}:00 (${totalSeconds} сек)`;
+                    return `Выполняйте ${minutes} мин`;
                 } else {
-                    return `Выполняйте упражнение ${totalSeconds} сек`;
+                    return `Выполняйте ${totalSeconds} сек`;
                 }
             }
             return 'Завершить упражнение';
