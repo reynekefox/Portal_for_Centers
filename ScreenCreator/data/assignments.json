@@ -3019,5 +3019,334 @@
     ],
     "status": "pending",
     "createdAt": "2026-01-31T23:32:34.491Z"
+  },
+  {
+    "id": 31,
+    "schoolId": 3,
+    "studentId": 0,
+    "title": "04.02.2026",
+    "scheduledDate": "2026-02-04",
+    "exercises": [
+      {
+        "trainingId": "stroop-test",
+        "parameters": {
+          "duration": 0.5,
+          "speed": 0.5,
+          "fontSize": 3,
+          "showClaps": false,
+          "showDistractors": false
+        },
+        "requiredResult": {
+          "type": "time_only"
+        }
+      },
+      {
+        "trainingId": "schulte-table",
+        "parameters": {
+          "gridSize": 3,
+          "step": 1,
+          "isGorbov": false,
+          "useLeadingZeros": false,
+          "useTempHighlight": false,
+          "useShuffle": false,
+          "showHint": false
+        },
+        "requiredResult": {
+          "type": "max_time",
+          "minValue": 10
+        }
+      },
+      {
+        "trainingId": "n-back",
+        "parameters": {
+          "duration": 30,
+          "n": 2,
+          "mode": "letters",
+          "intervalMs": 2000
+        },
+        "requiredResult": {
+          "type": "min_accuracy",
+          "minValue": 70
+        }
+      },
+      {
+        "trainingId": "correction-test",
+        "parameters": {
+          "signCount": 200,
+          "mode": "letters",
+          "timeLimit": 30
+        },
+        "requiredResult": {
+          "type": "completion"
+        }
+      },
+      {
+        "trainingId": "reaction-test",
+        "parameters": {
+          "duration": 30,
+          "greenDuration": 2
+        },
+        "requiredResult": {
+          "type": "max_time",
+          "minValue": 400
+        }
+      },
+      {
+        "trainingId": "munsterberg-test",
+        "parameters": {
+          "duration": 180,
+          "showHints": true
+        },
+        "requiredResult": {
+          "type": "completion"
+        }
+      },
+      {
+        "trainingId": "alphabet-game",
+        "parameters": {
+          "duration": 30,
+          "mode": "letters",
+          "speed": 2,
+          "fontSizeScale": 1,
+          "isX2Mode": false
+        },
+        "requiredResult": {
+          "type": "time_only"
+        }
+      },
+      {
+        "trainingId": "calcudoku",
+        "parameters": {
+          "size": 3,
+          "operations": "+"
+        },
+        "requiredResult": {
+          "type": "completion",
+          "minValue": 90
+        }
+      },
+      {
+        "trainingId": "counting-game",
+        "parameters": {
+          "mode": "single",
+          "gridConfig": "3x3"
+        },
+        "requiredResult": {
+          "type": "completion"
+        }
+      },
+      {
+        "trainingId": "speed-reading",
+        "parameters": {
+          "letterCount": 5,
+          "displayTime": 0.5,
+          "fontSize": 6,
+          "duration": 30
+        },
+        "requiredResult": {
+          "type": "time_only"
+        }
+      }
+    ],
+    "status": "pending",
+    "createdAt": "2026-02-01T00:54:07.716Z"
+  },
+  {
+    "id": 32,
+    "schoolId": 3,
+    "studentId": 0,
+    "title": "05.02.2026",
+    "scheduledDate": "2026-02-05",
+    "exercises": [
+      {
+        "trainingId": "schulte-table",
+        "parameters": {
+          "gridSize": 3,
+          "step": 1,
+          "isGorbov": true,
+          "useLeadingZeros": true,
+          "useTempHighlight": true,
+          "useShuffle": true,
+          "showHint": false
+        },
+        "requiredResult": {
+          "type": "max_time",
+          "minValue": 50
+        }
+      },
+      {
+        "trainingId": "n-back",
+        "parameters": {
+          "duration": 30,
+          "n": 2,
+          "mode": "letters",
+          "intervalMs": 2000
+        },
+        "requiredResult": {
+          "type": "min_accuracy",
+          "minValue": 60
+        }
+      },
+      {
+        "trainingId": "correction-test",
+        "parameters": {
+          "signCount": 60,
+          "mode": "letters",
+          "timeLimit": 60
+        },
+        "requiredResult": {
+          "type": "completion"
+        }
+      },
+      {
+        "trainingId": "reaction-test",
+        "parameters": {
+          "duration": 60,
+          "greenDuration": 2
+        },
+        "requiredResult": {
+          "type": "max_time",
+          "minValue": 500
+        }
+      },
+      {
+        "trainingId": "munsterberg-test",
+        "parameters": {
+          "duration": 120,
+          "showHints": true
+        },
+        "requiredResult": {
+          "type": "completion"
+        }
+      },
+      {
+        "trainingId": "alphabet-game",
+        "parameters": {
+          "duration": 30,
+          "mode": "letters",
+          "speed": 2,
+          "fontSizeScale": 1,
+          "isX2Mode": true
+        },
+        "requiredResult": {
+          "type": "time_only"
+        }
+      },
+      {
+        "trainingId": "calcudoku",
+        "parameters": {
+          "timeLimit": 60,
+          "size": 3,
+          "operations": "+"
+        },
+        "requiredResult": {
+          "type": "max_time",
+          "minValue": 60
+        }
+      },
+      {
+        "trainingId": "counting-game",
+        "parameters": {
+          "mode": "single",
+          "gridConfig": "3x3",
+          "duration": 60
+        },
+        "requiredResult": {
+          "type": "time_only"
+        }
+      },
+      {
+        "trainingId": "speed-reading",
+        "parameters": {
+          "duration": 30,
+          "letterCount": 5,
+          "displayTime": 0.5,
+          "fontSize": 6
+        },
+        "requiredResult": {
+          "type": "time_only"
+        }
+      },
+      {
+        "trainingId": "tower-of-hanoi",
+        "parameters": {
+          "disks": 3
+        },
+        "requiredResult": {
+          "type": "completion"
+        }
+      },
+      {
+        "trainingId": "vocabulary-test",
+        "parameters": {
+          "exerciseDuration": 60
+        },
+        "requiredResult": {
+          "type": "min_accuracy",
+          "minValue": 70
+        }
+      },
+      {
+        "trainingId": "visual-memory-test",
+        "parameters": {
+          "gridSize": 4,
+          "rounds": 10
+        },
+        "requiredResult": {
+          "type": "min_accuracy",
+          "minValue": 70
+        }
+      },
+      {
+        "trainingId": "pairs-test",
+        "parameters": {
+          "pairCount": 5,
+          "pairTime": 5,
+          "wordMode": false
+        },
+        "requiredResult": {
+          "type": "min_accuracy",
+          "minValue": 70
+        }
+      },
+      {
+        "trainingId": "fly-test",
+        "parameters": {
+          "gridSize": 5,
+          "stepCount": 5,
+          "stepSpeed": 3,
+          "hiddenMode": false
+        },
+        "requiredResult": {
+          "type": "min_accuracy",
+          "minValue": 70
+        }
+      },
+      {
+        "trainingId": "stroop-test",
+        "parameters": {
+          "duration": 30,
+          "speed": 0.5,
+          "fontSize": 3,
+          "showClaps": true,
+          "showDistractors": true
+        },
+        "requiredResult": {
+          "type": "time_only"
+        }
+      },
+      {
+        "trainingId": "sequence-test",
+        "parameters": {
+          "startLength": 7,
+          "timeLimit": 60
+        },
+        "requiredResult": {
+          "type": "completion"
+        }
+      }
+    ],
+    "status": "pending",
+    "createdAt": "2026-02-01T00:54:07.736Z"
   }
 ]

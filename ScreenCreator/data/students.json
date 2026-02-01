@@ -200,5 +200,37 @@
       "start-test"
     ],
     "createdAt": "2026-02-01T00:07:55.500Z"
+  },
+  {
+    "id": 7,
+    "schoolId": 3,
+    "firstName": "ttt",
+    "lastName": "ttt",
+    "login": "ttt",
+    "password": "ttt",
+    "allowedGames": [
+      "stroop-test",
+      "schulte-table",
+      "n-back",
+      "correction-test",
+      "reaction-test",
+      "munsterberg-test",
+      "alphabet-game",
+      "calcudoku",
+      "counting-game",
+      "speed-reading",
+      "sequence-test",
+      "tower-of-hanoi",
+      "vocabulary-test",
+      "auditory-test",
+      "visual-memory-test",
+      "pairs-test",
+      "fly-test",
+      "anagram-test",
+      "math-test",
+      "magic-forest",
+      "start-test"
+    ],
+    "createdAt": "2026-02-01T00:52:21.598Z"
   }
 ]

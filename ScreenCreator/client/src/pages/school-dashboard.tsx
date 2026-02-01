@@ -431,7 +431,7 @@ export default function SchoolDashboard() {
                         className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
                     >
                         <LogOut size={18} />
-                        Ð’Ñ‹Ð¹Ñ‚Ð¸
+                        Выйти
                     </button>
                 </div>
             </header>
