@@ -4,7 +4,7 @@ import Cell from './Cell';
 import RadialMenu from './RadialMenu';
 import { CageGenerator } from '@/lib/calcudoku/generator';
 import type { PuzzleData, CellPosition, Operation } from '@/lib/calcudoku/types';
-import { Play, Square } from 'lucide-react';
+import { Play, Square, XCircle, RotateCcw } from 'lucide-react';
 
 interface Score {
     date: string;
@@ -558,37 +558,45 @@ export default function GameBoard({ size, ops, onWin, onBack, isLocked = false, 
                 )
             )}
 
-            {/* TIME UP MODAL - Shown when time runs out in locked mode */}
+            {/* TIME UP MODAL - Standard failure form */}
             {isTimeUp && !isWon && isLocked && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg">
-                    <div className="text-center">
-                        <div className="text-6xl mb-4">⏰</div>
-                        <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-6 rounded-xl shadow-lg inline-block">
-                            <p className="text-2xl font-bold mb-2">Время вышло!</p>
-                            <p className="text-lg opacity-90">
-                                К сожалению, вы не успели решить головоломку.
-                            </p>
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-2xl">
+                        <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center bg-red-100">
+                            <XCircle size={48} className="text-red-600" />
                         </div>
-                        <div className="mt-6 flex gap-4 justify-center">
+
+                        <h2 className="text-3xl font-bold mb-2 text-red-600">
+                            Время вышло!
+                        </h2>
+
+                        <p className="text-gray-600 mb-6">
+                            Попробуйте решить головоломку быстрее
+                        </p>
+
+                        <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                            <div className="text-sm text-gray-500 mb-1">Лимит времени</div>
+                            <div className="text-3xl font-bold text-red-500">
+                                {formatTime(timeLimit || 0)}
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3">
                             <button
-                                onClick={() => {
-                                    // Submit failed result
-                                    if (onComplete) {
-                                        onComplete({ completed: false, time: timeLimit, size }, false);
-                                    }
-                                }}
-                                className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                onClick={onBack}
+                                className="flex-1 py-3 px-4 bg-gray-100 hover:bg-gray-200 rounded-xl font-bold text-gray-700 transition-all"
                             >
-                                {hasNextExercise ? 'К следующему упражнению' : 'Готово'}
+                                Закрыть
                             </button>
                             <button
                                 onClick={() => {
                                     setIsTimeUp(false);
                                     initGame();
                                 }}
-                                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2"
                             >
-                                Попробовать снова
+                                <RotateCcw size={18} />
+                                Ещё раз
                             </button>
                         </div>
                     </div>
