@@ -57,9 +57,7 @@ interface AssignmentBuilderProps {
     templateName: string;
     onTemplateNameChange: (name: string) => void;
 
-    // Exercise handlers  
-    onEditExercise: (index: number) => void;
-    onRemoveExercise: (index: number) => void;
+    // Utility
     getTrainingName: (id: string) => string;
 }
 
@@ -79,8 +77,6 @@ export function AssignmentBuilder({
     onDeleteTemplate,
     templateName,
     onTemplateNameChange,
-    onEditExercise,
-    onRemoveExercise,
     getTrainingName
 }: AssignmentBuilderProps) {
     // Local state

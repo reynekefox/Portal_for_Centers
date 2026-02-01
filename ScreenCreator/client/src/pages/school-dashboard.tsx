@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { useAuth, authApi } from "@/lib/auth-store";
-import { ArrowLeft, Plus, Pencil, Trash2, LogOut, Users, Check, BookOpen, Calendar, BarChart2, AlertTriangle, Play, X, GripVertical, ChevronDown, ChevronUp, Folder, Save } from "lucide-react";
+import { ArrowLeft, LogOut, Users, BookOpen, Calendar, BarChart2, AlertTriangle, Folder } from "lucide-react";
 import { ProgressTab } from "@/components/dashboard/ProgressTab";
 import { TrainingsTab } from "@/components/dashboard/TrainingsTab";
 import { StudentsTab } from "@/components/dashboard/StudentsTab";
@@ -73,9 +73,7 @@ export default function SchoolDashboard() {
 
     // Templates state
     const [templates, setTemplates] = useState<Template[]>([]);
-    const [showTemplates, setShowTemplates] = useState(false);
     const [templateName, setTemplateName] = useState('');
-    const [exercisesExpanded, setExercisesExpanded] = useState(true);
 
     // Student form state
     const [showStudentForm, setShowStudentForm] = useState(false);
@@ -103,13 +101,7 @@ export default function SchoolDashboard() {
         };
     });
 
-    // Exercise builder
-    const [showExerciseBuilder, setShowExerciseBuilder] = useState(false);
-    const [currentExercise, setCurrentExercise] = useState<Exercise>({
-        trainingId: '',
-        parameters: {},
-        requiredResult: { type: 'completion' }
-    });
+
 
     // Course builder state
     const [showCourseBuilder, setShowCourseBuilder] = useState(false);
@@ -228,7 +220,6 @@ export default function SchoolDashboard() {
             const templatesData = await authApi.getTemplates(user.id);
             setTemplates(templatesData);
             setTemplateName('');
-            setShowTemplates(false);
         } catch (e) {
             console.error('Failed to save template:', e);
         }
@@ -239,7 +230,6 @@ export default function SchoolDashboard() {
             ...prev,
             exercises: template.exercises
         }));
-        setShowTemplates(false);
     };
 
     const deleteTemplate = async (templateId: number) => {
@@ -258,7 +248,6 @@ export default function SchoolDashboard() {
             await authApi.updateTemplate(templateId, { exercises: assignmentFormData.exercises });
             const templatesData = await authApi.getTemplates(user.id);
             setTemplates(templatesData);
-            setShowTemplates(false);
         } catch (e) {
             console.error('Failed to update template:', e);
         }
@@ -378,105 +367,6 @@ export default function SchoolDashboard() {
             exercises: assignment.exercises
         });
         setShowAssignmentForm(true);
-    };
-
-    const addExerciseToAssignment = async () => {
-        if (!currentExercise.trainingId) return;
-
-        let newExercises: Exercise[];
-        if (editingExerciseIndex !== null) {
-            // Update existing exercise
-            newExercises = assignmentFormData.exercises.map((ex, i) =>
-                i === editingExerciseIndex ? { ...currentExercise } : ex
-            );
-            setEditingExerciseIndex(null);
-        } else {
-            // Add new exercise
-            newExercises = [...assignmentFormData.exercises, { ...currentExercise }];
-        }
-
-        setAssignmentFormData(prev => ({ ...prev, exercises: newExercises }));
-        setCurrentExercise({ trainingId: '', parameters: {}, requiredResult: { type: 'completion' } });
-        setShowExerciseBuilder(false);
-
-        // Auto-save if editing existing assignment
-        if (editingAssignmentId) {
-            try {
-                await authApi.updateAssignment(editingAssignmentId, {
-                    title: assignmentFormData.title,
-                    scheduledDate: assignmentFormData.scheduledDate,
-                    exercises: newExercises
-                });
-                await loadData();
-            } catch (error) {
-                console.error('Failed to auto-save exercise changes:', error);
-            }
-        }
-    };
-
-    const removeExercise = async (index: number) => {
-        const newExercises = assignmentFormData.exercises.filter((_, i) => i !== index);
-        setAssignmentFormData(prev => ({ ...prev, exercises: newExercises }));
-
-        // Auto-save if editing existing assignment
-        if (editingAssignmentId) {
-            try {
-                await authApi.updateAssignment(editingAssignmentId, {
-                    title: assignmentFormData.title,
-                    scheduledDate: assignmentFormData.scheduledDate,
-                    exercises: newExercises
-                });
-                await loadData();
-            } catch (error) {
-                console.error('Failed to auto-save exercise removal:', error);
-            }
-        }
-    };
-
-    const moveExercise = (fromIndex: number, toIndex: number) => {
-        if (toIndex < 0 || toIndex >= assignmentFormData.exercises.length) return;
-        setAssignmentFormData(prev => {
-            const exercises = [...prev.exercises];
-            const [moved] = exercises.splice(fromIndex, 1);
-            exercises.splice(toIndex, 0, moved);
-            return { ...prev, exercises };
-        });
-    };
-
-    const editExercise = (index: number) => {
-        const ex = assignmentFormData.exercises[index];
-        setCurrentExercise({ ...ex });
-        setEditingExerciseIndex(index);
-        setShowExerciseBuilder(true);
-    };
-
-    const [editingExerciseIndex, setEditingExerciseIndex] = useState<number | null>(null);
-    const [draggedExercise, setDraggedExercise] = useState<number | null>(null);
-
-    const handleExerciseDragStart = (index: number) => setDraggedExercise(index);
-    const handleExerciseDragOver = (e: React.DragEvent, index: number) => {
-        e.preventDefault();
-        if (draggedExercise !== null && draggedExercise !== index) {
-            moveExercise(draggedExercise, index);
-            setDraggedExercise(index);
-        }
-    };
-    const handleExerciseDragEnd = async () => {
-        setDraggedExercise(null);
-
-        // Auto-save reorder if editing existing assignment
-        if (editingAssignmentId) {
-            try {
-                await authApi.updateAssignment(editingAssignmentId, {
-                    title: assignmentFormData.title,
-                    scheduledDate: assignmentFormData.scheduledDate,
-                    exercises: assignmentFormData.exercises
-                });
-                await loadData();
-            } catch (error) {
-                console.error('Failed to auto-save exercise reorder:', error);
-            }
-        }
     };
 
     // Delete handler
@@ -697,8 +587,6 @@ export default function SchoolDashboard() {
                     onDeleteTemplate={deleteTemplate}
                     templateName={templateName}
                     onTemplateNameChange={setTemplateName}
-                    onEditExercise={editExercise}
-                    onRemoveExercise={removeExercise}
                     getTrainingName={getTrainingName}
                 />
             )}
