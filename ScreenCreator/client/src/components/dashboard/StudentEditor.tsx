@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowLeft, Save, Edit2, Calendar, X, User, BookOpen, BarChart2, CheckCircle, Clock, AlertCircle, XCircle, CalendarX } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Save, Edit2, Calendar, X, User, BookOpen, BarChart2, CheckCircle, Clock, AlertCircle, XCircle, CalendarX, History, Play, Target } from "lucide-react";
 
 interface Exercise {
     trainingId: string;
@@ -31,13 +31,27 @@ interface Training {
     name: string;
 }
 
-type TabType = 'data' | 'trainings' | 'statistics';
+interface ActivityLogEntry {
+    id: number;
+    assignmentId: number;
+    assignmentTitle: string;
+    exerciseIndex: number;
+    trainingId: string;
+    trainingName: string;
+    parameters: Record<string, unknown>;
+    result: Record<string, unknown>;
+    passed: boolean;
+    completedAt: string;
+}
+
+type TabType = 'data' | 'trainings' | 'statistics' | 'log';
 
 interface StudentEditorProps {
     student: StudentData;
     assignments: Assignment[];
     trainings: Training[];
     isSaving: boolean;
+    activityLog?: ActivityLogEntry[];
     onClose: () => void;
     onSaveStudent: (student: StudentData) => void;
     onEditAssignment: (assignment: Assignment) => void;
@@ -51,6 +65,7 @@ export function StudentEditor({
     assignments,
     trainings,
     isSaving,
+    activityLog = [],
     onClose,
     onSaveStudent,
     onEditAssignment,
@@ -114,9 +129,10 @@ export function StudentEditor({
     }).filter(stat => stat.total > 0).sort((a, b) => b.total - a.total);
 
     const tabs = [
-        { id: 'data' as TabType, label: 'Данные ученика', icon: User },
+        { id: 'data' as TabType, label: 'Данные', icon: User },
         { id: 'trainings' as TabType, label: 'Тренинги', icon: BookOpen },
-        { id: 'statistics' as TabType, label: 'Статистика', icon: BarChart2 }
+        { id: 'statistics' as TabType, label: 'Статистика', icon: BarChart2 },
+        { id: 'log' as TabType, label: 'Журнал', icon: History }
     ];
 
     return (
@@ -394,6 +410,95 @@ export function StudentEditor({
                                 )}
                             </div>
                         )}
+
+                        {/* Activity Log Tab */}
+                        {activeTab === 'log' && (
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="font-bold text-gray-800">История выполнения</h3>
+                                    <span className="text-sm text-gray-500">{activityLog.length} записей</span>
+                                </div>
+
+                                {activityLog.length === 0 ? (
+                                    <div className="text-center py-8 text-gray-500">
+                                        <History size={48} className="mx-auto mb-4 text-gray-300" />
+                                        <p>Нет записей в журнале</p>
+                                        <p className="text-sm">Ученик ещё не выполнял упражнения</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {activityLog.map((entry) => (
+                                            <div
+                                                key={entry.id}
+                                                className={`rounded-xl border p-4 ${entry.passed
+                                                        ? 'bg-green-50 border-green-200'
+                                                        : 'bg-orange-50 border-orange-200'
+                                                    }`}
+                                            >
+                                                <div className="flex items-start justify-between mb-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Play size={16} className={entry.passed ? 'text-green-600' : 'text-orange-600'} />
+                                                        <span className="font-bold text-gray-800">{entry.trainingName}</span>
+                                                        {entry.passed ? (
+                                                            <CheckCircle size={14} className="text-green-500" />
+                                                        ) : (
+                                                            <AlertCircle size={14} className="text-orange-500" />
+                                                        )}
+                                                    </div>
+                                                    <span className="text-sm text-gray-500">
+                                                        {new Date(entry.completedAt).toLocaleDateString('ru-RU', {
+                                                            day: 'numeric',
+                                                            month: 'short',
+                                                            year: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </span>
+                                                </div>
+
+                                                <p className="text-sm text-gray-600 mb-2">
+                                                    Занятие: {entry.assignmentTitle} (упр. #{entry.exerciseIndex + 1})
+                                                </p>
+
+                                                {/* Parameters */}
+                                                {Object.keys(entry.parameters).length > 0 && (
+                                                    <div className="mb-2">
+                                                        <p className="text-xs text-gray-500 mb-1">Настройки:</p>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {Object.entries(entry.parameters).map(([key, value]) => (
+                                                                <span key={key} className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs">
+                                                                    {key}: {String(value)}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Results */}
+                                                {Object.keys(entry.result).length > 0 && (
+                                                    <div>
+                                                        <p className="text-xs text-gray-500 mb-1">Результат:</p>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {Object.entries(entry.result).map(([key, value]) => (
+                                                                <span
+                                                                    key={key}
+                                                                    className={`px-2 py-0.5 rounded text-xs ${entry.passed
+                                                                            ? 'bg-green-100 text-green-700'
+                                                                            : 'bg-orange-100 text-orange-700'
+                                                                        }`}
+                                                                >
+                                                                    {key}: {String(value)}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -416,10 +521,10 @@ export function StudentEditor({
                                     <div
                                         key={assignment.id}
                                         className={`rounded-xl border p-4 hover:shadow-md transition-all ${isMissed
-                                                ? 'bg-red-50 border-red-200'
-                                                : assignment.status === 'completed'
-                                                    ? 'bg-green-50 border-green-200'
-                                                    : 'bg-white border-gray-200'
+                                            ? 'bg-red-50 border-red-200'
+                                            : assignment.status === 'completed'
+                                                ? 'bg-green-50 border-green-200'
+                                                : 'bg-white border-gray-200'
                                             }`}
                                     >
                                         <div className="flex items-center justify-between">

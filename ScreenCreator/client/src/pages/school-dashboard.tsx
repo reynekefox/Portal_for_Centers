@@ -89,6 +89,18 @@ export default function SchoolDashboard() {
     // Student editor state
     const [showStudentEditor, setShowStudentEditor] = useState(false);
     const [editingStudent, setEditingStudent] = useState<StudentData | null>(null);
+    const [studentActivityLog, setStudentActivityLog] = useState<Array<{
+        id: number;
+        assignmentId: number;
+        assignmentTitle: string;
+        exerciseIndex: number;
+        trainingId: string;
+        trainingName: string;
+        parameters: Record<string, unknown>;
+        result: Record<string, unknown>;
+        passed: boolean;
+        completedAt: string;
+    }>>([]);
 
     // Delete confirmation
     const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'student' | 'assignment'; id: number } | null>(null);
@@ -186,9 +198,44 @@ export default function SchoolDashboard() {
         }
     };
 
-    const handleEditStudent = (student: StudentData) => {
+    const handleEditStudent = async (student: StudentData) => {
         setEditingStudent(student);
         setShowStudentEditor(true);
+
+        // Load student activity log
+        try {
+            const studentAssignments = assignments.filter(a => a.studentId === student.id);
+            const logEntries: typeof studentActivityLog = [];
+
+            for (const assignment of studentAssignments) {
+                const results = await authApi.getAssignmentResults(assignment.id);
+                if (results && Array.isArray(results)) {
+                    for (const res of results) {
+                        const exercise = assignment.exercises?.[res.exerciseIndex];
+                        const training = trainings.find(t => t.id === exercise?.trainingId);
+                        logEntries.push({
+                            id: res.id || Date.now() + Math.random(),
+                            assignmentId: assignment.id,
+                            assignmentTitle: assignment.title,
+                            exerciseIndex: res.exerciseIndex,
+                            trainingId: exercise?.trainingId || '',
+                            trainingName: training?.name || 'Неизвестный тренинг',
+                            parameters: exercise?.parameters || {},
+                            result: res.result || {},
+                            passed: res.passed,
+                            completedAt: res.createdAt || new Date().toISOString()
+                        });
+                    }
+                }
+            }
+
+            // Sort by date, newest first
+            logEntries.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
+            setStudentActivityLog(logEntries);
+        } catch (e) {
+            console.error('Failed to load activity log:', e);
+            setStudentActivityLog([]);
+        }
     };
 
     const toggleStudentGame = (gameId: string) => {
@@ -605,7 +652,8 @@ export default function SchoolDashboard() {
                     assignments={assignments.filter(a => a.studentId === editingStudent.id)}
                     trainings={trainings}
                     isSaving={isSaving}
-                    onClose={() => { setShowStudentEditor(false); setEditingStudent(null); }}
+                    activityLog={studentActivityLog}
+                    onClose={() => { setShowStudentEditor(false); setEditingStudent(null); setStudentActivityLog([]); }}
                     onSaveStudent={async (student) => {
                         setIsSaving(true);
                         try {
