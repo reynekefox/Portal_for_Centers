@@ -403,11 +403,11 @@ export default function SchoolDashboard() {
     };
 
     const tabs: { id: TabType; label: string; icon: typeof Users }[] = [
-        { id: 'students', label: 'Ð£Ñ‡ÐµÐ½Ð¸ÐºÐ¸', icon: Users },
-        { id: 'trainings', label: 'Ð¢Ñ€ÐµÐ½Ð¸Ð½Ð³Ð¸', icon: BookOpen },
-        { id: 'assignments', label: 'Ð—Ð°Ð½ÑÑ‚Ð¸Ñ', icon: Calendar },
-        { id: 'courses', label: 'ÐšÑƒÑ€ÑÑ‹', icon: Folder },
-        { id: 'progress', label: 'ÐŸÑ€Ð¾Ð³Ñ€ÐµÑÑ', icon: BarChart2 },
+        { id: 'students', label: 'Ученики', icon: Users },
+        { id: 'trainings', label: 'Тренинги', icon: BookOpen },
+        { id: 'assignments', label: 'Занятия', icon: Calendar },
+        { id: 'courses', label: 'Курсы', icon: Folder },
+        { id: 'progress', label: 'Прогресс', icon: BarChart2 },
     ];
 
     return (
@@ -422,7 +422,7 @@ export default function SchoolDashboard() {
                             </button>
                         </Link>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-800">Ð›Ð¸Ñ‡Ð½Ñ‹Ð¹ ÐºÐ°Ð±Ð¸Ð½ÐµÑ‚ ÑˆÐºÐ¾Ð»Ñ‹</h1>
+                            <h1 className="text-xl font-bold text-gray-800">Личный кабинет школы</h1>
                             <p className="text-sm text-gray-500">{user?.name}</p>
                         </div>
                     </div>
@@ -456,7 +456,7 @@ export default function SchoolDashboard() {
 
                 {/* Tab Content */}
                 {isLoading ? (
-                    <div className="text-gray-500 text-center py-12">Ð—Ð°Ð³Ñ€ÑƒÐ·ÐºÐ°...</div>
+                    <div className="text-gray-500 text-center py-12">Загрузка...</div>
                 ) : (
                     <>
                         {/* Students Tab */}
