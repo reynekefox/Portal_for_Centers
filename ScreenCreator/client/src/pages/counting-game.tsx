@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, ArrowRight, RefreshCw, Trophy, Play, Settings, HelpCircle, X, Square } from "lucide-react";
+import { ArrowLeft, ArrowRight, RefreshCw, Trophy, Play, Settings, HelpCircle, X, Square, XCircle, RotateCcw, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLockedParams, formatRequiredResult } from "@/hooks/useLockedParams";
 import { RequiredResultBanner } from "@/components/RequiredResultBanner";
@@ -140,9 +140,13 @@ export default function CountingGame() {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (gameState === 'playing') {
+      // Get effective duration from lockedParameters if duration state hasn't synced yet
+      const effectiveDuration = duration ?? (lockedParameters?.duration ? Number(lockedParameters.duration) : null);
+      const isCountdownMode = isLocked && effectiveDuration !== null;
+
       interval = setInterval(() => {
         setTime(t => {
-          if (isLocked && duration !== null) {
+          if (isCountdownMode) {
             // Countdown mode
             const newTime = t - 1;
             if (newTime <= 0) {
@@ -150,9 +154,9 @@ export default function CountingGame() {
               setEndReason('timeout');
               const remainingCount = table.length;
               const remainingPenalty = remainingCount * 10;
-              const finalScoreTime = duration + remainingPenalty;
+              const finalScoreTime = effectiveDuration! + remainingPenalty;
               setAttempts(prev => [...prev, {
-                time: formatTime(duration),
+                time: formatTime(effectiveDuration!),
                 penalty: remainingPenalty,
                 score: finalScoreTime
               }]);
@@ -167,7 +171,7 @@ export default function CountingGame() {
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [gameState, isLocked, duration, table.length]);
+  }, [gameState, isLocked, duration, lockedParameters, table.length]);
 
   const hasValidMoves = (cells: Cell[]): boolean => {
     if (cells.length < 3) return false;
@@ -480,25 +484,42 @@ export default function CountingGame() {
                   (Время: {attempts[attempts.length - 1]?.time} + Штраф: {attempts[attempts.length - 1]?.penalty}с)
                 </p>
                 {isLocked ? (
-                  <Link href={hasNextExercise ? getNextPath() : '/student-dashboard'}>
-                    <button
-                      onClick={() => {
-                        // Submit result - passed only if table was cleared (not timeout or deadlock)
-                        const lastAttempt = attempts[attempts.length - 1];
-                        const passed = endReason === 'cleared';
-                        completeLockedExercise({
-                          time: lastAttempt?.score || time,
-                          formatted: lastAttempt?.time || formatTime(time),
-                          penalty: lastAttempt?.penalty || 0,
-                          completed: passed
-                        }, passed);
-                      }}
-                      className="mt-6 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 mx-auto"
-                    >
-                      {hasNextExercise ? 'К следующему упражнению' : 'Завершить занятие'}
-                      <ArrowRight size={20} />
-                    </button>
-                  </Link>
+                  endReason === 'cleared' ? (
+                    // Success - allow proceed
+                    <Link href={hasNextExercise ? getNextPath() : '/student-dashboard'}>
+                      <button
+                        onClick={() => {
+                          const lastAttempt = attempts[attempts.length - 1];
+                          completeLockedExercise({
+                            time: lastAttempt?.score || time,
+                            formatted: lastAttempt?.time || formatTime(time),
+                            penalty: lastAttempt?.penalty || 0,
+                            completed: true
+                          }, true);
+                        }}
+                        className="mt-6 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 mx-auto"
+                      >
+                        {hasNextExercise ? 'К следующему упражнению' : 'Завершить занятие'}
+                        <ArrowRight size={20} />
+                      </button>
+                    </Link>
+                  ) : (
+                    // Failed (timeout or deadlock) - only retry option
+                    <div className="mt-6 flex gap-3 justify-center">
+                      <Link href={backPath}>
+                        <button className="px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-bold text-gray-700 transition-all">
+                          Закрыть
+                        </button>
+                      </Link>
+                      <button
+                        onClick={handleStart}
+                        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <RotateCcw size={18} />
+                        Ещё раз
+                      </button>
+                    </div>
+                  )
                 ) : (
                   <button
                     onClick={handleStart}

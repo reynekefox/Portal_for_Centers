@@ -289,5 +289,18 @@
     },
     "passed": true,
     "completedAt": "2026-02-01T01:46:15.514Z"
+  },
+  {
+    "id": 32,
+    "assignmentId": 28,
+    "exerciseIndex": 7,
+    "studentId": 5,
+    "result": {
+      "completed": true,
+      "time": 14,
+      "size": 3
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T02:01:21.506Z"
   }
 ]
