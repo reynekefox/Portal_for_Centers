@@ -223,6 +223,7 @@ export const authApi = {
         login?: string;
         password?: string;
         allowed_games?: string[];
+        notes?: string;
     }) {
         const res = await fetch(`${API_BASE}/students/${id}`, {
             method: 'PUT',

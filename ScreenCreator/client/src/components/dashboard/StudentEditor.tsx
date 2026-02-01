@@ -22,6 +22,7 @@ interface StudentData {
     login: string;
     password: string;
     allowed_games: string[];
+    notes?: string;
 }
 
 interface Training {
@@ -39,6 +40,7 @@ interface StudentEditorProps {
     onEditAssignment: (assignment: Assignment) => void;
     onDeleteAssignment: (assignmentId: number) => void;
     onToggleGame: (gameId: string) => void;
+    onNotesChange: (notes: string) => void;
 }
 
 export function StudentEditor({
@@ -50,7 +52,8 @@ export function StudentEditor({
     onSaveStudent,
     onEditAssignment,
     onDeleteAssignment,
-    onToggleGame
+    onToggleGame,
+    onNotesChange
 }: StudentEditorProps) {
     const studentAssignments = assignments.filter(a => true); // Will filter by student
 
@@ -148,6 +151,20 @@ export function StudentEditor({
                                     </label>
                                 ))}
                             </div>
+                        </div>
+
+                        {/* Notes */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Заметки
+                            </label>
+                            <textarea
+                                value={student.notes || ''}
+                                onChange={(e) => onNotesChange(e.target.value)}
+                                placeholder="Заметки об ученике..."
+                                rows={5}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 outline-none resize-none"
+                            />
                         </div>
                     </div>
                 </div>

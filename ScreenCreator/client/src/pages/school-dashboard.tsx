@@ -27,6 +27,7 @@ interface StudentData {
     login: string;
     password: string;
     allowed_games: string[];
+    notes?: string;
 }
 
 interface Exercise {
@@ -613,7 +614,8 @@ export default function SchoolDashboard() {
                                 last_name: student.last_name,
                                 login: student.login,
                                 password: student.password,
-                                allowed_games: student.allowed_games
+                                allowed_games: student.allowed_games,
+                                notes: student.notes
                             });
                             await loadData();
                             setShowStudentEditor(false);
@@ -650,6 +652,9 @@ export default function SchoolDashboard() {
                                     : [...games, gameId]
                             };
                         });
+                    }}
+                    onNotesChange={(notes) => {
+                        setEditingStudent(prev => prev ? { ...prev, notes } : null);
                     }}
                 />
             )}
