@@ -127,5 +127,167 @@
     },
     "passed": true,
     "completedAt": "2026-01-31T09:02:05.137Z"
+  },
+  {
+    "id": 19,
+    "assignmentId": 28,
+    "exerciseIndex": 0,
+    "studentId": 5,
+    "result": {
+      "completedDuration": 0.5,
+      "wordsShown": 0
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T01:36:46.488Z"
+  },
+  {
+    "id": 20,
+    "assignmentId": 28,
+    "exerciseIndex": 0,
+    "studentId": 5,
+    "result": {
+      "time": 0.5
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T01:37:12.740Z"
+  },
+  {
+    "id": 21,
+    "assignmentId": 28,
+    "exerciseIndex": 1,
+    "studentId": 5,
+    "result": {
+      "time": 11,
+      "formatted": "00:11"
+    },
+    "passed": false,
+    "completedAt": "2026-02-01T01:37:43.316Z"
+  },
+  {
+    "id": 22,
+    "assignmentId": 28,
+    "exerciseIndex": 1,
+    "studentId": 5,
+    "result": {
+      "time": 5,
+      "formatted": "00:05"
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T01:37:50.356Z"
+  },
+  {
+    "id": 23,
+    "assignmentId": 28,
+    "exerciseIndex": 1,
+    "studentId": 5,
+    "result": {
+      "time": 5,
+      "formatted": "00:05"
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T01:38:13.905Z"
+  },
+  {
+    "id": 24,
+    "assignmentId": 28,
+    "exerciseIndex": 2,
+    "studentId": 5,
+    "result": {
+      "accuracy": 86
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T01:38:48.140Z"
+  },
+  {
+    "id": 25,
+    "assignmentId": 28,
+    "exerciseIndex": 3,
+    "studentId": 5,
+    "result": {
+      "timeElapsed": 0,
+      "foundCount": 0,
+      "totalTargets": 26,
+      "mode": "letters"
+    },
+    "passed": false,
+    "completedAt": "2026-02-01T01:39:21.972Z"
+  },
+  {
+    "id": 26,
+    "assignmentId": 28,
+    "exerciseIndex": 3,
+    "studentId": 5,
+    "result": {
+      "timeElapsed": 29,
+      "foundCount": 26,
+      "totalTargets": 26,
+      "mode": "letters"
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T01:39:55.657Z"
+  },
+  {
+    "id": 27,
+    "assignmentId": 28,
+    "exerciseIndex": 3,
+    "studentId": 5,
+    "result": {
+      "timeElapsed": 29,
+      "foundCount": 26,
+      "totalTargets": 26
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T01:40:10.854Z"
+  },
+  {
+    "id": 28,
+    "assignmentId": 28,
+    "exerciseIndex": 4,
+    "studentId": 5,
+    "result": {
+      "correct": 8,
+      "errors": 0,
+      "accuracy": 100,
+      "avgReactionTime": 356
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T01:40:53.771Z"
+  },
+  {
+    "id": 29,
+    "assignmentId": 28,
+    "exerciseIndex": 5,
+    "studentId": 5,
+    "result": {
+      "completed": true,
+      "wordsFound": 8,
+      "totalWords": 8
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T01:45:33.026Z"
+  },
+  {
+    "id": 30,
+    "assignmentId": 28,
+    "exerciseIndex": 5,
+    "studentId": 5,
+    "result": {
+      "completed": true,
+      "wordsFound": 8,
+      "totalWords": 8
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T01:45:35.502Z"
+  },
+  {
+    "id": 31,
+    "assignmentId": 28,
+    "exerciseIndex": 6,
+    "studentId": 5,
+    "result": {
+      "completed": true
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T01:46:15.514Z"
   }
 ]

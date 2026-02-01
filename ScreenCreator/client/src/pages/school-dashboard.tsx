@@ -14,6 +14,25 @@ import { CourseBuilder } from "@/components/dashboard/CourseBuilder";
 import { AssignmentBuilder } from "@/components/dashboard/AssignmentBuilder";
 import { StudentEditor } from "@/components/dashboard/StudentEditor";
 
+
+// Helper function to normalize exercise parameters with defaults
+function normalizeExerciseParams(exercise: Exercise): Exercise {
+    const config = TRAINING_CONFIG[exercise.trainingId];
+    if (!config) return exercise;
+
+    const normalizedParams: Record<string, unknown> = { ...exercise.parameters };
+    config.params.forEach(param => {
+        if (normalizedParams[param.key] === undefined) {
+            normalizedParams[param.key] = param.default;
+        }
+    });
+
+    return {
+        ...exercise,
+        parameters: normalizedParams
+    };
+}
+
 interface Training {
     id: string;
     name: string;
@@ -311,7 +330,7 @@ export default function SchoolDashboard() {
                 await authApi.updateAssignment(editingAssignmentId, {
                     title: assignmentFormData.title,
                     scheduledDate: assignmentFormData.scheduledDate,
-                    exercises: assignmentFormData.exercises
+                    exercises: assignmentFormData.exercises.map(normalizeExerciseParams)
                 });
             } else {
                 await authApi.createAssignment({
@@ -319,7 +338,7 @@ export default function SchoolDashboard() {
                     studentId: assignmentFormData.studentId,
                     title: assignmentFormData.title,
                     scheduledDate: assignmentFormData.scheduledDate,
-                    exercises: assignmentFormData.exercises
+                    exercises: assignmentFormData.exercises.map(normalizeExerciseParams)
                 });
             }
             setShowAssignmentForm(false);
@@ -387,7 +406,7 @@ export default function SchoolDashboard() {
                     studentId: courseData.studentId,
                     title: new Date(assignmentDate).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
                     scheduledDate: assignmentDate,
-                    exercises: day.exercises
+                    exercises: day.exercises.map(normalizeExerciseParams)
                 });
             }
             setCourseData({
