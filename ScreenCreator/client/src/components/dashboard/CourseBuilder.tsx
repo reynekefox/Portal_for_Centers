@@ -89,14 +89,6 @@ export function CourseBuilder({
                     </button>
                     <h1 className="text-2xl font-bold text-gray-800">Создать курс</h1>
                 </div>
-                <button
-                    onClick={onCreateCourse}
-                    disabled={courseData.days.length === 0 || isSaving || courseData.studentId === 0}
-                    className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white rounded-lg transition-all flex items-center gap-2"
-                >
-                    <Check size={18} />
-                    {isSaving ? 'Создание...' : `Создать курс (${courseData.days.length} дней)`}
-                </button>
             </div>
 
             {/* Two Column Layout */}
