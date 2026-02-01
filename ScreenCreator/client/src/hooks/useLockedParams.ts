@@ -280,13 +280,15 @@ export function formatRequiredResult(
                 const totalSeconds = Math.round(Number(duration));
                 const minutes = Math.floor(totalSeconds / 60);
                 const seconds = totalSeconds % 60;
+                let timeStr = '';
                 if (minutes > 0 && seconds > 0) {
-                    return `Выполняйте ${minutes} мин ${seconds} сек`;
+                    timeStr = `${minutes} мин ${seconds} сек`;
                 } else if (minutes > 0) {
-                    return `Выполняйте ${minutes} мин`;
+                    timeStr = `${minutes} мин`;
                 } else {
-                    return `Выполняйте ${totalSeconds} сек`;
+                    timeStr = `${totalSeconds} сек`;
                 }
+                return `Лимит времени: ${timeStr}`;
             }
             return 'Завершить упражнение';
         }
