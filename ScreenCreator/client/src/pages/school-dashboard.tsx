@@ -12,6 +12,7 @@ import { StudentFormModal } from "@/components/dashboard/StudentFormModal";
 import { OverwriteCourseModal } from "@/components/dashboard/OverwriteCourseModal";
 import { CourseBuilder } from "@/components/dashboard/CourseBuilder";
 import { AssignmentBuilder } from "@/components/dashboard/AssignmentBuilder";
+import { StudentEditor } from "@/components/dashboard/StudentEditor";
 
 interface Training {
     id: string;
@@ -83,6 +84,10 @@ export default function SchoolDashboard() {
         first_name: '', last_name: '', login: '', password: '', allowed_games: [] as string[]
     });
     const [isSaving, setIsSaving] = useState(false);
+
+    // Student editor state
+    const [showStudentEditor, setShowStudentEditor] = useState(false);
+    const [editingStudent, setEditingStudent] = useState<StudentData | null>(null);
 
     // Delete confirmation
     const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'student' | 'assignment'; id: number } | null>(null);
@@ -181,15 +186,8 @@ export default function SchoolDashboard() {
     };
 
     const handleEditStudent = (student: StudentData) => {
-        setEditingStudentId(student.id);
-        setStudentFormData({
-            first_name: student.first_name,
-            last_name: student.last_name,
-            login: student.login,
-            password: student.password,
-            allowed_games: student.allowed_games || []
-        });
-        setShowStudentForm(true);
+        setEditingStudent(student);
+        setShowStudentEditor(true);
     };
 
     const toggleStudentGame = (gameId: string) => {
@@ -589,6 +587,63 @@ export default function SchoolDashboard() {
                     templateName={templateName}
                     onTemplateNameChange={setTemplateName}
                     getTrainingName={getTrainingName}
+                />
+            )}
+
+            {/* Student Editor - Full Screen */}
+            {showStudentEditor && editingStudent && (
+                <StudentEditor
+                    student={editingStudent}
+                    assignments={assignments.filter(a => a.studentId === editingStudent.id)}
+                    trainings={trainings}
+                    isSaving={isSaving}
+                    onClose={() => { setShowStudentEditor(false); setEditingStudent(null); }}
+                    onSaveStudent={async (student) => {
+                        setIsSaving(true);
+                        try {
+                            await authApi.updateStudent(student.id, {
+                                first_name: student.first_name,
+                                last_name: student.last_name,
+                                login: student.login,
+                                password: student.password,
+                                allowed_games: student.allowed_games
+                            });
+                            await loadData();
+                            setShowStudentEditor(false);
+                            setEditingStudent(null);
+                        } finally {
+                            setIsSaving(false);
+                        }
+                    }}
+                    onEditAssignment={(assignment) => {
+                        setShowStudentEditor(false);
+                        setEditingStudent(null);
+                        setEditingAssignmentId(assignment.id);
+                        setAssignmentFormData({
+                            studentId: assignment.studentId,
+                            title: assignment.title,
+                            scheduledDate: assignment.scheduledDate,
+                            exercises: assignment.exercises || []
+                        });
+                        setShowAssignmentForm(true);
+                    }}
+                    onDeleteAssignment={async (assignmentId) => {
+                        await authApi.deleteAssignment(assignmentId);
+                        await loadData();
+                        setEditingStudent(prev => prev ? { ...prev } : null);
+                    }}
+                    onToggleGame={(gameId) => {
+                        setEditingStudent(prev => {
+                            if (!prev) return null;
+                            const games = prev.allowed_games || [];
+                            return {
+                                ...prev,
+                                allowed_games: games.includes(gameId)
+                                    ? games.filter(g => g !== gameId)
+                                    : [...games, gameId]
+                            };
+                        });
+                    }}
                 />
             )}
 
