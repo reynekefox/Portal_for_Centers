@@ -558,6 +558,43 @@ export default function GameBoard({ size, ops, onWin, onBack, isLocked = false, 
                 )
             )}
 
+            {/* TIME UP MODAL - Shown when time runs out in locked mode */}
+            {isTimeUp && !isWon && isLocked && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg">
+                    <div className="text-center">
+                        <div className="text-6xl mb-4">⏰</div>
+                        <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-6 rounded-xl shadow-lg inline-block">
+                            <p className="text-2xl font-bold mb-2">Время вышло!</p>
+                            <p className="text-lg opacity-90">
+                                К сожалению, вы не успели решить головоломку.
+                            </p>
+                        </div>
+                        <div className="mt-6 flex gap-4 justify-center">
+                            <button
+                                onClick={() => {
+                                    // Submit failed result
+                                    if (onComplete) {
+                                        onComplete({ completed: false, time: timeLimit, size }, false);
+                                    }
+                                }}
+                                className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-full shadow-lg transition-all"
+                            >
+                                {hasNextExercise ? 'К следующему упражнению' : 'Готово'}
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setIsTimeUp(false);
+                                    initGame();
+                                }}
+                                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                            >
+                                Попробовать снова
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <style>{`
         .grid-container {
           display: grid;
