@@ -471,7 +471,7 @@ export default function SchoolDashboard() {
 
     const getStudentName = (studentId: number) => {
         const student = students.find(s => s.id === studentId);
-        return student ? `${student.first_name} ${student.last_name}` : 'ÐÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ñ‹Ð¹';
+        return student ? `${student.first_name} ${student.last_name}` : 'Неизвестный';
     };
 
     const getTrainingName = (trainingId: string) => {

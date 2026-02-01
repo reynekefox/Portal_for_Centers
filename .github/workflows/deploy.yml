@@ -1,0 +1,26 @@
+name: Deploy to Timeweb
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /var/www/portal
+            git pull origin master
+            cd ScreenCreator
+            npm install --production
+            pm2 restart portal || pm2 start npm --name "portal" -- run dev
+            pm2 save
+            echo "Deployment completed at $(date)"

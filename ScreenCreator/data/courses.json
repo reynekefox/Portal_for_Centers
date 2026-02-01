@@ -459,5 +459,139 @@
       }
     ],
     "createdAt": "2026-01-31T15:30:07.583Z"
+  },
+  {
+    "id": 3,
+    "schoolId": 3,
+    "name": "1234",
+    "days": [
+      {
+        "date": null,
+        "daysOffset": 2,
+        "exercises": [
+          {
+            "trainingId": "stroop-test",
+            "parameters": {
+              "duration": 0.5,
+              "speed": 0.5,
+              "fontSize": 3,
+              "showClaps": false,
+              "showDistractors": false
+            },
+            "requiredResult": {
+              "type": "time_only"
+            }
+          },
+          {
+            "trainingId": "schulte-table",
+            "parameters": {
+              "gridSize": 3,
+              "step": 1,
+              "isGorbov": false,
+              "useLeadingZeros": false,
+              "useTempHighlight": false,
+              "useShuffle": false,
+              "showHint": false
+            },
+            "requiredResult": {
+              "type": "max_time",
+              "minValue": 10
+            }
+          },
+          {
+            "trainingId": "n-back",
+            "parameters": {
+              "duration": 30,
+              "n": 2,
+              "mode": "letters",
+              "intervalMs": 2000
+            },
+            "requiredResult": {
+              "type": "min_accuracy",
+              "minValue": 70
+            }
+          },
+          {
+            "trainingId": "correction-test",
+            "parameters": {
+              "signCount": 200,
+              "mode": "letters",
+              "timeLimit": 30
+            },
+            "requiredResult": {
+              "type": "completion"
+            }
+          },
+          {
+            "trainingId": "reaction-test",
+            "parameters": {
+              "duration": 30,
+              "greenDuration": 2
+            },
+            "requiredResult": {
+              "type": "max_time",
+              "minValue": 400
+            }
+          },
+          {
+            "trainingId": "munsterberg-test",
+            "parameters": {
+              "duration": 180,
+              "showHints": true
+            },
+            "requiredResult": {
+              "type": "completion"
+            }
+          },
+          {
+            "trainingId": "alphabet-game",
+            "parameters": {
+              "duration": 30,
+              "mode": "letters",
+              "speed": 2,
+              "fontSizeScale": 1,
+              "isX2Mode": false
+            },
+            "requiredResult": {
+              "type": "time_only"
+            }
+          },
+          {
+            "trainingId": "calcudoku",
+            "parameters": {
+              "size": 3,
+              "operations": "+"
+            },
+            "requiredResult": {
+              "type": "completion",
+              "minValue": 90
+            }
+          },
+          {
+            "trainingId": "counting-game",
+            "parameters": {
+              "mode": "single",
+              "gridConfig": "3x3"
+            },
+            "requiredResult": {
+              "type": "completion"
+            }
+          },
+          {
+            "trainingId": "speed-reading",
+            "parameters": {
+              "letterCount": 5,
+              "displayTime": 0.5,
+              "fontSize": 6,
+              "duration": 30
+            },
+            "requiredResult": {
+              "type": "time_only"
+            }
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-02-01T03:55:25.716Z"
   }
 ]

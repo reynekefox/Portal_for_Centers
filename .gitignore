@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Deployment scripts and secrets
+github_actions_key.txt
+setup_server.py
+deploy_app.py
+check_status.py
+setup_ssh_key.py
+*.pem
+*.key
+
