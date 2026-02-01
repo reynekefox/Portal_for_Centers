@@ -192,6 +192,15 @@ export const authApi = {
         await fetch(`${API_BASE}/schools/${id}`, { method: 'DELETE' });
     },
 
+    async getSchoolStatistics(schoolId: number) {
+        try {
+            const res = await fetch(`${API_BASE}/schools/${schoolId}/statistics`);
+            return await res.json();
+        } catch {
+            return null;
+        }
+    },
+
     async getStudents(schoolId: number) {
         try {
             const res = await fetch(`${API_BASE}/schools/${schoolId}/students`);
@@ -224,6 +233,11 @@ export const authApi = {
         password?: string;
         allowed_games?: string[];
         notes?: string;
+        phone?: string;
+        email?: string;
+        telegram?: string;
+        parentName?: string;
+        birthday?: string;
     }) {
         const res = await fetch(`${API_BASE}/students/${id}`, {
             method: 'PUT',
@@ -245,6 +259,16 @@ export const authApi = {
         } catch {
             return [];
         }
+    },
+
+    // Admin password change
+    async changeAdminPassword(currentPassword: string, newPassword: string) {
+        const res = await fetch(`${API_BASE}/admin/password`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword, newPassword })
+        });
+        return await res.json();
     },
 
     // Assignments

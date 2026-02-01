@@ -7,6 +7,12 @@ interface StudentData {
     login: string;
     password: string;
     allowed_games: string[];
+    notes?: string;
+    phone?: string;
+    email?: string;
+    telegram?: string;
+    parentName?: string;
+    birthday?: string;
 }
 
 interface StudentsTabProps {

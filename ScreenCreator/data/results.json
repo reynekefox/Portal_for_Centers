@@ -302,5 +302,17 @@
     },
     "passed": true,
     "completedAt": "2026-02-01T02:01:21.506Z"
+  },
+  {
+    "id": 33,
+    "assignmentId": 16,
+    "exerciseIndex": 0,
+    "studentId": 1,
+    "result": {
+      "completedDuration": 0.5,
+      "wordsShown": 0
+    },
+    "passed": true,
+    "completedAt": "2026-02-01T02:24:28.640Z"
   }
 ]

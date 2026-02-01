@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { useAuth, authApi } from "@/lib/auth-store";
-import { ArrowLeft, Plus, Pencil, Trash2, LogOut, School, AlertTriangle, Settings, Check } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, LogOut, School, AlertTriangle, Settings, Check, Key, ChevronDown, ChevronUp, Users, BookOpen, Target, TrendingUp, Clock, Award } from "lucide-react";
 
 interface Training {
     id: string;
@@ -15,6 +15,22 @@ interface SchoolData {
     login: string;
     password: string;
     allowedTrainings: string[];
+}
+
+interface SchoolStatistics {
+    studentsCount: number;
+    assignmentsTotal: number;
+    assignmentsCompleted: number;
+    assignmentsInProgress: number;
+    assignmentsPending: number;
+    exercisesTotal: number;
+    exercisesPassed: number;
+    exercisesFailed: number;
+    successRate: number;
+    lastActivity: string;
+    createdAt: string;
+    topTrainings: { id: string; name: string; count: number }[];
+    studentActivity: { id: number; name: string; completedExercises: number; totalAssignments: number; completedAssignments: number }[];
 }
 
 export default function SuperAdmin() {
@@ -38,6 +54,17 @@ export default function SuperAdmin() {
     // Delete confirmation state
     const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    // Password change modal state
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
+    const [passwordError, setPasswordError] = useState('');
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+    // Expanded school statistics
+    const [expandedSchool, setExpandedSchool] = useState<number | null>(null);
+    const [schoolStats, setSchoolStats] = useState<Record<number, SchoolStatistics>>({});
+    const [loadingStats, setLoadingStats] = useState<number | null>(null);
 
     useEffect(() => {
         if (authLoading) return;
@@ -135,6 +162,59 @@ export default function SuperAdmin() {
         setLocation('/');
     };
 
+    const toggleSchoolExpand = async (schoolId: number) => {
+        if (expandedSchool === schoolId) {
+            setExpandedSchool(null);
+            return;
+        }
+
+        setExpandedSchool(schoolId);
+
+        // Load statistics if not cached
+        if (!schoolStats[schoolId]) {
+            setLoadingStats(schoolId);
+            const stats = await authApi.getSchoolStatistics(schoolId);
+            if (stats) {
+                setSchoolStats(prev => ({ ...prev, [schoolId]: stats }));
+            }
+            setLoadingStats(null);
+        }
+    };
+
+    const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    };
+
+    const handleChangePassword = async () => {
+        setPasswordError('');
+
+        if (passwordForm.new !== passwordForm.confirm) {
+            setPasswordError('Пароли не совпадают');
+            return;
+        }
+
+        if (passwordForm.new.length < 4) {
+            setPasswordError('Новый пароль должен быть минимум 4 символа');
+            return;
+        }
+
+        setIsChangingPassword(true);
+        try {
+            const result = await authApi.changeAdminPassword(passwordForm.current, passwordForm.new);
+            if (result.success) {
+                setShowPasswordModal(false);
+                setPasswordForm({ current: '', new: '', confirm: '' });
+            } else {
+                setPasswordError(result.error || 'Ошибка при смене пароля');
+            }
+        } catch {
+            setPasswordError('Ошибка соединения с сервером');
+        } finally {
+            setIsChangingPassword(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
@@ -148,13 +228,23 @@ export default function SuperAdmin() {
                         </Link>
                         <h1 className="text-xl font-bold text-gray-800">Панель администратора</h1>
                     </div>
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
-                    >
-                        <LogOut size={18} />
-                        Выйти
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setShowPasswordModal(true)}
+                            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
+                            title="Сменить пароль"
+                        >
+                            <Key size={18} />
+                            Сменить пароль
+                        </button>
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
+                        >
+                            <LogOut size={18} />
+                            Выйти
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -333,6 +423,66 @@ export default function SuperAdmin() {
                     </div>
                 )}
 
+                {/* Password Change Modal */}
+                {showPasswordModal && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
+                        <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <Key size={24} className="text-blue-600" />
+                                Сменить пароль
+                            </h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Текущий пароль</label>
+                                    <input
+                                        type="password"
+                                        value={passwordForm.current}
+                                        onChange={(e) => setPasswordForm({ ...passwordForm, current: e.target.value })}
+                                        className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-blue-500 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Новый пароль</label>
+                                    <input
+                                        type="password"
+                                        value={passwordForm.new}
+                                        onChange={(e) => setPasswordForm({ ...passwordForm, new: e.target.value })}
+                                        className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-blue-500 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Подтвердите пароль</label>
+                                    <input
+                                        type="password"
+                                        value={passwordForm.confirm}
+                                        onChange={(e) => setPasswordForm({ ...passwordForm, confirm: e.target.value })}
+                                        className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-blue-500 outline-none"
+                                    />
+                                </div>
+                                {passwordError && (
+                                    <p className="text-red-500 text-sm">{passwordError}</p>
+                                )}
+                            </div>
+                            <div className="flex gap-3 mt-6">
+                                <button
+                                    onClick={() => { setShowPasswordModal(false); setPasswordError(''); setPasswordForm({ current: '', new: '', confirm: '' }); }}
+                                    disabled={isChangingPassword}
+                                    className="flex-1 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all"
+                                >
+                                    Отмена
+                                </button>
+                                <button
+                                    onClick={handleChangePassword}
+                                    disabled={isChangingPassword}
+                                    className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-all"
+                                >
+                                    {isChangingPassword ? 'Сохранение...' : 'Сохранить'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Schools List */}
                 {isLoading ? (
                     <div className="text-gray-500 text-center py-12">Загрузка...</div>
@@ -344,46 +494,168 @@ export default function SuperAdmin() {
                     </div>
                 ) : (
                     <div className="grid gap-4">
-                        {schools.map((school) => (
-                            <div key={school.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-all">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex-1">
-                                        <h3 className="font-bold text-gray-800">{school.title || '(Без названия)'}</h3>
-                                        <p className="text-sm text-gray-500">
-                                            Логин: <span className="font-mono bg-gray-100 px-1 rounded">{school.login}</span>
-                                            {' · '}
-                                            Пароль: <span className="font-mono bg-gray-100 px-1 rounded">{school.password}</span>
-                                        </p>
-                                        <p className="text-sm text-gray-400 mt-1">
-                                            Тренингов: {(school.allowedTrainings || []).length}
-                                        </p>
+                        {schools.map((school) => {
+                            const stats = schoolStats[school.id];
+                            const isExpanded = expandedSchool === school.id;
+                            const isLoadingThisStats = loadingStats === school.id;
+
+                            return (
+                                <div key={school.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-all">
+                                    {/* Header - clickable */}
+                                    <div
+                                        className="p-4 cursor-pointer flex items-center justify-between"
+                                        onClick={() => toggleSchoolExpand(school.id)}
+                                    >
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2">
+                                                <h3 className="font-bold text-gray-800">{school.title || '(Без названия)'}</h3>
+                                                {isExpanded ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+                                            </div>
+                                            <p className="text-sm text-gray-500">
+                                                Логин: <span className="font-mono bg-gray-100 px-1 rounded">{school.login}</span>
+                                                {' · '}
+                                                Пароль: <span className="font-mono bg-gray-100 px-1 rounded">{school.password}</span>
+                                            </p>
+                                            <p className="text-sm text-gray-400 mt-1">
+                                                Тренингов: {(school.allowedTrainings || []).length}
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                                            <button
+                                                onClick={() => handleOpenTrainingSelector(school)}
+                                                className="p-2 hover:bg-purple-50 rounded-lg transition-all"
+                                                title="Настроить тренинги"
+                                            >
+                                                <Settings size={18} className="text-purple-600" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleEdit(school)}
+                                                className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+                                                title="Редактировать"
+                                            >
+                                                <Pencil size={18} className="text-gray-600" />
+                                            </button>
+                                            <button
+                                                onClick={() => setDeleteConfirm(school.id)}
+                                                className="p-2 hover:bg-red-50 rounded-lg transition-all"
+                                                title="Удалить"
+                                            >
+                                                <Trash2 size={18} className="text-red-500" />
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => handleOpenTrainingSelector(school)}
-                                            className="p-2 hover:bg-purple-50 rounded-lg transition-all"
-                                            title="Настроить тренинги"
-                                        >
-                                            <Settings size={18} className="text-purple-600" />
-                                        </button>
-                                        <button
-                                            onClick={() => handleEdit(school)}
-                                            className="p-2 hover:bg-gray-100 rounded-lg transition-all"
-                                            title="Редактировать"
-                                        >
-                                            <Pencil size={18} className="text-gray-600" />
-                                        </button>
-                                        <button
-                                            onClick={() => setDeleteConfirm(school.id)}
-                                            className="p-2 hover:bg-red-50 rounded-lg transition-all"
-                                            title="Удалить"
-                                        >
-                                            <Trash2 size={18} className="text-red-500" />
-                                        </button>
-                                    </div>
+
+                                    {/* Expanded Statistics */}
+                                    {isExpanded && (
+                                        <div className="border-t border-gray-100 p-4 bg-gray-50">
+                                            {isLoadingThisStats ? (
+                                                <div className="text-center py-4 text-gray-500">Загрузка статистики...</div>
+                                            ) : stats ? (
+                                                <div className="space-y-4">
+                                                    {/* Stats Grid */}
+                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                                            <div className="flex items-center gap-2 text-blue-600 mb-1">
+                                                                <Users size={16} />
+                                                                <span className="text-xs font-medium">Учеников</span>
+                                                            </div>
+                                                            <div className="text-2xl font-bold text-gray-800">{stats.studentsCount}</div>
+                                                        </div>
+                                                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                                            <div className="flex items-center gap-2 text-purple-600 mb-1">
+                                                                <BookOpen size={16} />
+                                                                <span className="text-xs font-medium">Заданий</span>
+                                                            </div>
+                                                            <div className="text-2xl font-bold text-gray-800">{stats.assignmentsTotal}</div>
+                                                            <div className="text-xs text-gray-500">
+                                                                {stats.assignmentsCompleted} готово · {stats.assignmentsInProgress} в работе
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                                            <div className="flex items-center gap-2 text-green-600 mb-1">
+                                                                <Target size={16} />
+                                                                <span className="text-xs font-medium">Упражнений</span>
+                                                            </div>
+                                                            <div className="text-2xl font-bold text-gray-800">{stats.exercisesTotal}</div>
+                                                            <div className="text-xs text-gray-500">
+                                                                {stats.exercisesPassed} успешно · {stats.exercisesFailed} неуспешно
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                                            <div className="flex items-center gap-2 text-orange-600 mb-1">
+                                                                <TrendingUp size={16} />
+                                                                <span className="text-xs font-medium">Успешность</span>
+                                                            </div>
+                                                            <div className="text-2xl font-bold text-gray-800">{stats.successRate}%</div>
+                                                            <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                                                                <div
+                                                                    className="bg-gradient-to-r from-orange-400 to-green-500 h-1.5 rounded-full"
+                                                                    style={{ width: `${stats.successRate}%` }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Activity Info */}
+                                                    <div className="flex gap-4 text-sm text-gray-500">
+                                                        <div className="flex items-center gap-1">
+                                                            <Clock size={14} />
+                                                            <span>Последняя активность: {formatDate(stats.lastActivity)}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Top Trainings */}
+                                                    {stats.topTrainings.length > 0 && (
+                                                        <div>
+                                                            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                                                                <Award size={14} className="text-yellow-500" />
+                                                                Популярные тренинги
+                                                            </h4>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {stats.topTrainings.map((t, i) => (
+                                                                    <span
+                                                                        key={t.id}
+                                                                        className="px-2 py-1 bg-white border border-gray-200 rounded-full text-xs"
+                                                                    >
+                                                                        <span className="text-gray-400">{i + 1}.</span> {t.name} <span className="text-gray-400">({t.count})</span>
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Student Activity */}
+                                                    {stats.studentActivity.length > 0 && (
+                                                        <div>
+                                                            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                                                                <Users size={14} className="text-blue-500" />
+                                                                Активность учеников
+                                                            </h4>
+                                                            <div className="space-y-1">
+                                                                {stats.studentActivity.slice(0, 5).map((s) => (
+                                                                    <div
+                                                                        key={s.id}
+                                                                        className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-gray-200"
+                                                                    >
+                                                                        <span className="text-sm font-medium text-gray-700">{s.name}</span>
+                                                                        <div className="flex gap-3 text-xs text-gray-500">
+                                                                            <span>{s.completedExercises} упр.</span>
+                                                                            <span>{s.completedAssignments}/{s.totalAssignments} заданий</span>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="text-center py-4 text-gray-500">Не удалось загрузить статистику</div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </main>

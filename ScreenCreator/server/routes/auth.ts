@@ -11,10 +11,34 @@ const STUDENTS_FILE = path.join(DATA_DIR, "students.json");
 const ASSIGNMENTS_FILE = path.join(DATA_DIR, "assignments.json");
 const RESULTS_FILE = path.join(DATA_DIR, "results.json");
 const TEMPLATES_FILE = path.join(DATA_DIR, "templates.json");
+const ADMIN_FILE = path.join(DATA_DIR, "admin.json");
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+// Admin settings interface
+interface AdminSettings {
+    username: string;
+    password: string;
+}
+
+// Load/save admin settings
+function loadAdminSettings(): AdminSettings {
+    try {
+        if (fs.existsSync(ADMIN_FILE)) {
+            return JSON.parse(fs.readFileSync(ADMIN_FILE, "utf-8"));
+        }
+    } catch (e) {
+        console.error("Error loading admin settings:", e);
+    }
+    // Default admin credentials
+    return { username: "admin", password: "admin" };
+}
+
+function saveAdminSettings(settings: AdminSettings): void {
+    fs.writeFileSync(ADMIN_FILE, JSON.stringify(settings, null, 2));
 }
 
 // ==================== INTERFACES ====================
@@ -226,11 +250,32 @@ router.get("/trainings", (_req: Request, res: Response) => {
 // ==================== ADMIN AUTH ====================
 router.post("/auth/admin", (req: Request, res: Response) => {
     const { username, password } = req.body;
-    if (username === "admin" && password === "admin") {
+    const adminSettings = loadAdminSettings();
+    if (username === adminSettings.username && password === adminSettings.password) {
         res.json({ success: true });
     } else {
         res.json({ success: false });
     }
+});
+
+// Change admin password
+router.put("/admin/password", (req: Request, res: Response) => {
+    const { currentPassword, newPassword } = req.body;
+    const adminSettings = loadAdminSettings();
+
+    if (adminSettings.password !== currentPassword) {
+        res.status(401).json({ success: false, error: "Неверный текущий пароль" });
+        return;
+    }
+
+    if (!newPassword || newPassword.length < 4) {
+        res.status(400).json({ success: false, error: "Новый пароль должен быть минимум 4 символа" });
+        return;
+    }
+
+    adminSettings.password = newPassword;
+    saveAdminSettings(adminSettings);
+    res.json({ success: true });
 });
 
 // ==================== SCHOOL AUTH ====================
@@ -335,6 +380,84 @@ router.delete("/schools/:id", (req: Request, res: Response) => {
     saveStudents(students);
     saveAssignments(assignments);
     res.json({ success: true });
+});
+
+// ==================== SCHOOL STATISTICS ====================
+router.get("/schools/:id/statistics", (req: Request, res: Response) => {
+    const schoolId = parseInt(req.params.id);
+    const schools = loadSchools();
+    const school = schools.find(s => s.id === schoolId);
+
+    if (!school) {
+        res.status(404).json({ error: "School not found" });
+        return;
+    }
+
+    const students = loadStudents().filter(s => s.schoolId === schoolId);
+    const assignments = loadAssignments().filter(a => a.schoolId === schoolId);
+    const studentIds = students.map(s => s.id);
+    const results = loadResults().filter(r => studentIds.includes(r.studentId));
+
+    // Assignment statistics
+    const assignmentsCompleted = assignments.filter(a => a.status === 'completed').length;
+    const assignmentsInProgress = assignments.filter(a => a.status === 'in_progress').length;
+    const assignmentsPending = assignments.filter(a => a.status === 'pending').length;
+
+    // Exercise statistics
+    const exercisesPassed = results.filter(r => r.passed).length;
+    const exercisesFailed = results.filter(r => !r.passed).length;
+    const exercisesTotal = results.length;
+    const successRate = exercisesTotal > 0 ? Math.round((exercisesPassed / exercisesTotal) * 100) : 0;
+
+    // Last activity
+    const lastResult = results.length > 0
+        ? results.reduce((latest, r) => new Date(r.completedAt) > new Date(latest.completedAt) ? r : latest)
+        : null;
+
+    // Top trainings
+    const trainingCounts: Record<string, number> = {};
+    assignments.forEach(a => {
+        a.exercises.forEach(e => {
+            trainingCounts[e.trainingId] = (trainingCounts[e.trainingId] || 0) + 1;
+        });
+    });
+
+    const topTrainings = Object.entries(trainingCounts)
+        .map(([id, count]) => {
+            const training = TRAININGS.find(t => t.id === id);
+            return { id, name: training?.name || id, count };
+        })
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+    // Students with most activity
+    const studentActivity = students.map(s => {
+        const studentResults = results.filter(r => r.studentId === s.id);
+        const studentAssignments = assignments.filter(a => a.studentId === s.id);
+        return {
+            id: s.id,
+            name: `${s.firstName} ${s.lastName}`,
+            completedExercises: studentResults.filter(r => r.passed).length,
+            totalAssignments: studentAssignments.length,
+            completedAssignments: studentAssignments.filter(a => a.status === 'completed').length
+        };
+    }).sort((a, b) => b.completedExercises - a.completedExercises);
+
+    res.json({
+        studentsCount: students.length,
+        assignmentsTotal: assignments.length,
+        assignmentsCompleted,
+        assignmentsInProgress,
+        assignmentsPending,
+        exercisesTotal,
+        exercisesPassed,
+        exercisesFailed,
+        successRate,
+        lastActivity: lastResult?.completedAt || school.createdAt,
+        createdAt: school.createdAt,
+        topTrainings,
+        studentActivity
+    });
 });
 
 // ==================== STUDENTS CRUD ====================

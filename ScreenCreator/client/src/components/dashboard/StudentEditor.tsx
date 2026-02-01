@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Save, Edit2, Calendar, X, User, BookOpen, BarChart2, CheckCircle, Clock, AlertCircle, XCircle, CalendarX, History, Play, Target } from "lucide-react";
+import { ArrowLeft, Save, Edit2, Calendar, X, User, BookOpen, BarChart2, CheckCircle, Clock, AlertCircle, XCircle, CalendarX, History, Play, Target, ChevronDown, ChevronUp, Plus } from "lucide-react";
 
 interface Exercise {
     trainingId: string;
@@ -24,6 +24,11 @@ interface StudentData {
     password: string;
     allowed_games: string[];
     notes?: string;
+    phone?: string;
+    email?: string;
+    telegram?: string;
+    parentName?: string;
+    birthday?: string;
 }
 
 interface Training {
@@ -58,6 +63,8 @@ interface StudentEditorProps {
     onDeleteAssignment: (assignmentId: number) => void;
     onToggleGame: (gameId: string) => void;
     onNotesChange: (notes: string) => void;
+    onStudentFieldChange: (field: string, value: string) => void;
+    onCreateAssignment: () => void;
 }
 
 export function StudentEditor({
@@ -71,9 +78,12 @@ export function StudentEditor({
     onEditAssignment,
     onDeleteAssignment,
     onToggleGame,
-    onNotesChange
+    onNotesChange,
+    onStudentFieldChange,
+    onCreateAssignment
 }: StudentEditorProps) {
     const [activeTab, setActiveTab] = useState<TabType>('data');
+    const [trainingsExpanded, setTrainingsExpanded] = useState(false);
     const studentAssignments = assignments;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -163,7 +173,7 @@ export function StudentEditor({
             {/* Two Column Layout */}
             <div className="flex-1 flex overflow-hidden">
                 {/* Left Column - Tabs */}
-                <div className="w-1/2 bg-white border-r border-gray-200 flex flex-col">
+                <div className={`${activeTab === 'trainings' ? 'w-1/2' : 'w-full'} bg-white border-r border-gray-200 flex flex-col transition-all`}>
                     {/* Tab Navigation */}
                     <div className="flex border-b border-gray-200 px-4">
                         {tabs.map((tab) => (
@@ -185,50 +195,111 @@ export function StudentEditor({
                     <div className="flex-1 overflow-y-auto p-6">
                         {/* Data Tab */}
                         {activeTab === 'data' && (
-                            <div className="max-w-lg mx-auto space-y-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Имя</label>
-                                    <input
-                                        type="text"
-                                        value={student.first_name}
-                                        readOnly
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50"
-                                    />
+                            <div className="max-w-4xl mx-auto">
+                                {/* Two column layout for basic info */}
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Имя</label>
+                                        <input
+                                            type="text"
+                                            value={student.first_name}
+                                            readOnly
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Фамилия</label>
+                                        <input
+                                            type="text"
+                                            value={student.last_name}
+                                            readOnly
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Логин</label>
+                                        <input
+                                            type="text"
+                                            value={student.login}
+                                            readOnly
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 font-mono"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Пароль</label>
+                                        <input
+                                            type="text"
+                                            value={student.password}
+                                            readOnly
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 font-mono"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">День рождения</label>
+                                        <input
+                                            type="date"
+                                            value={student.birthday || ''}
+                                            onChange={(e) => onStudentFieldChange('birthday', e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Имя родителя</label>
+                                        <input
+                                            type="text"
+                                            value={student.parentName || ''}
+                                            onChange={(e) => onStudentFieldChange('parentName', e.target.value)}
+                                            placeholder="Иванов Иван Иванович"
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 outline-none"
+                                        />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Фамилия</label>
-                                    <input
-                                        type="text"
-                                        value={student.last_name}
-                                        readOnly
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50"
-                                    />
+
+                                {/* Contact info section - 3 columns */}
+                                <div className="pt-4 border-t border-gray-200 mb-6">
+                                    <h3 className="text-sm font-bold text-gray-600 mb-4 uppercase tracking-wide">Контактная информация</h3>
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Телефон</label>
+                                            <input
+                                                type="tel"
+                                                value={student.phone || ''}
+                                                onChange={(e) => onStudentFieldChange('phone', e.target.value)}
+                                                placeholder="+7 (999) 123-45-67"
+                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                                            <input
+                                                type="email"
+                                                value={student.email || ''}
+                                                onChange={(e) => onStudentFieldChange('email', e.target.value)}
+                                                placeholder="student@example.com"
+                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Telegram</label>
+                                            <input
+                                                type="text"
+                                                value={student.telegram || ''}
+                                                onChange={(e) => onStudentFieldChange('telegram', e.target.value)}
+                                                placeholder="@username"
+                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 outline-none"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Логин</label>
-                                    <input
-                                        type="text"
-                                        value={student.login}
-                                        readOnly
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 font-mono"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Пароль</label>
-                                    <input
-                                        type="text"
-                                        value={student.password}
-                                        readOnly
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 font-mono"
-                                    />
-                                </div>
+
+                                {/* Notes - full width */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Заметки</label>
                                     <textarea
                                         value={student.notes || ''}
                                         onChange={(e) => onNotesChange(e.target.value)}
                                         placeholder="Заметки об ученике..."
-                                        rows={5}
+                                        rows={4}
                                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 outline-none resize-none"
                                     />
                                 </div>
@@ -236,37 +307,109 @@ export function StudentEditor({
                         )}
 
                         {/* Trainings Tab */}
-                        {activeTab === 'trainings' && (
-                            <div className="max-w-lg mx-auto">
-                                <p className="text-sm text-gray-500 mb-4">
-                                    Выбрано: {student.allowed_games?.length || 0} из {trainings.length} тренингов
-                                </p>
-                                <div className="grid gap-2">
-                                    {trainings.map((training) => (
-                                        <label
-                                            key={training.id}
-                                            className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl cursor-pointer transition-all"
+                        {activeTab === 'trainings' && (() => {
+                            const allSelected = trainings.length > 0 && (student.allowed_games || []).length === trainings.length;
+                            const someSelected = (student.allowed_games || []).length > 0 && !allSelected;
+
+                            const toggleAll = () => {
+                                if (allSelected) {
+                                    // Deselect all
+                                    (student.allowed_games || []).forEach(gameId => {
+                                        onToggleGame(gameId);
+                                    });
+                                } else {
+                                    // Select all
+                                    trainings.forEach(t => {
+                                        if (!(student.allowed_games || []).includes(t.id)) {
+                                            onToggleGame(t.id);
+                                        }
+                                    });
+                                }
+                            };
+
+                            return (
+                                <div className="max-w-lg mx-auto">
+                                    {/* Collapsible Section */}
+                                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                                        {/* Header */}
+                                        <div
+                                            className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-all"
+                                            onClick={() => setTrainingsExpanded(!trainingsExpanded)}
                                         >
-                                            <input
-                                                type="checkbox"
-                                                checked={(student.allowed_games || []).includes(training.id)}
-                                                onChange={() => onToggleGame(training.id)}
-                                                className="w-5 h-5 text-blue-600 rounded"
-                                            />
-                                            <span className="text-gray-800">{training.name}</span>
-                                        </label>
-                                    ))}
+                                            <div className="flex items-center gap-3">
+                                                <BookOpen size={20} className="text-blue-600" />
+                                                <div>
+                                                    <h3 className="font-bold text-gray-800">Подключенные тренировки</h3>
+                                                    <p className="text-sm text-gray-500">
+                                                        {student.allowed_games?.length || 0} из {trainings.length} выбрано
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {trainingsExpanded ? (
+                                                <ChevronUp size={20} className="text-gray-400" />
+                                            ) : (
+                                                <ChevronDown size={20} className="text-gray-400" />
+                                            )}
+                                        </div>
+
+                                        {/* Content */}
+                                        {trainingsExpanded && (
+                                            <div className="border-t border-gray-200">
+                                                {/* Select All */}
+                                                <label
+                                                    className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 cursor-pointer transition-all border-b border-gray-200"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={allSelected}
+                                                        ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                                                        onChange={toggleAll}
+                                                        className="w-5 h-5 text-blue-600 rounded"
+                                                    />
+                                                    <span className="font-semibold text-blue-800">Выбрать все</span>
+                                                </label>
+
+                                                {/* Training List */}
+                                                <div className="max-h-[400px] overflow-y-auto">
+                                                    {trainings.map((training) => (
+                                                        <label
+                                                            key={training.id}
+                                                            className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer transition-all border-b border-gray-100 last:border-b-0"
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={(student.allowed_games || []).includes(training.id)}
+                                                                onChange={() => onToggleGame(training.id)}
+                                                                className="w-5 h-5 text-blue-600 rounded"
+                                                            />
+                                                            <span className="text-gray-800">{training.name}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Create Assignment Button */}
+                                    <button
+                                        onClick={onCreateAssignment}
+                                        className="w-full mt-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                                    >
+                                        <Plus size={20} />
+                                        Создать занятие
+                                    </button>
                                 </div>
-                            </div>
-                        )}
+                            );
+                        })()}
 
                         {/* Statistics Tab */}
                         {activeTab === 'statistics' && (
-                            <div className="space-y-6">
+                            <div className="max-w-4xl mx-auto space-y-6">
                                 {/* Summary Cards - Assignments */}
                                 <div>
                                     <h3 className="font-bold text-gray-800 mb-3">Занятия</h3>
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-4 gap-3">
                                         <div className="bg-green-50 rounded-xl p-4 border border-green-200">
                                             <div className="flex items-center gap-2 text-green-700 mb-1">
                                                 <CheckCircle size={18} />
@@ -431,8 +574,8 @@ export function StudentEditor({
                                             <div
                                                 key={entry.id}
                                                 className={`rounded-xl border p-4 ${entry.passed
-                                                        ? 'bg-green-50 border-green-200'
-                                                        : 'bg-orange-50 border-orange-200'
+                                                    ? 'bg-green-50 border-green-200'
+                                                    : 'bg-orange-50 border-orange-200'
                                                     }`}
                                             >
                                                 <div className="flex items-start justify-between mb-2">
@@ -483,8 +626,8 @@ export function StudentEditor({
                                                                 <span
                                                                     key={key}
                                                                     className={`px-2 py-0.5 rounded text-xs ${entry.passed
-                                                                            ? 'bg-green-100 text-green-700'
-                                                                            : 'bg-orange-100 text-orange-700'
+                                                                        ? 'bg-green-100 text-green-700'
+                                                                        : 'bg-orange-100 text-orange-700'
                                                                         }`}
                                                                 >
                                                                     {key}: {String(value)}
@@ -502,81 +645,83 @@ export function StudentEditor({
                     </div>
                 </div>
 
-                {/* Right Column - Assignments */}
-                <div className="w-1/2 bg-gray-50 p-6 overflow-y-auto">
-                    <h2 className="text-lg font-bold text-gray-800 mb-4">
-                        Занятия ({studentAssignments.length})
-                    </h2>
+                {/* Right Column - Assignments (only visible on trainings tab) */}
+                {activeTab === 'trainings' && (
+                    <div className="w-1/2 bg-gray-50 p-6 overflow-y-auto">
+                        <h2 className="text-lg font-bold text-gray-800 mb-4">
+                            Занятия ({studentAssignments.length})
+                        </h2>
 
-                    {studentAssignments.length === 0 ? (
-                        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-                            <Calendar size={48} className="text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-500">Нет назначенных занятий</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {studentAssignments.map((assignment) => {
-                                const isMissed = isAssignmentMissed(assignment);
-                                return (
-                                    <div
-                                        key={assignment.id}
-                                        className={`rounded-xl border p-4 hover:shadow-md transition-all ${isMissed
-                                            ? 'bg-red-50 border-red-200'
-                                            : assignment.status === 'completed'
-                                                ? 'bg-green-50 border-green-200'
-                                                : 'bg-white border-gray-200'
-                                            }`}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <h3 className="font-bold text-gray-800">{assignment.title}</h3>
-                                                    {assignment.status === 'completed' && (
-                                                        <CheckCircle size={16} className="text-green-500" />
-                                                    )}
-                                                    {assignment.status === 'in_progress' && (
-                                                        <Clock size={16} className="text-yellow-500" />
-                                                    )}
-                                                    {isMissed && (
-                                                        <CalendarX size={16} className="text-red-500" />
-                                                    )}
+                        {studentAssignments.length === 0 ? (
+                            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+                                <Calendar size={48} className="text-gray-300 mx-auto mb-4" />
+                                <p className="text-gray-500">Нет назначенных занятий</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {studentAssignments.map((assignment) => {
+                                    const isMissed = isAssignmentMissed(assignment);
+                                    return (
+                                        <div
+                                            key={assignment.id}
+                                            className={`rounded-xl border p-4 hover:shadow-md transition-all ${isMissed
+                                                ? 'bg-red-50 border-red-200'
+                                                : assignment.status === 'completed'
+                                                    ? 'bg-green-50 border-green-200'
+                                                    : 'bg-white border-gray-200'
+                                                }`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <h3 className="font-bold text-gray-800">{assignment.title}</h3>
+                                                        {assignment.status === 'completed' && (
+                                                            <CheckCircle size={16} className="text-green-500" />
+                                                        )}
+                                                        {assignment.status === 'in_progress' && (
+                                                            <Clock size={16} className="text-yellow-500" />
+                                                        )}
+                                                        {isMissed && (
+                                                            <CalendarX size={16} className="text-red-500" />
+                                                        )}
+                                                    </div>
+                                                    <p className={`text-sm ${isMissed ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
+                                                        {new Date(assignment.scheduledDate).toLocaleDateString('ru-RU', {
+                                                            day: 'numeric',
+                                                            month: 'long',
+                                                            year: 'numeric'
+                                                        })}
+                                                        {isMissed && ' — день пропущен'}
+                                                    </p>
+                                                    <p className="text-sm text-gray-400">
+                                                        {assignment.exercises?.length || 0} упражнений
+                                                    </p>
                                                 </div>
-                                                <p className={`text-sm ${isMissed ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
-                                                    {new Date(assignment.scheduledDate).toLocaleDateString('ru-RU', {
-                                                        day: 'numeric',
-                                                        month: 'long',
-                                                        year: 'numeric'
-                                                    })}
-                                                    {isMissed && ' — день пропущен'}
-                                                </p>
-                                                <p className="text-sm text-gray-400">
-                                                    {assignment.exercises?.length || 0} упражнений
-                                                </p>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => onEditAssignment(assignment)}
-                                                    className="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium rounded-lg transition-all flex items-center gap-1"
-                                                >
-                                                    <Edit2 size={14} />
-                                                    Редактировать
-                                                </button>
-                                                <button
-                                                    onClick={() => onDeleteAssignment(assignment.id)}
-                                                    className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium rounded-lg transition-all flex items-center gap-1"
-                                                >
-                                                    <X size={14} />
-                                                    Отменить
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => onEditAssignment(assignment)}
+                                                        className="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium rounded-lg transition-all flex items-center gap-1"
+                                                    >
+                                                        <Edit2 size={14} />
+                                                        Редактировать
+                                                    </button>
+                                                    <button
+                                                        onClick={() => onDeleteAssignment(assignment.id)}
+                                                        className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium rounded-lg transition-all flex items-center gap-1"
+                                                    >
+                                                        <X size={14} />
+                                                        Отменить
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
-        </div>
+        </div >
     );
 }

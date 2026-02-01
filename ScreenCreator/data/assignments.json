@@ -647,7 +647,7 @@
         }
       }
     ],
-    "status": "pending",
+    "status": "in_progress",
     "createdAt": "2026-01-31T14:55:16.784Z"
   },
   {
@@ -3281,5 +3281,107 @@
     ],
     "status": "pending",
     "createdAt": "2026-02-01T00:58:51.752Z"
+  },
+  {
+    "id": 34,
+    "schoolId": 3,
+    "studentId": 1,
+    "title": "01.02.2026",
+    "scheduledDate": "2026-02-02",
+    "exercises": [
+      {
+        "trainingId": "n-back",
+        "parameters": {
+          "duration": 120,
+          "n": 2,
+          "mode": "letters",
+          "intervalMs": 2000
+        },
+        "requiredResult": {
+          "type": "min_accuracy",
+          "minValue": 70
+        }
+      },
+      {
+        "trainingId": "reaction-test",
+        "parameters": {
+          "duration": 60,
+          "greenDuration": 2
+        },
+        "requiredResult": {
+          "type": "max_time",
+          "minValue": 400
+        }
+      }
+    ],
+    "status": "pending",
+    "createdAt": "2026-02-01T02:52:38.030Z"
+  },
+  {
+    "id": 35,
+    "schoolId": 3,
+    "studentId": 1,
+    "title": "01.02.2026",
+    "scheduledDate": "2026-02-22",
+    "exercises": [
+      {
+        "trainingId": "alphabet-game",
+        "parameters": {
+          "duration": 120,
+          "mode": "letters",
+          "speed": 2,
+          "fontSizeScale": 1,
+          "isX2Mode": false
+        },
+        "requiredResult": {
+          "type": "time_only"
+        }
+      },
+      {
+        "trainingId": "speed-reading",
+        "parameters": {
+          "duration": 60,
+          "letterCount": 5,
+          "displayTime": 0.5,
+          "fontSize": 6
+        },
+        "requiredResult": {
+          "type": "time_only"
+        }
+      },
+      {
+        "trainingId": "sequence-test",
+        "parameters": {
+          "startLength": 7
+        },
+        "requiredResult": {
+          "type": "completion"
+        }
+      }
+    ],
+    "status": "pending",
+    "createdAt": "2026-02-01T02:54:20.763Z"
+  },
+  {
+    "id": 36,
+    "schoolId": 3,
+    "studentId": 1,
+    "title": "уке",
+    "scheduledDate": "2026-02-10",
+    "exercises": [
+      {
+        "trainingId": "reaction-test",
+        "parameters": {
+          "duration": 60,
+          "greenDuration": 2
+        },
+        "requiredResult": {
+          "type": "max_time",
+          "minValue": 400
+        }
+      }
+    ],
+    "status": "pending",
+    "createdAt": "2026-02-01T02:56:20.011Z"
   }
 ]

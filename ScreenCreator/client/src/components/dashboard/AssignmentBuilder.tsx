@@ -43,6 +43,7 @@ interface AssignmentBuilderProps {
     templates: Template[];
     editingAssignmentId: number | null;
     isSaving: boolean;
+    lockStudent?: boolean;  // Lock student selector when creating assignment from StudentEditor
 
     // State setters
     onAssignmentFormDataChange: (data: AssignmentFormData) => void;
@@ -68,6 +69,7 @@ export function AssignmentBuilder({
     templates,
     editingAssignmentId,
     isSaving,
+    lockStudent = false,
     onAssignmentFormDataChange,
     onClose,
     onSubmit,
@@ -267,16 +269,24 @@ export function AssignmentBuilder({
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Ученик</label>
-                                <select
-                                    value={assignmentFormData.studentId}
-                                    onChange={(e) => onAssignmentFormDataChange({ ...assignmentFormData, studentId: parseInt(e.target.value) })}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 outline-none"
-                                >
-                                    <option value={0}>Без ученика</option>
-                                    {students.map((s) => (
-                                        <option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>
-                                    ))}
-                                </select>
+                                {lockStudent && assignmentFormData.studentId > 0 ? (
+                                    <div className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 font-medium">
+                                        {students.find(s => s.id === assignmentFormData.studentId)?.first_name}{' '}
+                                        {students.find(s => s.id === assignmentFormData.studentId)?.last_name}
+                                        <span className="ml-2 text-xs text-gray-400">(нельзя изменить)</span>
+                                    </div>
+                                ) : (
+                                    <select
+                                        value={assignmentFormData.studentId}
+                                        onChange={(e) => onAssignmentFormDataChange({ ...assignmentFormData, studentId: parseInt(e.target.value) })}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 outline-none"
+                                    >
+                                        <option value={0}>Без ученика</option>
+                                        {students.map((s) => (
+                                            <option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>
+                                        ))}
+                                    </select>
+                                )}
                             </div>
                         </div>
 

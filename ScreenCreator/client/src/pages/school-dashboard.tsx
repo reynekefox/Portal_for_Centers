@@ -47,6 +47,11 @@ interface StudentData {
     password: string;
     allowed_games: string[];
     notes?: string;
+    phone?: string;
+    email?: string;
+    telegram?: string;
+    parentName?: string;
+    birthday?: string;
 }
 
 interface Exercise {
@@ -332,6 +337,12 @@ export default function SchoolDashboard() {
                     scheduledDate: assignmentFormData.scheduledDate,
                     exercises: assignmentFormData.exercises.map(normalizeExerciseParams)
                 });
+                // After editing, close and return
+                setShowAssignmentForm(false);
+                setEditingAssignmentId(null);
+                if (editingStudent) {
+                    setShowStudentEditor(true);
+                }
             } else {
                 await authApi.createAssignment({
                     schoolId: user.id,
@@ -340,15 +351,16 @@ export default function SchoolDashboard() {
                     scheduledDate: assignmentFormData.scheduledDate,
                     exercises: assignmentFormData.exercises.map(normalizeExerciseParams)
                 });
+                // After creating new assignment, stay in the form but clear exercises
+                // Keep studentId for creating more assignments
+                const keepStudentId = assignmentFormData.studentId;
+                setAssignmentFormData({
+                    studentId: keepStudentId,
+                    title: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                    scheduledDate: new Date().toISOString().split('T')[0],
+                    exercises: []
+                });
             }
-            setShowAssignmentForm(false);
-            setEditingAssignmentId(null);
-            setAssignmentFormData({
-                studentId: students[0]?.id || 0,
-                title: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-                scheduledDate: new Date().toISOString().split('T')[0],
-                exercises: []
-            });
             await loadData();
         } finally {
             setIsSaving(false);
@@ -644,6 +656,7 @@ export default function SchoolDashboard() {
                     templates={templates}
                     editingAssignmentId={editingAssignmentId}
                     isSaving={isSaving}
+                    lockStudent={!!editingStudent}
                     onAssignmentFormDataChange={setAssignmentFormData}
                     onClose={() => {
                         setShowAssignmentForm(false);
@@ -682,7 +695,12 @@ export default function SchoolDashboard() {
                                 login: student.login,
                                 password: student.password,
                                 allowed_games: student.allowed_games,
-                                notes: student.notes
+                                notes: student.notes,
+                                phone: student.phone,
+                                email: student.email,
+                                telegram: student.telegram,
+                                parentName: student.parentName,
+                                birthday: student.birthday
                             });
                             await loadData();
                             setShowStudentEditor(false);
@@ -722,6 +740,21 @@ export default function SchoolDashboard() {
                     }}
                     onNotesChange={(notes) => {
                         setEditingStudent(prev => prev ? { ...prev, notes } : null);
+                    }}
+                    onStudentFieldChange={(field, value) => {
+                        setEditingStudent(prev => prev ? { ...prev, [field]: value } : null);
+                    }}
+                    onCreateAssignment={() => {
+                        setShowStudentEditor(false);
+                        // Keep editingStudent to return later
+                        setEditingAssignmentId(null);
+                        setAssignmentFormData({
+                            studentId: editingStudent.id,
+                            title: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                            scheduledDate: new Date().toISOString().split('T')[0],
+                            exercises: []
+                        });
+                        setShowAssignmentForm(true);
                     }}
                 />
             )}
