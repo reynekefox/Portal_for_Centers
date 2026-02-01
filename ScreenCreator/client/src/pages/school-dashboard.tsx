@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { useAuth, authApi } from "@/lib/auth-store";
 import { ArrowLeft, Plus, Pencil, Trash2, LogOut, Users, Check, BookOpen, Calendar, BarChart2, AlertTriangle, Play, X, GripVertical, ChevronDown, ChevronUp, Folder, Save } from "lucide-react";
@@ -502,7 +502,7 @@ export default function SchoolDashboard() {
 
     const getStudentName = (studentId: number) => {
         const student = students.find(s => s.id === studentId);
-        return student ? `${student.first_name} ${student.last_name}` : 'Неизвестный';
+        return student ? `${student.first_name} ${student.last_name}` : 'ÐÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ñ‹Ð¹';
     };
 
     const getTrainingName = (trainingId: string) => {
@@ -511,11 +511,11 @@ export default function SchoolDashboard() {
     };
 
     const tabs: { id: TabType; label: string; icon: typeof Users }[] = [
-        { id: 'students', label: 'Ученики', icon: Users },
-        { id: 'trainings', label: 'Тренинги', icon: BookOpen },
-        { id: 'assignments', label: 'Занятия', icon: Calendar },
-        { id: 'courses', label: 'Курсы', icon: Folder },
-        { id: 'progress', label: 'Прогресс', icon: BarChart2 },
+        { id: 'students', label: 'Ð£Ñ‡ÐµÐ½Ð¸ÐºÐ¸', icon: Users },
+        { id: 'trainings', label: 'Ð¢Ñ€ÐµÐ½Ð¸Ð½Ð³Ð¸', icon: BookOpen },
+        { id: 'assignments', label: 'Ð—Ð°Ð½ÑÑ‚Ð¸Ñ', icon: Calendar },
+        { id: 'courses', label: 'ÐšÑƒÑ€ÑÑ‹', icon: Folder },
+        { id: 'progress', label: 'ÐŸÑ€Ð¾Ð³Ñ€ÐµÑÑ', icon: BarChart2 },
     ];
 
     return (
@@ -530,7 +530,7 @@ export default function SchoolDashboard() {
                             </button>
                         </Link>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-800">Личный кабинет школы</h1>
+                            <h1 className="text-xl font-bold text-gray-800">Ð›Ð¸Ñ‡Ð½Ñ‹Ð¹ ÐºÐ°Ð±Ð¸Ð½ÐµÑ‚ ÑˆÐºÐ¾Ð»Ñ‹</h1>
                             <p className="text-sm text-gray-500">{user?.name}</p>
                         </div>
                     </div>
@@ -539,7 +539,7 @@ export default function SchoolDashboard() {
                         className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
                     >
                         <LogOut size={18} />
-                        Выйти
+                        Ð’Ñ‹Ð¹Ñ‚Ð¸
                     </button>
                 </div>
             </header>
@@ -564,7 +564,7 @@ export default function SchoolDashboard() {
 
                 {/* Tab Content */}
                 {isLoading ? (
-                    <div className="text-gray-500 text-center py-12">Загрузка...</div>
+                    <div className="text-gray-500 text-center py-12">Ð—Ð°Ð³Ñ€ÑƒÐ·ÐºÐ°...</div>
                 ) : (
                     <>
                         {/* Students Tab */}
@@ -659,316 +659,23 @@ export default function SchoolDashboard() {
 
             {/* Course Builder - Full Screen */}
             {showCourseBuilder && (
-                <div className="fixed inset-0 bg-gray-100 z-50 flex flex-col">
-                    {/* Header */}
-                    <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => setShowCourseBuilder(false)}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-all"
-                            >
-                                <ArrowLeft size={24} className="text-gray-600" />
-                            </button>
-                            <h1 className="text-2xl font-bold text-gray-800">Создать курс</h1>
-                        </div>
-                        <button
-                            onClick={handleCreateCourse}
-                            disabled={courseData.days.length === 0 || isSaving}
-                            className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white rounded-lg transition-all flex items-center gap-2"
-                        >
-                            <Check size={18} />
-                            {isSaving ? 'Создание...' : `Создать курс (${courseData.days.length} дней)`}
-                        </button>
-                    </div>
-
-                    {/* Two Column Layout */}
-                    <div className="flex-1 flex overflow-hidden">
-                        {/* Left Column - Course Settings */}
-                        <div className="w-1/2 bg-white border-r border-gray-200 p-6 overflow-y-auto">
-                            <div className="max-w-2xl mx-auto space-y-6">
-                                {/* Course Name */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Название курса</label>
-                                    <input
-                                        type="text"
-                                        value={courseData.courseName}
-                                        onChange={(e) => setCourseData(prev => ({ ...prev, courseName: e.target.value }))}
-                                        placeholder="Введите название курса"
-                                        className={`w-full px-4 py-3 rounded-xl border ${!courseData.courseName.trim() ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-green-500'} outline-none`}
-                                    />
-                                    {!courseData.courseName.trim() && (
-                                        <p className="text-red-500 text-sm mt-1">Введите название</p>
-                                    )}
-                                </div>
-
-                                {/* Student Selection */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Ученик</label>
-                                    <select
-                                        value={courseData.studentId}
-                                        onChange={(e) => setCourseData(prev => ({ ...prev, studentId: parseInt(e.target.value) }))}
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 outline-none"
-                                    >
-                                        <option value={0}>Без ученика</option>
-                                        {students.map((s) => (
-                                            <option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>
-                                        ))}
-                                    </select>
-
-                                    {/* Start Course Button */}
-                                    <button
-                                        onClick={handleCreateCourse}
-                                        disabled={courseData.days.length === 0 || isSaving}
-                                        className="w-full mt-3 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2"
-                                    >
-                                        {isSaving ? 'Создание...' : `Начать курс (${courseData.days.length} дней)`}
-                                    </button>
-                                </div>
-
-                                {/* Add Day Section */}
-                                <div className="bg-gray-50 rounded-xl p-4 space-y-4">
-                                    <label className="block text-lg font-bold text-gray-800">Добавить день</label>
-
-                                    {/* Mode Selection */}
-                                    <div className="flex gap-6">
-                                        <label className="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                checked={courseData.addMode === 'date'}
-                                                onChange={() => setCourseData(prev => ({ ...prev, addMode: 'date' }))}
-                                                className="w-5 h-5 text-green-600"
-                                            />
-                                            <span className="text-lg">По дате</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                checked={courseData.addMode === 'interval'}
-                                                onChange={() => setCourseData(prev => ({ ...prev, addMode: 'interval' }))}
-                                                className="w-5 h-5 text-green-600"
-                                            />
-                                            <span className="text-lg">Через N дней</span>
-                                        </label>
-                                    </div>
-
-                                    {/* Date or Interval Input */}
-                                    <div className="flex gap-3">
-                                        {courseData.addMode === 'date' ? (
-                                            <input
-                                                type="date"
-                                                value={courseData.nextDate}
-                                                onChange={(e) => setCourseData(prev => ({ ...prev, nextDate: e.target.value }))}
-                                                className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 outline-none text-lg"
-                                            />
-                                        ) : (
-                                            <div className="flex-1 flex items-center gap-3">
-                                                <span className="text-gray-600 text-lg">Через</span>
-                                                <div className="flex items-center">
-                                                    <button
-                                                        onClick={() => setCourseData(prev => ({ ...prev, intervalDays: Math.max(0, prev.intervalDays - 1) }))}
-                                                        className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-l-xl flex items-center justify-center text-gray-600 font-bold text-xl transition-all"
-                                                    >
-                                                        −
-                                                    </button>
-                                                    <div className="w-14 h-10 bg-white border-y border-gray-200 flex items-center justify-center text-lg font-medium">
-                                                        {courseData.intervalDays}
-                                                    </div>
-                                                    <button
-                                                        onClick={() => setCourseData(prev => ({ ...prev, intervalDays: Math.min(30, prev.intervalDays + 1) }))}
-                                                        className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-r-xl flex items-center justify-center text-gray-600 font-bold text-xl transition-all"
-                                                    >
-                                                        +
-                                                    </button>
-                                                </div>
-                                                <span className="text-gray-600 text-lg">дней</span>
-                                            </div>
-                                        )}
-                                        <button
-                                            onClick={addCourseDay}
-                                            disabled={!courseData.templateId}
-                                            className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl flex items-center gap-2 text-lg font-medium"
-                                        >
-                                            <Plus size={20} />
-                                            Добавить день
-                                        </button>
-                                    </div>
-
-                                    {/* Template Selection - at the bottom */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-600 mb-1">Шаблон</label>
-                                        <select
-                                            value={courseData.templateId || ''}
-                                            onChange={(e) => setCourseData(prev => ({ ...prev, templateId: e.target.value ? parseInt(e.target.value) : null }))}
-                                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 outline-none bg-white"
-                                        >
-                                            {templates.length === 0 ? (
-                                                <option value="">Нет шаблонов</option>
-                                            ) : (
-                                                <>
-                                                    <option value="">Выберите шаблон</option>
-                                                    {templates.map((t) => (
-                                                        <option key={t.id} value={t.id}>{t.name} ({t.exercises.length} упр.)</option>
-                                                    ))}
-                                                </>
-                                            )}
-                                        </select>
-                                    </div>
-                                </div>
-
-                                {/* Save Current Course Button - Above the collapsible section */}
-                                <button
-                                    onClick={async () => {
-                                        if (courseData.days.length > 0 && courseData.courseName.trim() && user?.id) {
-                                            const trimmedName = courseData.courseName.trim();
-                                            const existingCourse = savedCourses.find(c => c.name.toLowerCase() === trimmedName.toLowerCase());
-
-                                            if (existingCourse) {
-                                                // Show confirmation dialog
-                                                setOverwriteConfirm({ show: true, existingCourse });
-                                            } else {
-                                                // Create new course
-                                                const result = await authApi.createCourseTemplate({
-                                                    schoolId: user.id,
-                                                    name: trimmedName,
-                                                    days: courseData.days
-                                                });
-                                                setSavedCourses(prev => [result, ...prev]);
-                                            }
-                                        }
-                                    }}
-                                    disabled={courseData.days.length === 0 || !courseData.courseName.trim()}
-                                    className="w-full mb-4 py-2 bg-blue-100 hover:bg-blue-200 disabled:bg-gray-100 disabled:text-gray-400 text-blue-700 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
-                                >
-                                    <Save size={18} />
-                                    Сохранить курс
-                                </button>
-
-                                {/* Saved Courses Section */}
-                                <div className="bg-gray-50 rounded-xl p-4">
-                                    <button
-                                        onClick={() => setShowSavedCourses(!showSavedCourses)}
-                                        className="w-full flex items-center justify-between text-lg font-bold text-gray-800"
-                                    >
-                                        <span className="flex items-center gap-2">
-                                            <Folder size={20} />
-                                            Сохранённые курсы ({savedCourses.length})
-                                        </span>
-                                        <ChevronDown size={20} className={`transition-transform ${showSavedCourses ? 'rotate-180' : ''}`} />
-                                    </button>
-
-                                    {showSavedCourses && (
-                                        <div className="mt-4 space-y-2">
-                                            {savedCourses.length === 0 ? (
-                                                <p className="text-gray-500 text-center py-3">Нет сохранённых курсов</p>
-                                            ) : (
-                                                savedCourses.map((course) => (
-                                                    <div key={course.id} className="flex items-center justify-between bg-white rounded-lg px-4 py-3 border border-gray-200">
-                                                        <div>
-                                                            <p className="font-medium text-gray-800">{course.name}</p>
-                                                            <p className="text-sm text-gray-500">{course.days?.length || 0} дней</p>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <button
-                                                                onClick={() => {
-                                                                    setCourseData(prev => ({ ...prev, days: course.days || [], courseName: course.name }));
-                                                                }}
-                                                                className="px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg text-sm font-medium transition-all"
-                                                            >
-                                                                Загрузить
-                                                            </button>
-                                                            <button
-                                                                onClick={async () => {
-                                                                    await authApi.deleteCourseTemplate(course.id);
-                                                                    setSavedCourses(prev => prev.filter(c => c.id !== course.id));
-                                                                }}
-                                                                className="p-1.5 hover:bg-red-100 rounded-lg text-red-500 transition-all"
-                                                            >
-                                                                <Trash2 size={18} />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Right Column - Days List */}
-                        <div className="w-1/2 bg-gray-50 p-6 overflow-y-auto">
-                            <h3 className="text-xl font-bold text-gray-800 mb-4">
-                                Дни курса ({courseData.days.length})
-                            </h3>
-
-                            {courseData.days.length === 0 ? (
-                                <div className="bg-white rounded-xl border-2 border-dashed border-gray-300 p-12 text-center text-gray-400">
-                                    <Calendar size={48} className="mx-auto mb-4 opacity-50" />
-                                    <p className="text-xl mb-2">Нет дней</p>
-                                    <p>Добавьте дни курса слева</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {courseData.days.map((day, i) => (
-                                        <div
-                                            key={i}
-                                            draggable
-                                            onDragStart={(e) => e.dataTransfer.setData('courseDayIndex', i.toString())}
-                                            onDragOver={(e) => e.preventDefault()}
-                                            onDrop={(e) => {
-                                                e.preventDefault();
-                                                const fromIndex = parseInt(e.dataTransfer.getData('courseDayIndex'));
-                                                if (fromIndex !== i) {
-                                                    setCourseData(prev => {
-                                                        const newDays = [...prev.days];
-                                                        const [movedDay] = newDays.splice(fromIndex, 1);
-                                                        newDays.splice(i, 0, movedDay);
-                                                        return { ...prev, days: newDays };
-                                                    });
-                                                }
-                                            }}
-                                            className="flex items-center justify-between bg-white rounded-xl px-5 py-4 shadow-sm border border-gray-100 cursor-grab active:cursor-grabbing hover:shadow-md transition-all"
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                <GripVertical size={20} className="text-gray-400 cursor-grab" />
-                                                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                                                    <span className="text-green-700 font-bold text-lg">{i + 1}</span>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-gray-800 text-lg">
-                                                        {day.date
-                                                            ? new Date(day.date).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })
-                                                            : `через ${day.daysOffset} дней`
-                                                        }
-                                                    </p>
-                                                    <p className="text-gray-500">
-                                                        {day.exercises.length} упражнений
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => {
-                                                        // TODO: Open day editor
-                                                    }}
-                                                    className="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 font-medium rounded-lg transition-all"
-                                                >
-                                                    Редактировать
-                                                </button>
-                                                <button
-                                                    onClick={() => removeCourseDay(i)}
-                                                    className="p-2 hover:bg-red-100 rounded-lg text-red-500 transition-all"
-                                                >
-                                                    <Trash2 size={20} />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                <CourseBuilder
+                    courseData={courseData}
+                    students={students}
+                    templates={templates}
+                    savedCourses={savedCourses}
+                    isSaving={isSaving}
+                    showSavedCourses={showSavedCourses}
+                    userId={user?.id}
+                    onCourseDataChange={setCourseData}
+                    onClose={() => setShowCourseBuilder(false)}
+                    onCreateCourse={handleCreateCourse}
+                    onAddDay={addCourseDay}
+                    onRemoveDay={removeCourseDay}
+                    onShowSavedCoursesChange={setShowSavedCourses}
+                    onSavedCoursesChange={setSavedCourses}
+                    onShowOverwriteConfirm={(course) => setOverwriteConfirm({ show: true, existingCourse: course })}
+                />
             )}
 
             {/* Assignment Builder - Full Screen */}
@@ -984,7 +691,7 @@ export default function SchoolDashboard() {
                                 <ArrowLeft size={24} className="text-gray-600" />
                             </button>
                             <h2 className="text-xl font-bold text-gray-800">
-                                {editingAssignmentId ? 'Редактировать занятие' : 'Создать занятие'}
+                                {editingAssignmentId ? 'Ð ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð·Ð°Ð½ÑÑ‚Ð¸Ðµ' : 'Ð¡Ð¾Ð·Ð´Ð°Ñ‚ÑŒ Ð·Ð°Ð½ÑÑ‚Ð¸Ðµ'}
                             </h2>
                         </div>
                         <div className="flex items-center gap-3">
@@ -994,18 +701,18 @@ export default function SchoolDashboard() {
                                     onClick={() => setShowTemplates(!showTemplates)}
                                     className="px-4 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg font-medium text-gray-700 transition-all"
                                 >
-                                    📋 Шаблоны
+                                    ðŸ“‹ Ð¨Ð°Ð±Ð»Ð¾Ð½Ñ‹
                                 </button>
                                 {showTemplates && (
                                     <div className="absolute right-0 top-12 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
                                         <div className="p-4 border-b border-gray-100">
-                                            <h4 className="font-bold text-gray-800 mb-2">Сохранить как шаблон</h4>
+                                            <h4 className="font-bold text-gray-800 mb-2">Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ ÐºÐ°Ðº ÑˆÐ°Ð±Ð»Ð¾Ð½</h4>
                                             <div className="flex gap-2">
                                                 <input
                                                     type="text"
                                                     value={templateName}
                                                     onChange={(e) => setTemplateName(e.target.value)}
-                                                    placeholder="Название шаблона"
+                                                    placeholder="ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ ÑˆÐ°Ð±Ð»Ð¾Ð½Ð°"
                                                     className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
                                                 />
                                                 <button
@@ -1013,13 +720,13 @@ export default function SchoolDashboard() {
                                                     disabled={!templateName.trim() || assignmentFormData.exercises.length === 0}
                                                     className="px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white rounded-lg text-sm font-medium"
                                                 >
-                                                    💾
+                                                    ðŸ’¾
                                                 </button>
                                             </div>
                                         </div>
                                         <div className="max-h-60 overflow-y-auto">
                                             {templates.length === 0 ? (
-                                                <p className="text-gray-400 text-center py-4 text-sm">Нет сохранённых шаблонов</p>
+                                                <p className="text-gray-400 text-center py-4 text-sm">ÐÐµÑ‚ ÑÐ¾Ñ…Ñ€Ð°Ð½Ñ‘Ð½Ð½Ñ‹Ñ… ÑˆÐ°Ð±Ð»Ð¾Ð½Ð¾Ð²</p>
                                             ) : (
                                                 templates.map((t) => (
                                                     <div key={t.id} className="flex items-center justify-between p-3 hover:bg-gray-50 border-b border-gray-100 last:border-0">
@@ -1028,15 +735,15 @@ export default function SchoolDashboard() {
                                                             className="flex-1 text-left"
                                                         >
                                                             <span className="font-medium text-gray-800">{t.name}</span>
-                                                            <span className="text-xs text-gray-400 ml-2">({t.exercises.length} упр.)</span>
+                                                            <span className="text-xs text-gray-400 ml-2">({t.exercises.length} ÑƒÐ¿Ñ€.)</span>
                                                         </button>
                                                         <button
                                                             onClick={() => updateTemplate(t.id)}
                                                             disabled={assignmentFormData.exercises.length === 0}
                                                             className="p-1 hover:bg-blue-100 rounded text-blue-500 disabled:opacity-30 disabled:cursor-not-allowed"
-                                                            title="Перезаписать текущими упражнениями"
+                                                            title="ÐŸÐµÑ€ÐµÐ·Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ Ñ‚ÐµÐºÑƒÑ‰Ð¸Ð¼Ð¸ ÑƒÐ¿Ñ€Ð°Ð¶Ð½ÐµÐ½Ð¸ÑÐ¼Ð¸"
                                                         >
-                                                            ⬆️
+                                                            â¬†ï¸
                                                         </button>
                                                         <button
                                                             onClick={() => deleteTemplate(t.id)}
@@ -1056,7 +763,7 @@ export default function SchoolDashboard() {
                                 disabled={isSaving || assignmentFormData.exercises.length === 0 || !assignmentFormData.title}
                                 className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-medium transition-all"
                             >
-                                {isSaving ? 'Сохранение...' : 'Сохранить занятие'}
+                                {isSaving ? 'Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ...' : 'Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ Ð·Ð°Ð½ÑÑ‚Ð¸Ðµ'}
                             </button>
                         </div>
                     </div>
@@ -1068,20 +775,20 @@ export default function SchoolDashboard() {
                             <div className="max-w-2xl mx-auto space-y-6">
                                 {/* Title */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Название занятия</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ Ð·Ð°Ð½ÑÑ‚Ð¸Ñ</label>
                                     <input
                                         type="text"
                                         value={assignmentFormData.title}
                                         onChange={(e) => setAssignmentFormData({ ...assignmentFormData, title: e.target.value })}
                                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 outline-none text-lg"
-                                        placeholder="Занятие на внимание"
+                                        placeholder="Ð—Ð°Ð½ÑÑ‚Ð¸Ðµ Ð½Ð° Ð²Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ"
                                     />
                                 </div>
 
                                 {/* Date & Student */}
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Дата</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Ð”Ð°Ñ‚Ð°</label>
                                         <input
                                             type="date"
                                             value={assignmentFormData.scheduledDate}
@@ -1091,13 +798,13 @@ export default function SchoolDashboard() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Ученик</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Ð£Ñ‡ÐµÐ½Ð¸Ðº</label>
                                         <select
                                             value={assignmentFormData.studentId}
                                             onChange={(e) => setAssignmentFormData({ ...assignmentFormData, studentId: parseInt(e.target.value) })}
                                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 outline-none"
                                         >
-                                            <option value={0}>Без ученика</option>
+                                            <option value={0}>Ð‘ÐµÐ· ÑƒÑ‡ÐµÐ½Ð¸ÐºÐ°</option>
                                             {students.map((s) => (
                                                 <option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>
                                             ))}
@@ -1113,7 +820,7 @@ export default function SchoolDashboard() {
                                         className="flex items-center justify-between w-full text-left mb-3 group"
                                     >
                                         <span className="text-xl font-bold text-gray-800">
-                                            Упражнения ({assignmentFormData.exercises.length})
+                                            Ð£Ð¿Ñ€Ð°Ð¶Ð½ÐµÐ½Ð¸Ñ ({assignmentFormData.exercises.length})
                                         </span>
                                         {assignmentFormData.exercises.length > 0 && (
                                             exercisesExpanded
@@ -1124,8 +831,8 @@ export default function SchoolDashboard() {
                                     {assignmentFormData.exercises.length === 0 ? (
                                         <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl text-gray-400">
                                             <BookOpen size={48} className="mx-auto mb-3 opacity-50" />
-                                            <p>Выберите тренинги справа</p>
-                                            <p className="text-sm">для добавления в занятие</p>
+                                            <p>Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ Ñ‚Ñ€ÐµÐ½Ð¸Ð½Ð³Ð¸ ÑÐ¿Ñ€Ð°Ð²Ð°</p>
+                                            <p className="text-sm">Ð´Ð»Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð² Ð·Ð°Ð½ÑÑ‚Ð¸Ðµ</p>
                                         </div>
                                     ) : exercisesExpanded ? (
                                         <div className="space-y-2">
@@ -1146,8 +853,8 @@ export default function SchoolDashboard() {
                                                             <span className="font-bold text-gray-800">{i + 1}. {getTrainingName(ex.trainingId)}</span>
                                                             <span className="text-sm text-gray-500">
                                                                 ({ex.requiredResult.type === 'completion' || ex.requiredResult.type === 'time_only' || ex.requiredResult.type === 'min_moves'
-                                                                    ? '✓'
-                                                                    : `≥${ex.requiredResult.minValue}${ex.requiredResult.type === 'max_time' ? ' сек' : '%'}`})
+                                                                    ? 'âœ“'
+                                                                    : `â‰¥${ex.requiredResult.minValue}${ex.requiredResult.type === 'max_time' ? ' ÑÐµÐº' : '%'}`})
                                                             </span>
                                                         </div>
                                                         {Object.keys(ex.parameters).length > 0 && (
@@ -1157,18 +864,18 @@ export default function SchoolDashboard() {
                                                                     const param = config?.params?.find((p: { key: string }) => p.key === key);
                                                                     // Fallback labels for legacy keys
                                                                     const legacyLabels: Record<string, string> = {
-                                                                        exerciseDuration: 'Время (сек)',
-                                                                        duration: 'Время (сек)',
-                                                                        wordCount: 'Кол-во слов',
-                                                                        diskCount: 'Дисков',
-                                                                        gridSize: 'Размер поля',
-                                                                        rounds: 'Раундов',
-                                                                        speed: 'Скорость',
-                                                                        fontSize: 'Размер шрифта'
+                                                                        exerciseDuration: 'Ð’Ñ€ÐµÐ¼Ñ (ÑÐµÐº)',
+                                                                        duration: 'Ð’Ñ€ÐµÐ¼Ñ (ÑÐµÐº)',
+                                                                        wordCount: 'ÐšÐ¾Ð»-Ð²Ð¾ ÑÐ»Ð¾Ð²',
+                                                                        diskCount: 'Ð”Ð¸ÑÐºÐ¾Ð²',
+                                                                        gridSize: 'Ð Ð°Ð·Ð¼ÐµÑ€ Ð¿Ð¾Ð»Ñ',
+                                                                        rounds: 'Ð Ð°ÑƒÐ½Ð´Ð¾Ð²',
+                                                                        speed: 'Ð¡ÐºÐ¾Ñ€Ð¾ÑÑ‚ÑŒ',
+                                                                        fontSize: 'Ð Ð°Ð·Ð¼ÐµÑ€ ÑˆÑ€Ð¸Ñ„Ñ‚Ð°'
                                                                     };
                                                                     const label = param?.label || legacyLabels[key] || key;
                                                                     return `${label}: ${val}`;
-                                                                }).join(' • ')}
+                                                                }).join(' â€¢ ')}
                                                             </div>
                                                         )}
                                                     </div>
@@ -1196,7 +903,7 @@ export default function SchoolDashboard() {
 
                         {/* Right Column - Available Trainings */}
                         <div className="w-1/2 bg-gray-50 p-6 overflow-y-auto">
-                            <h3 className="text-lg font-bold text-gray-800 mb-4">Доступные тренинги</h3>
+                            <h3 className="text-lg font-bold text-gray-800 mb-4">Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ñ‚Ñ€ÐµÐ½Ð¸Ð½Ð³Ð¸</h3>
                             <div className="grid grid-cols-2 gap-4">
                                 {trainings.map((training) => (
                                     <button
@@ -1226,7 +933,7 @@ export default function SchoolDashboard() {
                                         </div>
                                         <h4 className="font-bold text-gray-800 text-lg">{training.name}</h4>
                                         <p className="text-sm text-gray-500 mt-1">
-                                            {TRAINING_CONFIG[training.id]?.successCriteria?.label || 'Нажмите для настройки'}
+                                            {TRAINING_CONFIG[training.id]?.successCriteria?.label || 'ÐÐ°Ð¶Ð¼Ð¸Ñ‚Ðµ Ð´Ð»Ñ Ð½Ð°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ¸'}
                                         </p>
                                     </button>
                                 ))}
@@ -1240,10 +947,10 @@ export default function SchoolDashboard() {
             {showExerciseBuilder && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
-                        <h3 className="text-xl font-bold mb-4">{editingExerciseIndex !== null ? 'Редактировать упражнение' : 'Добавить упражнение'}</h3>
+                        <h3 className="text-xl font-bold mb-4">{editingExerciseIndex !== null ? 'Ð ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ ÑƒÐ¿Ñ€Ð°Ð¶Ð½ÐµÐ½Ð¸Ðµ' : 'Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ ÑƒÐ¿Ñ€Ð°Ð¶Ð½ÐµÐ½Ð¸Ðµ'}</h3>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Тренинг</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Ð¢Ñ€ÐµÐ½Ð¸Ð½Ð³</label>
                                 <select
                                     value={currentExercise.trainingId}
                                     onChange={(e) => {
@@ -1267,7 +974,7 @@ export default function SchoolDashboard() {
                                     }}
                                     className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-blue-500 outline-none"
                                 >
-                                    <option value="">Выберите тренинг</option>
+                                    <option value="">Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ Ñ‚Ñ€ÐµÐ½Ð¸Ð½Ð³</option>
                                     {trainings.map((t) => (
                                         <option key={t.id} value={t.id}>{t.name}</option>
                                     ))}
@@ -1293,7 +1000,7 @@ export default function SchoolDashboard() {
                                                             });
                                                         }}
                                                         className="w-10 h-10 flex items-center justify-center text-xl text-gray-500 hover:bg-gray-100 rounded-full transition-all"
-                                                    >−</button>
+                                                    >âˆ’</button>
                                                     <div className="flex items-center gap-1 min-w-[4rem] justify-center">
                                                         <span className="font-bold text-xl text-gray-800">
                                                             {(currentExercise.parameters[param.key] as number) ?? param.default}
@@ -1355,17 +1062,17 @@ export default function SchoolDashboard() {
                             {/* Success criteria - auto from config */}
                             {currentExercise.trainingId && TRAINING_CONFIG[currentExercise.trainingId] && (
                                 <div className="border-t border-gray-200 pt-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-3">Критерий успеха</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-3">ÐšÑ€Ð¸Ñ‚ÐµÑ€Ð¸Ð¹ ÑƒÑÐ¿ÐµÑ…Ð°</label>
                                     {(() => {
                                         const criteria = TRAINING_CONFIG[currentExercise.trainingId].successCriteria;
                                         if (criteria.type === 'time_only' || criteria.type === 'completion' || criteria.type === 'min_moves') {
                                             // For min_moves, show auto-calculated value
                                             const label = criteria.type === 'min_moves' && currentExercise.parameters.diskCount
-                                                ? `Завершить за ${Math.pow(2, Number(currentExercise.parameters.diskCount)) - 1} ходов`
+                                                ? `Ð—Ð°Ð²ÐµÑ€ÑˆÐ¸Ñ‚ÑŒ Ð·Ð° ${Math.pow(2, Number(currentExercise.parameters.diskCount)) - 1} Ñ…Ð¾Ð´Ð¾Ð²`
                                                 : criteria.label;
                                             return (
                                                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-green-700 text-sm">
-                                                    ✓ {label}
+                                                    âœ“ {label}
                                                 </div>
                                             );
                                         }
@@ -1383,7 +1090,7 @@ export default function SchoolDashboard() {
                                                         });
                                                     }}
                                                     className="w-10 h-10 flex items-center justify-center text-xl text-gray-500 hover:bg-gray-100 rounded-full transition-all"
-                                                >−</button>
+                                                >âˆ’</button>
                                                 <div className="flex items-center gap-1 min-w-[4rem] justify-center">
                                                     <span className="font-bold text-xl text-gray-800">
                                                         {currentExercise.requiredResult.minValue ?? criteria.default}
@@ -1418,7 +1125,7 @@ export default function SchoolDashboard() {
                                     }}
                                     className="flex-1 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all"
                                 >
-                                    Отмена
+                                    ÐžÑ‚Ð¼ÐµÐ½Ð°
                                 </button>
                                 <button
                                     type="button"
@@ -1426,7 +1133,7 @@ export default function SchoolDashboard() {
                                     disabled={!currentExercise.trainingId}
                                     className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-all"
                                 >
-                                    {editingExerciseIndex !== null ? 'Сохранить' : 'Добавить'}
+                                    {editingExerciseIndex !== null ? 'Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ' : 'Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ'}
                                 </button>
                             </div>
                         </div>
@@ -1440,23 +1147,23 @@ export default function SchoolDashboard() {
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
                         <AlertTriangle size={48} className="text-red-500 mx-auto mb-4" />
                         <h3 className="text-xl font-bold mb-2">
-                            {deleteConfirm.type === 'student' ? 'Удалить ученика?' : 'Удалить занятие?'}
+                            {deleteConfirm.type === 'student' ? 'Ð£Ð´Ð°Ð»Ð¸Ñ‚ÑŒ ÑƒÑ‡ÐµÐ½Ð¸ÐºÐ°?' : 'Ð£Ð´Ð°Ð»Ð¸Ñ‚ÑŒ Ð·Ð°Ð½ÑÑ‚Ð¸Ðµ?'}
                         </h3>
-                        <p className="text-gray-500 mb-6">Это действие нельзя отменить.</p>
+                        <p className="text-gray-500 mb-6">Ð­Ñ‚Ð¾ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ðµ Ð½ÐµÐ»ÑŒÐ·Ñ Ð¾Ñ‚Ð¼ÐµÐ½Ð¸Ñ‚ÑŒ.</p>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setDeleteConfirm(null)}
                                 disabled={isDeleting}
                                 className="flex-1 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all"
                             >
-                                Отмена
+                                ÐžÑ‚Ð¼ÐµÐ½Ð°
                             </button>
                             <button
                                 onClick={handleDelete}
                                 disabled={isDeleting}
                                 className="flex-1 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-lg transition-all"
                             >
-                                {isDeleting ? 'Удаление...' : 'Удалить'}
+                                {isDeleting ? 'Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ...' : 'Ð£Ð´Ð°Ð»Ð¸Ñ‚ÑŒ'}
                             </button>
                         </div>
                     </div>
@@ -1468,16 +1175,16 @@ export default function SchoolDashboard() {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
                         <AlertTriangle size={48} className="text-orange-500 mx-auto mb-4" />
-                        <h3 className="text-xl font-bold mb-2">Перезаписать курс?</h3>
+                        <h3 className="text-xl font-bold mb-2">ÐŸÐµÑ€ÐµÐ·Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ ÐºÑƒÑ€Ñ?</h3>
                         <p className="text-gray-500 mb-6">
-                            Курс "{overwriteConfirm.existingCourse.name}" уже существует. Перезаписать его?
+                            ÐšÑƒÑ€Ñ "{overwriteConfirm.existingCourse.name}" ÑƒÐ¶Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚. ÐŸÐµÑ€ÐµÐ·Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ ÐµÐ³Ð¾?
                         </p>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setOverwriteConfirm({ show: false, existingCourse: null })}
                                 className="flex-1 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all"
                             >
-                                Отмена
+                                ÐžÑ‚Ð¼ÐµÐ½Ð°
                             </button>
                             <button
                                 onClick={async () => {
@@ -1496,7 +1203,7 @@ export default function SchoolDashboard() {
                                 }}
                                 className="flex-1 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-all"
                             >
-                                Перезаписать
+                                ÐŸÐµÑ€ÐµÐ·Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ
                             </button>
                         </div>
                     </div>
