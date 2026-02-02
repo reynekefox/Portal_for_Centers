@@ -44,7 +44,10 @@ export function useLockedParams(expectedTrainingId: string) {
                 const parsed: LockedParams = JSON.parse(lockedData);
                 console.log('[useLockedParams] parsed.trainingId:', parsed.trainingId, 'match:', parsed.trainingId === expectedTrainingId);
                 if (parsed.trainingId === expectedTrainingId) {
-                    setIsLocked(true);
+                    // Only lock if there's a valid assignmentId - prevents stale data issues
+                    if (parsed.assignmentId) {
+                        setIsLocked(true);
+                    }
                     setLockedParameters(parsed.parameters || {});
                     if (parsed.requiredResult) {
                         setRequiredResult(parsed.requiredResult);

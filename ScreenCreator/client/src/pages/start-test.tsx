@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, Play, Clock, CheckCircle, HelpCircle, X, ArrowRight } from "lucide-react";
+import { ArrowLeft, Play, Clock, CheckCircle, HelpCircle, X, ArrowRight, Minus, Plus, Square } from "lucide-react";
 import { useLessonConfig } from "@/hooks/use-lesson-config";
 import { useLockedParams, formatRequiredResult } from "@/hooks/useLockedParams";
 
@@ -30,8 +30,9 @@ export default function Attention66Test() {
 
     // Configurable parameters
     const [reactionTimeLimit, setReactionTimeLimit] = useState(1000); // ms
-    const [trainingDuration, setTrainingDuration] = useState(60); // seconds
-    const [trainingTimeLeft, setTrainingTimeLeft] = useState(60); // countdown
+    const [trainingDuration, setTrainingDuration] = useState(0); // seconds, 0 = unlimited (counts up)
+    const [trainingTimeLeft, setTrainingTimeLeft] = useState(0); // countdown
+    const [elapsedTime, setElapsedTime] = useState(0); // count-up timer for unlimited mode
 
     const [showStartModal, setShowStartModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
@@ -64,9 +65,9 @@ export default function Attention66Test() {
         }
     }, [isTimeUp, isLessonMode, phase]);
 
-    // Handle timer reaching 0 - show results
+    // Handle timer reaching 0 - show results (only for countdown mode)
     useEffect(() => {
-        if (trainingTimeLeft === 0 && phase !== 'idle') {
+        if (trainingDuration > 0 && trainingTimeLeft === 0 && phase !== 'idle') {
             // Stop all rounds
             if (roundTimeout.current) clearTimeout(roundTimeout.current);
             if (yellowTimeout.current) clearTimeout(yellowTimeout.current);
@@ -77,7 +78,7 @@ export default function Attention66Test() {
             // Show results
             setShowResultsModal(true);
         }
-    }, [trainingTimeLeft, phase]);
+    }, [trainingTimeLeft, phase, trainingDuration]);
 
     const handleCompleteExercise = async () => {
         if (!isLessonMode) return;
@@ -285,18 +286,26 @@ export default function Attention66Test() {
         setCorrectClicks(0);
         setErrors(0);
         setReactionTimes([]);
-        setTrainingTimeLeft(trainingDuration);
+        setElapsedTime(0);
 
-        // Start countdown timer
-        trainingTimerRef.current = setInterval(() => {
-            setTrainingTimeLeft(prev => {
-                if (prev <= 1) {
-                    if (trainingTimerRef.current) clearInterval(trainingTimerRef.current);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
+        if (trainingDuration > 0) {
+            // Countdown mode
+            setTrainingTimeLeft(trainingDuration);
+            trainingTimerRef.current = setInterval(() => {
+                setTrainingTimeLeft(prev => {
+                    if (prev <= 1) {
+                        if (trainingTimerRef.current) clearInterval(trainingTimerRef.current);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        } else {
+            // Unlimited mode - count up
+            trainingTimerRef.current = setInterval(() => {
+                setElapsedTime(prev => prev + 1);
+            }, 1000);
+        }
 
         setTimeout(runRound, 500);
     };
@@ -307,19 +316,29 @@ export default function Attention66Test() {
         stepRef.current = 0;
         setCorrectClicks(0);
         setErrors(0);
-        setTrainingTimeLeft(trainingDuration);
+        setElapsedTime(0);
 
-        // Restart countdown timer
+        // Restart timer
         if (trainingTimerRef.current) clearInterval(trainingTimerRef.current);
-        trainingTimerRef.current = setInterval(() => {
-            setTrainingTimeLeft(prev => {
-                if (prev <= 1) {
-                    if (trainingTimerRef.current) clearInterval(trainingTimerRef.current);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
+
+        if (trainingDuration > 0) {
+            // Countdown mode
+            setTrainingTimeLeft(trainingDuration);
+            trainingTimerRef.current = setInterval(() => {
+                setTrainingTimeLeft(prev => {
+                    if (prev <= 1) {
+                        if (trainingTimerRef.current) clearInterval(trainingTimerRef.current);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        } else {
+            // Unlimited mode - count up
+            trainingTimerRef.current = setInterval(() => {
+                setElapsedTime(prev => prev + 1);
+            }, 1000);
+        }
 
         setTimeout(runRound, 500);
     };
@@ -333,19 +352,29 @@ export default function Attention66Test() {
         totalStepsRef.current = trainingSteps;
         setCorrectClicks(0);
         setErrors(0);
-        setTrainingTimeLeft(trainingDuration);
+        setElapsedTime(0);
 
-        // Restart countdown timer
+        // Restart timer
         if (trainingTimerRef.current) clearInterval(trainingTimerRef.current);
-        trainingTimerRef.current = setInterval(() => {
-            setTrainingTimeLeft(prev => {
-                if (prev <= 1) {
-                    if (trainingTimerRef.current) clearInterval(trainingTimerRef.current);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
+
+        if (trainingDuration > 0) {
+            // Countdown mode
+            setTrainingTimeLeft(trainingDuration);
+            trainingTimerRef.current = setInterval(() => {
+                setTrainingTimeLeft(prev => {
+                    if (prev <= 1) {
+                        if (trainingTimerRef.current) clearInterval(trainingTimerRef.current);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        } else {
+            // Unlimited mode - count up
+            trainingTimerRef.current = setInterval(() => {
+                setElapsedTime(prev => prev + 1);
+            }, 1000);
+        }
 
         setTimeout(runRound, 500);
     };
@@ -401,119 +430,147 @@ export default function Attention66Test() {
                 </div>
             )}
 
-            {/* Header - Stroop Style */}
+            {/* Header - Same style as speed-reading */}
             <div className="bg-white border-b border-gray-100 px-6 py-4 flex-shrink-0 z-10 shadow-sm">
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                    {/* Back Button */}
-                    <Link href={backPath}>
-                        <button className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-all">
-                            <ArrowLeft size={24} />
-                        </button>
-                    </Link>
-                    <span className="text-lg font-bold text-gray-800">Start-тест</span>
+                <div className="flex items-center justify-center h-full relative">
 
-                    {/* Start/Stop Button */}
-                    <button
-                        onClick={phase === 'idle' ? startTraining : () => window.location.reload()}
-                        className={`px-6 py-2 text-sm font-bold rounded-full transition-all shadow-md hover:shadow-lg focus:outline-none flex items-center justify-center gap-2 ${phase !== 'idle'
-                            ? "bg-red-500 hover:bg-red-600 text-white"
-                            : "bg-blue-600 hover:bg-blue-700 text-white"
-                            }`}
-                    >
-                        <Play size={18} fill="currentColor" />
-                        {phase === 'idle' ? 'Начать тест' : 'Стоп'}
-                    </button>
-
-                    {/* Timer Display */}
-                    <div className="text-3xl font-mono font-bold text-blue-600">
-                        {`${Math.floor(trainingTimeLeft / 60).toString().padStart(2, '0')}:${(trainingTimeLeft % 60).toString().padStart(2, '0')}`}
+                    {/* LEFT: Back Button and Title - Absolutely positioned */}
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                        <Link href={backPath}>
+                            <button className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-all">
+                                <ArrowLeft size={24} />
+                            </button>
+                        </Link>
+                        <h1 className="text-xl font-bold text-gray-800">Start-тест</h1>
                     </div>
 
-                    {/* Current Accuracy Display */}
-                    {phase !== 'idle' && (
-                        <div className="text-lg font-bold">
-                            <span className="text-gray-500">Точность: </span>
-                            {totalAttempts > 0 ? (
-                                <span className={accuracyPercent >= 80 ? 'text-green-600' : accuracyPercent >= 50 ? 'text-yellow-600' : 'text-red-500'}>
-                                    {accuracyPercent}%
-                                </span>
-                            ) : (
-                                <span className="text-gray-400">—</span>
-                            )}
+                    {/* RIGHT: Timer Display - Absolutely positioned */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                        {isLessonMode && (
+                            <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+                                📚 Занятие
+                            </span>
+                        )}
+                        <div className="bg-gray-100 px-5 py-2.5 rounded-xl">
+                            <span className="text-2xl font-bold text-blue-600 font-mono tracking-wider">
+                                {trainingDuration > 0
+                                    ? `${Math.floor(trainingTimeLeft / 60).toString().padStart(2, '0')}:${(trainingTimeLeft % 60).toString().padStart(2, '0')}`
+                                    : `${Math.floor(elapsedTime / 60).toString().padStart(2, '0')}:${(elapsedTime % 60).toString().padStart(2, '0')}`
+                                }
+                            </span>
                         </div>
-                    )}
+                        <button
+                            onClick={() => setShowHelp(true)}
+                            className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-500"
+                        >
+                            <HelpCircle size={24} />
+                        </button>
+                    </div>
 
-                    {/* Training Duration Control - Hidden when locked */}
-                    {!isLocked && phase === 'idle' && (
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500">Время</span>
-                            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1.5">
-                                <button
-                                    onClick={() => {
-                                        const val = Math.max(30, trainingDuration - 30);
-                                        setTrainingDuration(val);
-                                        if (phase === 'idle') setTrainingTimeLeft(val);
-                                    }}
-                                    disabled={trainingDuration <= 30 || phase !== 'idle'}
-                                    className="p-2 rounded disabled:opacity-50 hover:bg-gray-100 text-gray-600 transition-colors"
-                                >
-                                    <span className="text-lg font-bold">−</span>
-                                </button>
-                                <span className="w-12 text-center font-bold text-gray-800">
-                                    {trainingDuration}
-                                </span>
-                                <button
-                                    onClick={() => {
-                                        const val = Math.min(300, trainingDuration + 30);
-                                        setTrainingDuration(val);
-                                        if (phase === 'idle') setTrainingTimeLeft(val);
-                                    }}
-                                    disabled={trainingDuration >= 300 || phase !== 'idle'}
-                                    className="p-2 rounded disabled:opacity-50 hover:bg-gray-100 text-gray-600 transition-colors"
-                                >
-                                    <span className="text-lg font-bold">+</span>
-                                </button>
+                    {/* CENTERED GROUP: Controls & Settings */}
+                    <div className="flex items-end gap-6">
+                        {/* Toggle Start/Stop Button */}
+                        <div className="flex flex-col gap-1 items-center">
+                            <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">
+                                Управление
+                            </span>
+                            <button
+                                onClick={phase === 'idle' ? startTraining : () => window.location.reload()}
+                                className={`h-[42px] px-6 text-sm font-bold rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none flex items-center justify-center gap-2 ${phase !== 'idle'
+                                    ? "bg-red-500 hover:bg-red-600 text-white"
+                                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                                    }`}
+                            >
+                                {phase !== 'idle' ? (
+                                    <>
+                                        <Square size={18} fill="currentColor" />
+                                        Стоп
+                                    </>
+                                ) : (
+                                    <>
+                                        <Play size={18} fill="currentColor" />
+                                        Начать
+                                    </>
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Training Duration Control - Hidden when locked or running */}
+                        {!isLocked && phase === 'idle' && (
+                            <div className="flex flex-col gap-1 items-center">
+                                <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Время</span>
+                                <div className="flex items-center rounded-lg border p-1.5 bg-white border-gray-200 h-[42px]">
+                                    <button
+                                        onClick={() => {
+                                            if (trainingDuration === 0) return;
+                                            const val = trainingDuration <= 30 ? 0 : trainingDuration - 30;
+                                            setTrainingDuration(val);
+                                        }}
+                                        disabled={trainingDuration === 0}
+                                        className="p-2 rounded disabled:opacity-50 transition-colors hover:bg-gray-100 text-gray-600"
+                                    >
+                                        <Minus size={18} />
+                                    </button>
+                                    <span className="w-14 text-center font-bold text-base text-gray-800">
+                                        {trainingDuration === 0 ? '∞' : trainingDuration}
+                                    </span>
+                                    <button
+                                        onClick={() => {
+                                            const val = trainingDuration === 0 ? 60 : Math.min(300, trainingDuration + 30);
+                                            setTrainingDuration(val);
+                                        }}
+                                        disabled={trainingDuration >= 300}
+                                        className="p-2 rounded disabled:opacity-50 transition-colors hover:bg-gray-100 text-gray-600"
+                                    >
+                                        <Plus size={18} />
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    {/* Reaction Time Control - Hidden when locked */}
-                    {!isLocked && phase === 'idle' && (
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500">Реакция</span>
-                            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1.5">
-                                <button
-                                    onClick={() => setReactionTimeLimit(Math.max(500, reactionTimeLimit - 100))}
-                                    disabled={reactionTimeLimit <= 500 || phase !== 'idle'}
-                                    className="p-2 rounded disabled:opacity-50 hover:bg-gray-100 text-gray-600 transition-colors"
-                                >
-                                    <span className="text-lg font-bold">−</span>
-                                </button>
-                                <span className="w-12 text-center font-bold text-gray-800">
-                                    {(reactionTimeLimit / 1000).toFixed(1)}
-                                </span>
-                                <button
-                                    onClick={() => setReactionTimeLimit(Math.min(3000, reactionTimeLimit + 100))}
-                                    disabled={reactionTimeLimit >= 3000 || phase !== 'idle'}
-                                    className="p-2 rounded disabled:opacity-50 hover:bg-gray-100 text-gray-600 transition-colors"
-                                >
-                                    <span className="text-lg font-bold">+</span>
-                                </button>
+                        {/* Reaction Time Control - Hidden when locked or running */}
+                        {!isLocked && phase === 'idle' && (
+                            <div className="flex flex-col gap-1 items-center">
+                                <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Реакция</span>
+                                <div className="flex items-center rounded-lg border p-1.5 bg-white border-gray-200 h-[42px]">
+                                    <button
+                                        onClick={() => setReactionTimeLimit(Math.max(500, reactionTimeLimit - 100))}
+                                        disabled={reactionTimeLimit <= 500}
+                                        className="p-2 rounded disabled:opacity-50 transition-colors hover:bg-gray-100 text-gray-600"
+                                    >
+                                        <Minus size={18} />
+                                    </button>
+                                    <span className="w-14 text-center font-bold text-base text-gray-800">
+                                        {(reactionTimeLimit / 1000).toFixed(1)}
+                                    </span>
+                                    <button
+                                        onClick={() => setReactionTimeLimit(Math.min(3000, reactionTimeLimit + 100))}
+                                        disabled={reactionTimeLimit >= 3000}
+                                        className="p-2 rounded disabled:opacity-50 transition-colors hover:bg-gray-100 text-gray-600"
+                                    >
+                                        <Plus size={18} />
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    {isLessonMode && (
-                        <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
-                            📚 Занятие
-                        </span>
-                    )}
-                    <button
-                        onClick={() => setShowHelp(true)}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-500"
-                    >
-                        <HelpCircle size={24} />
-                    </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Stats Bar */}
+            <div className="bg-white border-b border-gray-100 px-6 py-2 flex items-center justify-center gap-8">
+                <div className="flex items-center gap-2">
+                    <span className="text-gray-500">Верно:</span>
+                    <span className="font-bold text-green-600">{correctClicks}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-gray-500">Ошибки:</span>
+                    <span className="font-bold text-red-600">{errors}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-gray-500">Точность:</span>
+                    <span className="font-bold text-blue-600">{accuracyPercent}%</span>
                 </div>
             </div>
 

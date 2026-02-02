@@ -46,7 +46,7 @@ export default function SpeedReading() {
     const [letterCount, setLetterCount] = useState(5);
     const [displayTime, setDisplayTime] = useState(0.5); // seconds
     const [fontSize, setFontSize] = useState(6); // rem
-    const [exerciseDuration, setExerciseDuration] = useState(60); // seconds, 0 = unlimited
+    const [exerciseDuration, setExerciseDuration] = useState(0); // seconds, 0 = unlimited (counts up)
 
     // Game state
     const [isRunning, setIsRunning] = useState(false);
@@ -55,6 +55,7 @@ export default function SpeedReading() {
     const [words, setWords] = useState<string[]>([]);
     const [wordsShown, setWordsShown] = useState(0);
     const [timeRemaining, setTimeRemaining] = useState(0);
+    const [elapsedTime, setElapsedTime] = useState(0); // For count-up timer when unlimited
     const [exerciseCompleted, setExerciseCompleted] = useState(false);
 
     // We keep track of attempts internally even if not showing a list to keep logic
@@ -90,12 +91,13 @@ export default function SpeedReading() {
         setWordIndex(0);
         setCurrentWord(words[0]);
         setWordsShown(1);
+        setElapsedTime(0);
 
         timerRef.current = setInterval(() => {
             showNextWord();
         }, displayTime * 1000);
 
-        // Start countdown if duration is set
+        // Start countdown if duration is set, otherwise count up
         if (exerciseDuration > 0) {
             setTimeRemaining(exerciseDuration);
             countdownRef.current = setInterval(() => {
@@ -106,6 +108,11 @@ export default function SpeedReading() {
                     }
                     return prev - 1;
                 });
+            }, 1000);
+        } else {
+            // Unlimited mode - count up
+            countdownRef.current = setInterval(() => {
+                setElapsedTime(prev => prev + 1);
             }, 1000);
         }
     };
@@ -220,21 +227,24 @@ export default function SpeedReading() {
             <div className="bg-white border-b border-gray-100 px-6 py-4 flex-shrink-0 z-10 shadow-sm transition-colors duration-300 relative">
                 <div className="flex items-center justify-center h-full relative">
 
-                    {/* LEFT: Back Button - Absolutely positioned */}
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2">
+                    {/* LEFT: Back Button and Title - Absolutely positioned */}
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-3">
                         <Link href={backPath}>
                             <button className="p-2 rounded-full transition-all hover:bg-gray-100 text-gray-500" data-testid="button-back">
                                 <ArrowLeft size={24} />
                             </button>
                         </Link>
+                        <h1 className="text-xl font-bold text-gray-800">Турбочтение</h1>
                     </div>
 
                     {/* RIGHT: Timer Display - Absolutely positioned */}
-                    {isRunning && exerciseDuration > 0 && (
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-orange-100 px-4 py-2 rounded-xl">
-                            <Clock size={18} className="text-orange-600" />
-                            <span className="text-orange-600 font-bold font-mono">
-                                {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+                    {isRunning && (
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-100 px-5 py-2.5 rounded-xl">
+                            <span className="text-2xl font-bold text-blue-600 font-mono tracking-wider">
+                                {exerciseDuration > 0
+                                    ? `${Math.floor(timeRemaining / 60).toString().padStart(2, '0')}:${(timeRemaining % 60).toString().padStart(2, '0')}`
+                                    : `${Math.floor(elapsedTime / 60).toString().padStart(2, '0')}:${(elapsedTime % 60).toString().padStart(2, '0')}`
+                                }
                             </span>
                         </div>
                     )}

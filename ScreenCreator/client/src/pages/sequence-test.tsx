@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, Play, Clock, CheckCircle, HelpCircle, X, Square, ArrowRight } from "lucide-react";
+import { ArrowLeft, Play, Clock, CheckCircle, HelpCircle, X, Square, ArrowRight, Minus, Plus } from "lucide-react";
 import { useLockedParams, formatRequiredResult } from "@/hooks/useLockedParams";
 import { RequiredResultBanner } from "@/components/RequiredResultBanner";
 
@@ -238,59 +238,77 @@ export default function SequenceTest() {
                 </div>
             )}
 
-            {/* Header - Same style as start-test */}
+            {/* Header - Same style as speed-reading */}
             <div className="bg-white border-b border-gray-100 px-6 py-4 flex-shrink-0 z-10 shadow-sm">
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                    {/* Back Button */}
-                    <Link href={backPath}>
-                        <button className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-all">
-                            <ArrowLeft size={24} />
-                        </button>
-                    </Link>
+                <div className="flex items-center justify-center h-full relative">
 
-                    {/* Start/Stop Button */}
-                    <button
-                        onClick={phase === 'idle' ? startTest : stopTest}
-                        className={`px-6 py-2 text-sm font-bold rounded-full transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${phase !== 'idle'
-                            ? "bg-red-500 hover:bg-red-600 text-white"
-                            : "bg-blue-600 hover:bg-blue-700 text-white"
-                            }`}
-                    >
-                        {phase !== 'idle' ? (
-                            <>
-                                <Square size={18} fill="currentColor" />
-                                Стоп
-                            </>
-                        ) : (
-                            <>
-                                <Play size={18} fill="currentColor" />
-                                Начать тест
-                            </>
-                        )}
-                    </button>
-
-                    {/* Timer Display */}
-                    <div className="text-3xl font-mono font-bold text-blue-600">
-                        {phase === 'idle' && exerciseDuration === 0 ? (
-                            '∞'
-                        ) : (
-                            `${Math.floor(elapsedTime / 60).toString().padStart(2, '0')}:${(elapsedTime % 60).toString().padStart(2, '0')}`
-                        )}
+                    {/* LEFT: Back Button and Title - Absolutely positioned */}
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                        <Link href={backPath}>
+                            <button className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-all">
+                                <ArrowLeft size={24} />
+                            </button>
+                        </Link>
+                        <h1 className="text-xl font-bold text-gray-800">Последовательность</h1>
                     </div>
 
-                    {isLocked && (
-                        <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
-                            📚 Занятие
-                        </span>
-                    )}
+                    {/* RIGHT: Timer Display - Absolutely positioned */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                        {isLocked && (
+                            <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+                                📚 Занятие
+                            </span>
+                        )}
+                        <div className="bg-gray-100 px-5 py-2.5 rounded-xl">
+                            <span className="text-2xl font-bold text-blue-600 font-mono tracking-wider">
+                                {phase === 'idle' && exerciseDuration === 0 ? (
+                                    '∞'
+                                ) : (
+                                    `${Math.floor(elapsedTime / 60).toString().padStart(2, '0')}:${(elapsedTime % 60).toString().padStart(2, '0')}`
+                                )}
+                            </span>
+                        </div>
+                        <button
+                            onClick={() => setShowHelp(true)}
+                            className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-500"
+                        >
+                            <HelpCircle size={24} />
+                        </button>
+                    </div>
 
-                    {/* Settings - Hidden when locked */}
-                    {!isLocked && (
-                        <>
-                            {/* Duration Control */}
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-500">Время</span>
-                                <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1.5">
+                    {/* CENTERED GROUP: Controls & Settings */}
+                    <div className="flex items-end gap-6">
+                        {/* Toggle Start/Stop Button */}
+                        <div className="flex flex-col gap-1 items-center">
+                            <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">
+                                Управление
+                            </span>
+                            <button
+                                onClick={phase === 'idle' ? startTest : stopTest}
+                                className={`h-[42px] px-6 text-sm font-bold rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none flex items-center justify-center gap-2 ${phase !== 'idle'
+                                    ? "bg-red-500 hover:bg-red-600 text-white"
+                                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                                    }`}
+                            >
+                                {phase !== 'idle' ? (
+                                    <>
+                                        <Square size={18} fill="currentColor" />
+                                        Стоп
+                                    </>
+                                ) : (
+                                    <>
+                                        <Play size={18} fill="currentColor" />
+                                        Начать
+                                    </>
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Duration Control - Hidden when locked or running */}
+                        {!isLocked && phase === 'idle' && (
+                            <div className="flex flex-col gap-1 items-center">
+                                <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Время</span>
+                                <div className="flex items-center rounded-lg border p-1.5 bg-white border-gray-200 h-[42px]">
                                     <button
                                         onClick={() => {
                                             if (exerciseDuration === 0) return;
@@ -298,12 +316,12 @@ export default function SequenceTest() {
                                             setExerciseDuration(val);
                                             if (phase === 'idle') setElapsedTime(val);
                                         }}
-                                        disabled={exerciseDuration === 0 || phase !== 'idle'}
-                                        className="p-2 rounded disabled:opacity-50 hover:bg-gray-100 text-gray-600 transition-colors"
+                                        disabled={exerciseDuration === 0}
+                                        className="p-2 rounded disabled:opacity-50 transition-colors hover:bg-gray-100 text-gray-600"
                                     >
-                                        <span className="text-lg font-bold">−</span>
+                                        <Minus size={18} />
                                     </button>
-                                    <span className="w-12 text-center font-bold text-gray-800">
+                                    <span className="w-14 text-center font-bold text-base text-gray-800">
                                         {exerciseDuration === 0 ? '∞' : exerciseDuration}
                                     </span>
                                     <button
@@ -312,45 +330,42 @@ export default function SequenceTest() {
                                             setExerciseDuration(val);
                                             if (phase === 'idle') setElapsedTime(val);
                                         }}
-                                        disabled={exerciseDuration >= 300 || phase !== 'idle'}
-                                        className="p-2 rounded disabled:opacity-50 hover:bg-gray-100 text-gray-600 transition-colors"
+                                        disabled={exerciseDuration >= 300}
+                                        className="p-2 rounded disabled:opacity-50 transition-colors hover:bg-gray-100 text-gray-600"
                                     >
-                                        <span className="text-lg font-bold">+</span>
+                                        <Plus size={18} />
                                     </button>
                                 </div>
                             </div>
+                        )}
 
-                            {/* Sequence Length Control */}
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-500">Элементов</span>
-                                <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1.5">
+                        {/* Sequence Length Control - Hidden when locked or running */}
+                        {!isLocked && phase === 'idle' && (
+                            <div className="flex flex-col gap-1 items-center">
+                                <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Элементов</span>
+                                <div className="flex items-center rounded-lg border p-1.5 bg-white border-gray-200 h-[42px]">
                                     <button
                                         onClick={() => setSequenceLength(Math.max(5, sequenceLength - 1))}
-                                        disabled={sequenceLength <= 5 || phase !== 'idle'}
-                                        className="p-2 rounded disabled:opacity-50 hover:bg-gray-100 text-gray-600 transition-colors"
+                                        disabled={sequenceLength <= 5}
+                                        className="p-2 rounded disabled:opacity-50 transition-colors hover:bg-gray-100 text-gray-600"
                                     >
-                                        <span className="text-lg font-bold">−</span>
+                                        <Minus size={18} />
                                     </button>
-                                    <span className="w-10 text-center font-bold text-gray-800">
+                                    <span className="w-14 text-center font-bold text-base text-gray-800">
                                         {sequenceLength}
                                     </span>
                                     <button
                                         onClick={() => setSequenceLength(Math.min(25, sequenceLength + 1))}
-                                        disabled={sequenceLength >= 25 || phase !== 'idle'}
-                                        className="p-2 rounded disabled:opacity-50 hover:bg-gray-100 text-gray-600 transition-colors"
+                                        disabled={sequenceLength >= 25}
+                                        className="p-2 rounded disabled:opacity-50 transition-colors hover:bg-gray-100 text-gray-600"
                                     >
-                                        <span className="text-lg font-bold">+</span>
+                                        <Plus size={18} />
                                     </button>
                                 </div>
                             </div>
-                        </>
-                    )}
-                    <button
-                        onClick={() => setShowHelp(true)}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-500"
-                    >
-                        <HelpCircle size={24} />
-                    </button>
+                        )}
+
+                    </div>
                 </div>
             </div>
 

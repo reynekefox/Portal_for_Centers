@@ -314,5 +314,65 @@
     },
     "passed": true,
     "completedAt": "2026-02-01T02:24:28.640Z"
+  },
+  {
+    "id": 34,
+    "assignmentId": 16,
+    "exerciseIndex": 0,
+    "studentId": 1,
+    "result": {
+      "completedDuration": 0.5,
+      "wordsShown": 0
+    },
+    "passed": true,
+    "completedAt": "2026-02-02T01:51:36.541Z"
+  },
+  {
+    "id": 35,
+    "assignmentId": 16,
+    "exerciseIndex": 0,
+    "studentId": 1,
+    "result": {
+      "completedDuration": 0.5,
+      "wordsShown": 0
+    },
+    "passed": true,
+    "completedAt": "2026-02-02T01:51:39.156Z"
+  },
+  {
+    "id": 36,
+    "assignmentId": 16,
+    "exerciseIndex": 0,
+    "studentId": 1,
+    "result": {
+      "completedDuration": 0.5,
+      "wordsShown": 0
+    },
+    "passed": true,
+    "completedAt": "2026-02-02T01:53:10.965Z"
+  },
+  {
+    "id": 37,
+    "assignmentId": 16,
+    "exerciseIndex": 0,
+    "studentId": 1,
+    "result": {
+      "completedDuration": 0.5,
+      "wordsShown": 0
+    },
+    "passed": true,
+    "completedAt": "2026-02-02T01:53:33.141Z"
+  },
+  {
+    "id": 38,
+    "assignmentId": 16,
+    "exerciseIndex": 0,
+    "studentId": 1,
+    "result": {
+      "completedDuration": 1,
+      "wordsShown": 0
+    },
+    "passed": true,
+    "completedAt": "2026-02-02T01:56:48.722Z"
   }
 ]
