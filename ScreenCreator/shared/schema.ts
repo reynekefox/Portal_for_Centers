@@ -101,6 +101,7 @@ export const schools = pgTable("schools", {
   title: text("title").notNull(),
   login: text("login").notNull().unique(),
   password: text("password").notNull(),
+  allowedTrainings: json("allowed_trainings").$type<string[]>().default([]),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -152,3 +153,73 @@ export const insertCourseTemplateSchema = createInsertSchema(courseTemplates).om
 
 export type InsertCourseTemplate = z.infer<typeof insertCourseTemplateSchema>;
 export type CourseTemplate = typeof courseTemplates.$inferSelect;
+
+// ==================== ASSIGNMENTS ====================
+export const assignments = pgTable("assignments", {
+  id: serial("id").primaryKey(),
+  schoolId: integer("school_id").notNull().references(() => schools.id, { onDelete: "cascade" }),
+  studentId: integer("student_id").notNull().references(() => students.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  scheduledDate: text("scheduled_date").notNull(),
+  exercises: json("exercises").$type<Array<{ trainingId: string; parameters: Record<string, unknown>; requiredResult: { type: string; minValue?: number } }>>().default([]),
+  status: text("status").notNull().default("pending"), // pending, in_progress, completed
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAssignmentSchema = createInsertSchema(assignments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertAssignment = z.infer<typeof insertAssignmentSchema>;
+export type Assignment = typeof assignments.$inferSelect;
+
+// ==================== EXERCISE RESULTS ====================
+export const exerciseResults = pgTable("exercise_results", {
+  id: serial("id").primaryKey(),
+  assignmentId: integer("assignment_id").notNull().references(() => assignments.id, { onDelete: "cascade" }),
+  exerciseIndex: integer("exercise_index").notNull(),
+  studentId: integer("student_id").notNull().references(() => students.id, { onDelete: "cascade" }),
+  result: json("result").$type<Record<string, unknown>>().default({}),
+  passed: integer("passed").notNull().default(0), // 0 = false, 1 = true
+  completedAt: timestamp("completed_at").defaultNow(),
+});
+
+export const insertExerciseResultSchema = createInsertSchema(exerciseResults).omit({
+  id: true,
+  completedAt: true,
+});
+
+export type InsertExerciseResult = z.infer<typeof insertExerciseResultSchema>;
+export type ExerciseResult = typeof exerciseResults.$inferSelect;
+
+// ==================== TEMPLATES ====================
+export const templates = pgTable("templates", {
+  id: serial("id").primaryKey(),
+  schoolId: integer("school_id").notNull().references(() => schools.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  exercises: json("exercises").$type<Array<{ trainingId: string; parameters: Record<string, unknown>; requiredResult: { type: string; minValue?: number } }>>().default([]),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertTemplateSchema = createInsertSchema(templates).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertTemplate = z.infer<typeof insertTemplateSchema>;
+export type Template = typeof templates.$inferSelect;
+
+// ==================== ADMIN SETTINGS ====================
+export const adminSettings = pgTable("admin_settings", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().default("admin"),
+  password: text("password").notNull().default("admin"),
+});
+
+export const insertAdminSettingsSchema = createInsertSchema(adminSettings).omit({
+  id: true,
+});
+
+export type InsertAdminSettings = z.infer<typeof insertAdminSettingsSchema>;
+export type AdminSettings = typeof adminSettings.$inferSelect;
