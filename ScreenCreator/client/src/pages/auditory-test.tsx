@@ -13,7 +13,7 @@ interface AuditoryItem {
 
 // Items with audio and matching vocabulary images - organized by categories
 const allItems: AuditoryItem[] = [
-    // Animals (26 items)
+    // Animals (Updated with new assets)
     { word: "кошка", audioFile: "cat.mp3", image: "cat.png", category: "animals" },
     { word: "собака", audioFile: "dog.mp3", image: "dog.png", category: "animals" },
     { word: "птица", audioFile: "bird.mp3", image: "bird.png", category: "animals" },

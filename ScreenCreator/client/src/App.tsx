@@ -37,6 +37,7 @@ import PairsTest from "@/pages/pairs-test";
 import FlyTest from "@/pages/fly-test";
 import AnagramTest from "@/pages/anagram-test";
 import MathTest from "@/pages/math-test";
+import AnimalSoundTest from "@/pages/animal-sound-test"; // New
 // Login system
 import LoginPage from "@/pages/login";
 import SuperAdmin from "@/pages/super-admin";
@@ -99,6 +100,7 @@ function Router() {
         <Route path="/fly-test" component={FlyTest} />
         <Route path="/anagram-test" component={AnagramTest} />
         <Route path="/math-test" component={MathTest} />
+        <Route path="/animal-sound-test" component={AnimalSoundTest} />
         <Route component={NotFound} />
       </Switch>
     </>
