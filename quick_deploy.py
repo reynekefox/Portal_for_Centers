@@ -19,8 +19,8 @@ def deploy():
         print("Connected!")
         
         commands = [
-            "cd /var/www/portal/ScreenCreator && git fetch origin dev",
-            "cd /var/www/portal/ScreenCreator && git reset --hard origin/dev",
+            "cd /var/www/portal/ScreenCreator && git fetch origin master",
+            "cd /var/www/portal/ScreenCreator && git reset --hard origin/master",
             "cd /var/www/portal/ScreenCreator && npm run build",
             "pm2 restart portal"
         ]

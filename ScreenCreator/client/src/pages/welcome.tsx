@@ -195,11 +195,11 @@ export default function Welcome() {
               Понимание на слух
             </button>
           </Link>
-          <Link href="/animal-sound-test">
+          {/* <Link href="/animal-sound-test">
             <button className="px-8 py-3 bg-pink-600 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
               Звуки животных
             </button>
-          </Link>
+          </Link> */}
         </div>
 
         {/* Eighth row - Visual Memory, Pairs & Fly */}
