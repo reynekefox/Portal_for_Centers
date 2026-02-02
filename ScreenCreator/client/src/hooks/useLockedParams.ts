@@ -201,7 +201,7 @@ function getTrainingPath(trainingId: string): string {
         'magic-forest': '/magic-forest',
         'start-test': '/start-test',
         'attention-test': '/attention-test',
-
+        'animal-sound-test': '/animal-sound-test',
     };
     return pathMap[trainingId] || '/';
 }

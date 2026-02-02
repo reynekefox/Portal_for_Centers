@@ -244,5 +244,11 @@ export const TRAINING_CONFIG: Record<string, TrainingConfig> = {
             { key: 'reactionTimeLimit', label: 'Лимит реакции', type: 'number', default: 1000, min: 500, max: 3000, step: 100, unit: 'мс' }
         ],
         successCriteria: { type: 'min_accuracy', label: 'Мин. точность', unit: '%', default: 80, min: 50, max: 100 }
+    },
+    'animal-sound-test': {
+        params: [
+            { key: 'hideName', label: 'Скрыть названия', type: 'toggle', default: false }
+        ],
+        successCriteria: { type: 'min_accuracy', label: 'Мин. точность', unit: '%', default: 70, min: 50, max: 100 }
     }
 };

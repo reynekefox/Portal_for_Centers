@@ -31,6 +31,7 @@ const TRAININGS = [
     { id: 'math-test', name: 'Математика', path: '/math-test' },
     { id: 'magic-forest', name: 'Волшебный лес', path: '/magic-forest' },
     { id: 'start-test', name: 'Start-контроль', path: '/start-test' },
+    { id: 'animal-sound-test', name: 'Звуки Животных', path: '/animal-sound-test' },
 ];
 
 router.get("/trainings", (_req: Request, res: Response) => {

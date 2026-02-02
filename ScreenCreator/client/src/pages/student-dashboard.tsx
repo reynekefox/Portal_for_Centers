@@ -121,7 +121,35 @@ export default function StudentDashboard() {
 
     const getTrainingPath = (trainingId: string) => {
         const training = trainings.find(t => t.id === trainingId);
-        return training?.path || '/';
+        if (training?.path) return training.path;
+        // Fallback for assignment exercises not in allowed trainings
+        const pathMap: Record<string, string> = {
+            'stroop-test': '/stroop-test',
+            'schulte-table': '/schulte-table',
+            'n-back': '/n-back',
+            'correction-test': '/correction-test',
+            'reaction-test': '/reaction-test',
+            'munsterberg-test': '/munsterberg-test',
+            'alphabet-game': '/alphabet-game',
+            'calcudoku': '/calcudoku',
+            'counting-game': '/counting-game',
+            'speed-reading': '/speed-reading',
+            'flexibility-test': '/flexibility-test',
+            'sequence-test': '/sequence-test',
+            'tower-of-hanoi': '/tower-of-hanoi',
+            'vocabulary-test': '/vocabulary-test',
+            'auditory-test': '/auditory-test',
+            'visual-memory-test': '/visual-memory-test',
+            'pairs-test': '/pairs-test',
+            'fly-test': '/fly-test',
+            'anagram-test': '/anagram-test',
+            'math-test': '/math-test',
+            'magic-forest': '/magic-forest',
+            'start-test': '/start-test',
+            'attention-test': '/attention-test',
+            'animal-sound-test': '/animal-sound-test',
+        };
+        return pathMap[trainingId] || `/${trainingId}`;
     };
 
     const todayAssignments = assignments.filter(a =>

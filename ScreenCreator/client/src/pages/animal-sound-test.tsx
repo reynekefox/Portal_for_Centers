@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, Play, RotateCcw, Volume2, Square, HelpCircle, X, CheckCircle, Clock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useLockedParams } from "@/hooks/useLockedParams";
 import {
     Dialog,
     DialogContent,
@@ -55,6 +56,9 @@ const animals: AnimalItem[] = [
 ];
 
 export default function AnimalSoundTest() {
+    const [, setLocation] = useLocation();
+    const { isLocked, lockedParameters, requiredResult, backPath, completeExercise, getNextPath } = useLockedParams('animal-sound-test');
+
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentRound, setCurrentRound] = useState<{ target: AnimalItem; options: AnimalItem[] } | null>(null);
     const [score, setScore] = useState({ correct: 0, total: 0 });
@@ -63,6 +67,15 @@ export default function AnimalSoundTest() {
     const [showResults, setShowResults] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
     const [hideName, setHideName] = useState(false);
+
+    // Apply locked parameters
+    useEffect(() => {
+        if (isLocked && lockedParameters) {
+            if (lockedParameters.hideName !== undefined) {
+                setHideName(lockedParameters.hideName as boolean);
+            }
+        }
+    }, [isLocked, lockedParameters]);
 
     const timerRef = useRef<NodeJS.Timeout>();
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -89,9 +102,22 @@ export default function AnimalSoundTest() {
         nextRound();
     };
 
-    const stopGame = () => {
+    const stopGame = async () => {
         setIsPlaying(false);
         setShowResults(true);
+
+        // Submit result for locked assignment
+        if (isLocked) {
+            const accuracy = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
+            const minAccuracy = requiredResult?.minValue || 70;
+            const passed = accuracy >= minAccuracy;
+            await completeExercise({
+                correct: score.correct,
+                total: score.total,
+                accuracy,
+                timeElapsed
+            }, passed);
+        }
     };
 
     const nextRound = () => {
@@ -174,7 +200,7 @@ export default function AnimalSoundTest() {
             <div className="bg-white border-b border-gray-200 py-4 px-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href="/">
+                        <Link href={backPath}>
                             <button className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
                                 <ArrowLeft size={24} />
                             </button>
@@ -206,23 +232,25 @@ export default function AnimalSoundTest() {
                         {!isPlaying ? 'Начать тест' : 'Остановить'}
                     </button>
 
-                    {/* Settings */}
-                    <div className="bg-gray-50 rounded-xl p-4 mt-2">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Clock size={16} className="text-gray-500" />
-                            <span className="font-medium text-gray-700">Настройки</span>
-                        </div>
+                    {/* Settings - only show when NOT locked */}
+                    {!isLocked && (
+                        <div className="bg-gray-50 rounded-xl p-4 mt-2">
+                            <div className="flex items-center gap-2 mb-4">
+                                <Clock size={16} className="text-gray-500" />
+                                <span className="font-medium text-gray-700">Настройки</span>
+                            </div>
 
-                        <div className="flex items-center justify-between">
-                            <label className="text-sm text-gray-500">Скрыть названия</label>
-                            <button
-                                onClick={() => setHideName(!hideName)}
-                                className={`w-10 h-5 rounded-full transition-all ${hideName ? 'bg-blue-600' : 'bg-gray-300'}`}
-                            >
-                                <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${hideName ? 'translate-x-5' : 'translate-x-0.5'}`} />
-                            </button>
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm text-gray-500">Скрыть названия</label>
+                                <button
+                                    onClick={() => setHideName(!hideName)}
+                                    className={`w-10 h-5 rounded-full transition-all ${hideName ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                >
+                                    <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${hideName ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Repeat Sound Button */}
                     {isPlaying && (
@@ -334,13 +362,24 @@ export default function AnimalSoundTest() {
                         </div>
                     </div>
                     <DialogFooter className="sm:justify-center gap-2">
-                        <Button variant="outline" onClick={() => setShowResults(false)} className="rounded-full px-6">
-                            Закрыть
-                        </Button>
-                        <Button onClick={startGame} className="rounded-full px-6 bg-blue-600 hover:bg-blue-700">
-                            <RotateCcw className="mr-2 h-4 w-4" />
-                            Ещё раз
-                        </Button>
+                        {isLocked ? (
+                            <Button
+                                onClick={() => setLocation(getNextPath())}
+                                className="rounded-full px-6 bg-blue-600 hover:bg-blue-700"
+                            >
+                                Продолжить
+                            </Button>
+                        ) : (
+                            <>
+                                <Button variant="outline" onClick={() => setShowResults(false)} className="rounded-full px-6">
+                                    Закрыть
+                                </Button>
+                                <Button onClick={startGame} className="rounded-full px-6 bg-blue-600 hover:bg-blue-700">
+                                    <RotateCcw className="mr-2 h-4 w-4" />
+                                    Ещё раз
+                                </Button>
+                            </>
+                        )}
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
