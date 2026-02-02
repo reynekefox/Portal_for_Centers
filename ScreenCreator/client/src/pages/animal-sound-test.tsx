@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, RotateCcw, Volume2, Square } from "lucide-react";
+import { ArrowLeft, Play, RotateCcw, Volume2, Square, HelpCircle, X, CheckCircle, Clock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -21,9 +21,7 @@ interface AnimalItem {
     image: string; // Filename in /vocabulary/
 }
 
-// Master list of animals that we have BOTH Sound and Image for
-// Verified images: bear, bee, bird, butterfly, cat, chicken, cow, crow, dolphin, dog, duck, eagle, elephant, fish, fox, frog, giraffe, goat, horse, lion, monkey, mouse, owl, penguin, pig, rabbit, rooster, sheep, snake, spider, tiger, turtle, whale, wolf, zebra
-// (Plus others like beetle/insects if we map them, but let's stick to these core 35 for now).
+// Master list of animals
 const animals: AnimalItem[] = [
     { word: "Медведь", id: "bear", image: "bear.png" },
     { word: "Пчела", id: "bee", image: "bee.png" },
@@ -38,30 +36,23 @@ const animals: AnimalItem[] = [
     { word: "Утка", id: "duck", image: "duck.png" },
     { word: "Орел", id: "eagle", image: "eagle.png" },
     { word: "Слон", id: "elephant", image: "elephant.png" },
-    // { word: "Рыба", id: "fish", image: "fish.png" }, // Fish sound is bubble? verify later.
     { word: "Лиса", id: "fox", image: "fox.png" },
     { word: "Лягушка", id: "frog", image: "frog.png" },
-    { word: "Жираф", id: "giraffe", image: "giraffe.png" },
     { word: "Козёл", id: "goat", image: "goat.png" },
     { word: "Лошадь", id: "horse", image: "horse.png" },
     { word: "Лев", id: "lion", image: "lion.png" },
     { word: "Обезьяна", id: "monkey", image: "monkey.png" },
     { word: "Мышь", id: "mouse", image: "mouse.png" },
     { word: "Сова", id: "owl", image: "owl.png" },
-    { word: "Пингвин", id: "penguin", image: "penguin.png" },
     { word: "Свинья", id: "pig", image: "pig.png" },
-    { word: "Кролик", id: "rabbit", image: "rabbit.png" },
     { word: "Петух", id: "rooster", image: "rooster.png" },
     { word: "Овца", id: "sheep", image: "sheep.png" },
     { word: "Змея", id: "snake", image: "snake.png" },
-    { word: "Паук", id: "spider", image: "spider.png" },
     { word: "Тигр", id: "tiger", image: "tiger.png" },
-    { word: "Черепаха", id: "turtle", image: "turtle.png" },
     { word: "Кит", id: "whale", image: "whale.png" },
     { word: "Волк", id: "wolf", image: "wolf.png" },
     { word: "Зебра", id: "zebra", image: "zebra.png" },
 ];
-
 
 export default function AnimalSoundTest() {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -70,6 +61,8 @@ export default function AnimalSoundTest() {
     const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(null);
     const [timeElapsed, setTimeElapsed] = useState(0);
     const [showResults, setShowResults] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
+    const [hideName, setHideName] = useState(false);
 
     const timerRef = useRef<NodeJS.Timeout>();
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -87,7 +80,7 @@ export default function AnimalSoundTest() {
         return () => clearInterval(timerRef.current);
     }, [isPlaying]);
 
-    // Game Logic: Start
+    // Game Logic
     const startGame = () => {
         setIsPlaying(true);
         setScore({ correct: 0, total: 0 });
@@ -103,11 +96,7 @@ export default function AnimalSoundTest() {
 
     const nextRound = () => {
         setFeedback(null);
-
-        // Pick target
         const target = animals[Math.floor(Math.random() * animals.length)];
-
-        // Pick 5 distractors (unique)
         let options = [target];
         while (options.length < 6) {
             const random = animals[Math.floor(Math.random() * animals.length)];
@@ -115,28 +104,37 @@ export default function AnimalSoundTest() {
                 options.push(random);
             }
         }
-
-        // Shuffle options
         options = options.sort(() => Math.random() - 0.5);
-
         setCurrentRound({ target, options });
-
-        // Play sound immediately after a small delay
         setTimeout(() => playAnimalSound(target.id), 500);
     };
 
     const playAnimalSound = (animalId: string) => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
+        const baseAudio = `/auditory-test/audio/animals/${animalId}.mp3`;
+        console.log(`[AudioDebug] Attempting to play: ${baseAudio}`);
+
+        if (!audioRef.current) {
+            audioRef.current = new Audio();
         }
 
-        // Try basic path - make sure to use valid converted files
-        const baseAudio = `/auditory-test/audio/animals/${animalId}.mp3`;
+        const audio = audioRef.current;
 
-        const audio = new Audio(baseAudio);
-        audioRef.current = audio;
-        audio.play().catch(e => console.error("Sound play failed", e));
+        // Pause and reset
+        audio.pause();
+        audio.currentTime = 0;
+        audio.src = baseAudio;
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log("[AudioDebug] Playback started successfully");
+                })
+                .catch(error => {
+                    console.error("[AudioDebug] Playback failed:", error);
+                    // Avoid spamming toasts, just log to console
+                });
+        }
     };
 
     const repeatSound = () => {
@@ -147,15 +145,12 @@ export default function AnimalSoundTest() {
 
     const handleChoice = (animal: AnimalItem) => {
         if (!currentRound) return;
-
         const isCorrect = animal.id === currentRound.target.id;
 
         if (isCorrect) {
             setFeedback("correct");
-            // Use simple browser beep or visual only if audio lib missing
-            // Or try to play correct.mp3 if we had it
             setScore(prev => ({ ...prev, correct: prev.correct + 1, total: prev.total + 1 }));
-            setTimeout(() => nextRound(), 1000);
+            setTimeout(() => nextRound(), 800);
         } else {
             setFeedback("incorrect");
             setScore(prev => ({ ...prev, total: prev.total + 1 }));
@@ -167,77 +162,84 @@ export default function AnimalSoundTest() {
         }
     };
 
-    // Format time mm:ss
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 p-4">
-            {/* Header */}
-            <div className="mx-auto max-w-6xl flex items-center justify-between mb-6">
-                <Link href="/">
-                    <Button variant="ghost" className="gap-2">
-                        <ArrowLeft className="h-4 w-4" />
-                        На главную
-                    </Button>
-                </Link>
-                <div className="flex items-center gap-4 bg-white px-6 py-2 rounded-full shadow-sm border">
-                    <span className="text-lg font-bold text-slate-700">
-                        {formatTime(timeElapsed)}
-                    </span>
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+            {/* Header - Matches Visual Memory Test */}
+            <div className="bg-white border-b border-gray-200 py-4 px-6">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Link href="/">
+                            <button className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
+                                <ArrowLeft size={24} />
+                            </button>
+                        </Link>
+                        <h1 className="text-xl font-bold text-gray-800">Звуки Животных</h1>
+                    </div>
+                    <button
+                        onClick={() => setShowHelp(true)}
+                        className="p-2 hover:bg-gray-100 rounded-full text-gray-400"
+                    >
+                        <HelpCircle size={24} />
+                    </button>
                 </div>
             </div>
 
-            <div className="mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-4 gap-6 h-[calc(100vh-140px)]">
-                {/* Left Sidebar: Controls & Stats */}
-                <Card className="p-6 flex flex-col items-center justify-center gap-6 col-span-1 h-full bg-white shadow-xl border-slate-100">
-                    <div className="text-center space-y-2">
-                        <h2 className="text-2xl font-bold text-slate-800">Угадай звук</h2>
-                        <p className="text-slate-500">Послушай и выбери животное</p>
-                    </div>
+            {/* Main Content - 3 Column Layout */}
+            <div className="flex-1 flex">
+                {/* Left Sidebar */}
+                <div className="w-64 bg-white border-r border-gray-200 p-4 flex flex-col gap-4">
+                    {/* Start/Stop Button */}
+                    <button
+                        onClick={isPlaying ? stopGame : startGame}
+                        className={`w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${!isPlaying
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            : 'bg-red-500 hover:bg-red-600 text-white'
+                            }`}
+                    >
+                        {!isPlaying ? <Play size={18} /> : <Square size={18} />}
+                        {!isPlaying ? 'Начать тест' : 'Остановить'}
+                    </button>
 
-                    <div className="w-full flex justify-center py-8">
-                        {!isPlaying ? (
-                            <Button onClick={startGame} size="lg" className="w-48 h-16 text-xl rounded-2xl bg-green-500 hover:bg-green-600 shadow-lg shadow-green-200 transition-all hover:scale-105 active:scale-95">
-                                <Play className="mr-3 h-8 w-8" fill="currentColor" />
-                                Начать
-                            </Button>
-                        ) : (
-                            <Button onClick={stopGame} size="lg" variant="destructive" className="w-48 h-16 text-xl rounded-2xl shadow-lg shadow-red-200 transition-all hover:scale-105 active:scale-95">
-                                <Square className="mr-3 h-6 w-6" fill="currentColor" />
-                                Стоп
-                            </Button>
-                        )}
-                    </div>
-
-                    {isPlaying && (
-                        <div className="space-y-4 w-full px-4">
-                            <Button onClick={repeatSound} variant="outline" className="w-full h-14 text-lg rounded-xl border-2 border-indigo-100 hover:bg-indigo-50 text-indigo-600">
-                                <Volume2 className="mr-2 h-6 w-6" />
-                                Повторить звук
-                            </Button>
-
-                            <div className="pt-4 border-t w-full">
-                                <div className="flex justify-between text-m font-medium text-slate-600 mb-1">
-                                    <span>Верно:</span>
-                                    <span className="text-green-600">{score.correct}</span>
-                                </div>
-                                <div className="flex justify-between text-m font-medium text-slate-600">
-                                    <span>Всего:</span>
-                                    <span>{score.total}</span>
-                                </div>
-                            </div>
+                    {/* Settings */}
+                    <div className="bg-gray-50 rounded-xl p-4 mt-2">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Clock size={16} className="text-gray-500" />
+                            <span className="font-medium text-gray-700">Настройки</span>
                         </div>
-                    )}
-                </Card>
 
-                {/* Center: Game Area (6 Cards) */}
-                <div className="col-span-1 md:col-span-3 h-full">
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm text-gray-500">Скрыть названия</label>
+                            <button
+                                onClick={() => setHideName(!hideName)}
+                                className={`w-10 h-5 rounded-full transition-all ${hideName ? 'bg-blue-600' : 'bg-gray-300'}`}
+                            >
+                                <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${hideName ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Repeat Sound Button */}
+                    {isPlaying && (
+                        <button
+                            onClick={repeatSound}
+                            className="w-full py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border border-indigo-200 mt-auto"
+                        >
+                            <Volume2 size={20} />
+                            Повторить
+                        </button>
+                    )}
+                </div>
+
+                {/* Center: Game Area */}
+                <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50">
                     {isPlaying && currentRound ? (
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 h-full">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl h-full max-h-[600px]">
                             {currentRound.options.map((animal, idx) => (
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.9 }}
@@ -245,75 +247,134 @@ export default function AnimalSoundTest() {
                                     key={idx + animal.id} // reliable key
                                     className="h-full"
                                 >
-                                    <Card
-                                        onClick={() => multihandleChoice(animal)}
+                                    <div
+                                        onClick={() => handleChoice(animal)}
                                         className={cn(
-                                            "h-full flex flex-col items-center justify-center p-4 cursor-pointer hover:shadow-xl transition-all border-2 border-transparent hover:border-indigo-200 active:scale-95 bg-white rounded-3xl group",
-                                            feedback === 'correct' && animal.id === currentRound.target.id && "bg-green-50 border-green-500 scale-105",
-                                            feedback === 'incorrect' && "shake-animation" // Add css class if desired, or simple visual feedback
+                                            "h-full w-full bg-white rounded-2xl shadow-md border-2 border-transparent hover:border-blue-400 hover:shadow-lg transition-all cursor-pointer flex flex-col items-center justify-center p-4 active:scale-95",
+                                            feedback === 'correct' && animal.id === currentRound.target.id && "bg-green-50 border-green-500 scale-105 ring-2 ring-green-200",
+                                            feedback === 'incorrect' && "shake-animation border-red-200 bg-red-50"
                                         )}
                                     >
-                                        <div className="relative w-full aspect-square flex items-center justify-center mb-4">
+                                        <div className="flex-1 flex items-center justify-center w-full relative">
                                             <img
                                                 src={`/vocabulary/${animal.image}`}
                                                 alt={animal.word}
-                                                className="object-contain max-h-[80%] max-w-[80%] drop-shadow-md group-hover:scale-110 transition-transform duration-300"
+                                                className="object-contain max-h-[140px] max-w-full drop-shadow-sm"
                                             />
                                         </div>
-                                        <span className="text-xl font-bold text-slate-700 group-hover:text-indigo-600">{animal.word}</span>
-                                    </Card>
+                                        {!hideName && (
+                                            <span className="text-lg font-bold text-gray-700 mt-2">{animal.word}</span>
+                                        )}
+                                    </div>
                                 </motion.div>
                             ))}
                         </div>
                     ) : (
-                        <div className="h-full flex items-center justify-center bg-white/50 rounded-3xl border-2 border-dashed border-slate-200">
-                            <div className="text-center text-slate-400">
-                                <p className="text-lg">Нажми "Начать" для старта игры</p>
+                        <div className="text-center space-y-6">
+                            <div className="w-64 h-64 rounded-full border-4 border-dashed border-gray-300 flex items-center justify-center bg-white mx-auto">
+                                <span className="text-6xl">🎧</span>
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-800">Угадай звук</h2>
+                                <p className="text-gray-500 mt-2">Нажмите "Начать тест", послушайте звук и выберите животное.</p>
                             </div>
                         </div>
                     )}
+                </div>
+
+                {/* Right Sidebar - Stats */}
+                <div className="w-64 bg-white border-l border-gray-200 p-4">
+                    <div className="flex items-center gap-2 mb-4">
+                        <CheckCircle size={16} className="text-gray-500" />
+                        <span className="font-medium text-gray-700">Результаты</span>
+                    </div>
+
+                    <div className="space-y-3">
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <span className="text-sm text-gray-500 block mb-1">Верно</span>
+                            <span className="text-3xl font-bold text-green-600">{score.correct}</span>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <span className="text-sm text-gray-500 block mb-1">Всего</span>
+                            <span className="text-2xl font-bold text-gray-700">{score.total}</span>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <span className="text-sm text-gray-500 block mb-1">Точность</span>
+                            <span className={`text-2xl font-bold ${score.total > 0 && (score.correct / score.total) > 0.8 ? 'text-green-600' : 'text-orange-500'}`}>
+                                {score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0}%
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {/* Results Dialog */}
             <Dialog open={showResults} onOpenChange={setShowResults}>
                 <DialogContent className="sm:max-w-md text-center">
-
                     <DialogHeader>
-                        <DialogTitle className="text-3xl text-center mb-2">🎉 Отличная работа!</DialogTitle>
+                        <DialogTitle className="text-3xl text-center mb-2">🎉 Результат</DialogTitle>
                     </DialogHeader>
                     <div className="py-6 space-y-4">
-                        <div className="text-6xl font-bold text-indigo-600">{score.correct}</div>
+                        <div className="text-6xl font-bold text-blue-600">{score.correct}</div>
                         <div className="text-gray-500">верных ответов из {score.total}</div>
 
                         <div className="grid grid-cols-2 gap-4 mt-8">
-                            <div className="bg-slate-50 p-4 rounded-xl">
-                                <div className="text-sm text-slate-500">Время</div>
-                                <div className="text-xl font-bold">{formatTime(timeElapsed)}</div>
+                            <div className="bg-gray-50 p-4 rounded-xl">
+                                <div className="text-sm text-gray-500">Время</div>
+                                <div className="text-xl font-bold text-gray-800">{formatTime(timeElapsed)}</div>
                             </div>
-                            <div className="bg-slate-50 p-4 rounded-xl">
-                                <div className="text-sm text-slate-500">Точность</div>
-                                <div className="text-xl font-bold">
+                            <div className="bg-gray-50 p-4 rounded-xl">
+                                <div className="text-sm text-gray-500">Точность</div>
+                                <div className="text-xl font-bold text-gray-800">
                                     {score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0}%
                                 </div>
                             </div>
                         </div>
                     </div>
                     <DialogFooter className="sm:justify-center gap-2">
-                        <Button variant="outline" onClick={() => setShowResults(false)} className="rounded-xl">
+                        <Button variant="outline" onClick={() => setShowResults(false)} className="rounded-full px-6">
                             Закрыть
                         </Button>
-                        <Button onClick={startGame} className="rounded-xl bg-green-500 hover:bg-green-600">
+                        <Button onClick={startGame} className="rounded-full px-6 bg-blue-600 hover:bg-blue-700">
                             <RotateCcw className="mr-2 h-4 w-4" />
-                            Играть снова
+                            Ещё раз
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Help Modal */}
+            {showHelp && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl">
+                        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-gray-800">Инструкция</h2>
+                            <button onClick={() => setShowHelp(false)} className="p-2 hover:bg-gray-100 rounded-full">
+                                <X size={20} className="text-gray-500" />
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-4 text-gray-600">
+                            <p><strong>Цель:</strong> Определить животное по звуку.</p>
+                            <p><strong>Правила:</strong></p>
+                            <ul className="list-disc list-inside space-y-1">
+                                <li>Нажмите "Начать тест", чтобы услышать звук.</li>
+                                <li>Выберите подходящее животное из 6 картинок.</li>
+                                <li>Если не расслышали, нажмите "Повторить".</li>
+                            </ul>
+                        </div>
+                        <div className="p-6 border-t border-gray-200">
+                            <button
+                                onClick={() => setShowHelp(false)}
+                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                            >
+                                Понятно
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
-
-    function multihandleChoice(animal: AnimalItem) {
-        handleChoice(animal);
-    }
 }
