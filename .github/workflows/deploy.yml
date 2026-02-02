@@ -20,7 +20,7 @@ jobs:
             cd /var/www/portal
             git pull origin master
             cd ScreenCreator
-            npm install --production
+            npm install
             pm2 restart portal || pm2 start npm --name "portal" -- run dev
             pm2 save
             echo "Deployment completed at $(date)"
