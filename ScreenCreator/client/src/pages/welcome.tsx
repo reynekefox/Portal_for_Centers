@@ -239,6 +239,11 @@ export default function Welcome() {
               Быстрые слоги
             </button>
           </Link>
+          <Link href="/syllable-picture">
+            <button className="px-8 py-3 bg-pink-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
+              Слоги и картинки
+            </button>
+          </Link>
         </div>
       </div>
     </div>

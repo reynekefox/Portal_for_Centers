@@ -265,5 +265,16 @@ export const TRAINING_CONFIG: Record<string, TrainingConfig> = {
             { key: 'shuffle', label: 'Вразнобой', type: 'toggle', default: false }
         ],
         successCriteria: { type: 'min_accuracy', label: 'Мин. точность', unit: '%', default: 80, min: 50, max: 100 }
+    },
+    'syllable-picture': {
+        params: [
+            { key: 'rounds', label: 'Количество слов', type: 'number', default: 5, min: 3, max: 15, step: 1 },
+            {
+                key: 'difficulty', label: 'Сложность', type: 'select', default: 'easy', options: [
+                    { value: 'easy', label: 'Лёгкая' }, { value: 'medium', label: 'Средняя' }, { value: 'hard', label: 'Сложная' }
+                ]
+            }
+        ],
+        successCriteria: { type: 'min_accuracy', label: 'Мин. точность', unit: '%', default: 80, min: 50, max: 100 }
     }
 };
