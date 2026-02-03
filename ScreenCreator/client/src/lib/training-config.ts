@@ -257,5 +257,13 @@ export const TRAINING_CONFIG: Record<string, TrainingConfig> = {
             { key: 'shuffle', label: 'Вразнобой', type: 'toggle', default: false }
         ],
         successCriteria: { type: 'min_accuracy', label: 'Мин. точность', unit: '%', default: 80, min: 50, max: 100 }
+    },
+    'fast-syllables': {
+        params: [
+            { key: 'rounds', label: 'Количество кругов', type: 'number', default: 3, min: 1, max: 10, step: 1 },
+            { key: 'gridSize', label: 'Слогов на экране', type: 'number', default: 9, min: 4, max: 16, step: 1 },
+            { key: 'shuffle', label: 'Вразнобой', type: 'toggle', default: false }
+        ],
+        successCriteria: { type: 'min_accuracy', label: 'Мин. точность', unit: '%', default: 80, min: 50, max: 100 }
     }
 };

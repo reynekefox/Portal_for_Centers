@@ -234,6 +234,11 @@ export default function Welcome() {
               Быстрые цифры
             </button>
           </Link>
+          <Link href="/fast-syllables">
+            <button className="px-8 py-3 bg-violet-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
+              Быстрые слоги
+            </button>
+          </Link>
         </div>
       </div>
     </div>

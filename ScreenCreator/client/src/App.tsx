@@ -39,6 +39,7 @@ import AnagramTest from "@/pages/anagram-test";
 import MathTest from "@/pages/math-test";
 import AnimalSoundTest from "@/pages/animal-sound-test"; // New
 import FastNumbers from "@/pages/fast-numbers";
+import FastSyllables from "@/pages/fast-syllables";
 // Login system
 import LoginPage from "@/pages/login";
 import SuperAdmin from "@/pages/super-admin";
@@ -103,6 +104,7 @@ function Router() {
         <Route path="/math-test" component={MathTest} />
         <Route path="/animal-sound-test" component={AnimalSoundTest} />
         <Route path="/fast-numbers" component={FastNumbers} />
+        <Route path="/fast-syllables" component={FastSyllables} />
         <Route component={NotFound} />
       </Switch>
     </>
