@@ -229,6 +229,11 @@ export default function Welcome() {
               Математика
             </button>
           </Link>
+          <Link href="/fast-numbers">
+            <button className="px-8 py-3 bg-sky-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
+              Быстрые цифры
+            </button>
+          </Link>
         </div>
       </div>
     </div>
