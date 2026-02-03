@@ -270,8 +270,8 @@ export const TRAINING_CONFIG: Record<string, TrainingConfig> = {
         params: [
             { key: 'rounds', label: 'Количество слов', type: 'number', default: 5, min: 3, max: 15, step: 1 },
             {
-                key: 'difficulty', label: 'Сложность', type: 'select', default: 'easy', options: [
-                    { value: 'easy', label: 'Лёгкая' }, { value: 'medium', label: 'Средняя' }, { value: 'hard', label: 'Сложная' }
+                key: 'syllableCount', label: 'Число слогов', type: 'select', default: 2, options: [
+                    { value: 2, label: '2 слога' }, { value: 3, label: '3 слога' }, { value: 4, label: '4 слога' }
                 ]
             }
         ],

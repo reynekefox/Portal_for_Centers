@@ -24,7 +24,7 @@ export default function SyllablePictureGame() {
 
     // Settings
     const [rounds, setRounds] = useState(5);
-    const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
+    const [syllableCount, setSyllableCount] = useState<2 | 3 | 4>(2);
 
     // Game state
     const [phase, setPhase] = useState<Phase>('idle');
@@ -58,16 +58,13 @@ export default function SyllablePictureGame() {
     useEffect(() => {
         if (isLocked && lockedParameters) {
             if (lockedParameters.rounds !== undefined) setRounds(Number(lockedParameters.rounds));
-            if (lockedParameters.difficulty !== undefined) setDifficulty(lockedParameters.difficulty as 'easy' | 'medium' | 'hard');
+            if (lockedParameters.syllableCount !== undefined) setSyllableCount(Number(lockedParameters.syllableCount) as 2 | 3 | 4);
         }
     }, [isLocked, lockedParameters]);
 
-    // Get category based on difficulty
-    const getCategory = (): WordEntry['category'] | undefined => {
-        if (difficulty === 'easy') return '4-letters';
-        if (difficulty === 'medium') return '6-letters';
-        if (difficulty === 'hard') return '8-letters';
-        return undefined;
+    // Filter words by syllable count
+    const getFilteredWords = (): WordEntry[] => {
+        return WORD_DICTIONARY.filter(w => w.syllables.length === syllableCount);
     };
 
     // Speak a syllable
@@ -109,10 +106,18 @@ export default function SyllablePictureGame() {
 
     // Start a new round
     const startRound = () => {
-        const category = getCategory();
-        const filteredWords = category
-            ? WORD_DICTIONARY.filter(w => w.category === category)
-            : WORD_DICTIONARY;
+        const filteredWords = getFilteredWords();
+        if (filteredWords.length === 0) {
+            // Fallback to all words if no words match
+            const allWords = WORD_DICTIONARY;
+            const word = allWords[Math.floor(Math.random() * allWords.length)];
+            setCurrentWord(word);
+            const distractors = getDistractors(word, 3);
+            const allOptions = [word, ...distractors].sort(() => Math.random() - 0.5);
+            setOptions(allOptions);
+            speakWordBySyllables(word);
+            return;
+        }
 
         // Pick a random word
         const word = filteredWords[Math.floor(Math.random() * filteredWords.length)];
@@ -290,22 +295,22 @@ export default function SyllablePictureGame() {
                                 </div>
                             </div>
 
-                            {/* Difficulty */}
+                            {/* Syllable Count */}
                             <div>
-                                <label className="text-sm text-gray-500 block mb-2">Сложность</label>
+                                <label className="text-sm text-gray-500 block mb-2">Число слогов</label>
                                 <div className="flex gap-2">
                                     <button
-                                        onClick={() => setDifficulty('easy')}
-                                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${difficulty === 'easy' ? 'bg-green-500 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
-                                    >Лёгкая</button>
+                                        onClick={() => setSyllableCount(2)}
+                                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${syllableCount === 2 ? 'bg-green-500 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
+                                    >2</button>
                                     <button
-                                        onClick={() => setDifficulty('medium')}
-                                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${difficulty === 'medium' ? 'bg-yellow-500 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
-                                    >Средняя</button>
+                                        onClick={() => setSyllableCount(3)}
+                                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${syllableCount === 3 ? 'bg-yellow-500 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
+                                    >3</button>
                                     <button
-                                        onClick={() => setDifficulty('hard')}
-                                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${difficulty === 'hard' ? 'bg-red-500 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
-                                    >Сложная</button>
+                                        onClick={() => setSyllableCount(4)}
+                                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${syllableCount === 4 ? 'bg-red-500 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
+                                    >4</button>
                                 </div>
                             </div>
                         </div>
@@ -350,10 +355,10 @@ export default function SyllablePictureGame() {
                                         <div
                                             key={idx}
                                             className={`text-5xl font-bold transition-all ${idx === currentSyllableIndex
-                                                    ? 'text-blue-600 scale-125'
-                                                    : idx < currentSyllableIndex
-                                                        ? 'text-gray-400'
-                                                        : 'text-gray-300'
+                                                ? 'text-blue-600 scale-125'
+                                                : idx < currentSyllableIndex
+                                                    ? 'text-gray-400'
+                                                    : 'text-gray-300'
                                                 }`}
                                         >
                                             {syllable}
@@ -522,11 +527,11 @@ export default function SyllablePictureGame() {
                                 <li>Выберите картинку, соответствующую слову</li>
                                 <li>При ошибке слово повторяется снова</li>
                             </ul>
-                            <p><strong>Сложность:</strong></p>
+                            <p><strong>Число слогов:</strong></p>
                             <ul className="list-disc list-inside space-y-1">
-                                <li>Лёгкая — простые слова (мама, рыба)</li>
-                                <li>Средняя — средние слова (собака, машина)</li>
-                                <li>Сложная — длинные слова (велосипед, черепаха)</li>
+                                <li>2 слога — мама, папа, коза</li>
+                                <li>3 слога — собака, ракета, машина</li>
+                                <li>4 слога — велосипед, черепаха</li>
                             </ul>
                         </div>
                         <div className="p-6 border-t border-gray-200">
