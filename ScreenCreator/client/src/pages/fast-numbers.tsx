@@ -71,16 +71,20 @@ export default function FastNumbers() {
         }
     }, [isLocked, lockedParameters]);
 
-    // Speak a digit
+    // Play digit audio from pre-generated MP3 files
     const speak = (digit: number) => {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(DIGIT_NAMES[digit]);
-            utterance.lang = 'ru-RU';
-            utterance.rate = 0.9;
-            speechRef.current = utterance;
-            window.speechSynthesis.speak(utterance);
-        }
+        const audio = new Audio(`/audio/numbers/${digit}.mp3`);
+        audio.play().catch(() => {
+            // Fallback to speech synthesis if MP3 not found
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(DIGIT_NAMES[digit]);
+                utterance.lang = 'ru-RU';
+                utterance.rate = 0.9;
+                speechRef.current = utterance;
+                window.speechSynthesis.speak(utterance);
+            }
+        });
     };
 
     // Fisher-Yates shuffle
@@ -222,7 +226,7 @@ export default function FastNumbers() {
         : 0;
 
     // Check if passed (for locked mode)
-    const requiredAccuracy = requiredResult ? Number(requiredResult) : 80;
+    const requiredAccuracy = requiredResult?.minValue ? Number(requiredResult.minValue) : 80;
     const passed = accuracy >= requiredAccuracy;
 
     return (
@@ -236,7 +240,7 @@ export default function FastNumbers() {
                                 <ArrowLeft size={24} />
                             </button>
                         </Link>
-                        <h1 className="text-xl font-bold text-gray-800">Быстрые цифры</h1>
+                        <h1 className="text-xl font-bold text-gray-800">Быстрые числа</h1>
                     </div>
                     <button
                         onClick={() => setShowHelp(true)}
@@ -339,7 +343,7 @@ export default function FastNumbers() {
                             {/* Current digit display */}
                             <div className="h-20 flex items-center justify-center">
                                 {currentDigit !== null && (
-                                    <div className="text-4xl font-bold text-blue-600 animate-pulse">
+                                    <div className="text-4xl font-bold text-blue-600">
                                         🔊 {DIGIT_NAMES[currentDigit]}
                                     </div>
                                 )}

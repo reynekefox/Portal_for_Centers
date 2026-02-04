@@ -1,74 +1,64 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { LogIn, LogOut, User, Settings } from "lucide-react";
-import { useAuth } from "@/lib/auth-store";
+import { useAuth, authApi } from "@/lib/auth-store";
+
+interface Training {
+  id: string;
+  name: string;
+  path: string;
+}
 
 export default function Welcome() {
   const [, setLocation] = useLocation();
   const { user, logout, isStudent, isSchool, isAdmin } = useAuth();
+  const [trainings, setTrainings] = useState<Training[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadTrainings();
+  }, []);
+
+  const loadTrainings = async () => {
+    try {
+      const data = await authApi.getTrainings();
+      setTrainings(data);
+    } catch (e) {
+      console.error('Failed to load trainings:', e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     logout();
   };
 
-  // Games organized in alternating rows of 5 and 4
-  const rows = [
-    // Row 1 - 5 items
-    [
-      { path: "/stroop-test", name: "Тест Струпа", color: "indigo-600" },
-      { path: "/schulte-table", name: "Таблица Шульте", color: "blue-500" },
-      { path: "/munsterberg-test", name: "Тест Мюнстенберга", color: "indigo-600" },
-      { path: "/alphabet-game", name: "Алфавит", color: "indigo-500" },
-      { path: "/n-back", name: "N-back", color: "blue-500" },
-    ],
-    // Row 2 - 4 items
-    [
-      { path: "/correction-test", name: "Корректурная проба", color: "indigo-600" },
-      { path: "/calcudoku", name: "Калькудоку", color: "blue-500" },
-      { path: "/counting-game", name: "Считалка", color: "indigo-500" },
-      { path: "/magic-forest", name: "Волшебный лес", color: "blue-600" },
-    ],
-    // Row 3 - 5 items
-    [
-      { path: "/speed-reading", name: "Турбочтение", color: "indigo-600" },
-      { path: "/start-test", name: "Start-контроль", color: "blue-500" },
-      { path: "/attention-test", name: "Тест на внимание", color: "indigo-600" },
-      { path: "/reaction-test", name: "Тест реакции", color: "blue-600" },
-      { path: "/flexibility-test", name: "Когнитивная гибкость", color: "indigo-500" },
-    ],
-    // Row 4 - 4 items
-    [
-      { path: "/sequence-test", name: "Последовательность", color: "blue-500" },
-      { path: "/tower-of-hanoi", name: "Ханойская башня", color: "indigo-600" },
-      { path: "/vocabulary-test", name: "Словарный запас", color: "blue-500" },
-      { path: "/auditory-test", name: "Понимание на слух", color: "indigo-500" },
-    ],
-    // Row 5 - 5 items
-    [
-      { path: "/animal-sound-test", name: "Звуки животных", color: "blue-600" },
-      { path: "/visual-memory-test", name: "Цепочки", color: "indigo-600" },
-      { path: "/pairs-test", name: "Пары", color: "blue-500" },
-      { path: "/fly-test", name: "Муха", color: "indigo-500" },
-      { path: "/anagram-test", name: "Анаграммы", color: "blue-600" },
-    ],
-    // Row 6 - 5 items
-    [
-      { path: "/math-test", name: "Математика", color: "indigo-600" },
-      { path: "/fast-numbers", name: "Быстрые цифры", color: "blue-500" },
-      { path: "/fast-syllables", name: "Быстрые слоги", color: "indigo-500" },
-      { path: "/syllable-picture", name: "Слоги и картинки", color: "blue-600" },
-      { path: "/memory-cards", name: "Парные карточки", color: "indigo-600" },
-    ],
-  ];
-
-  const getColorClasses = (color: string) => {
-    const colorMap: Record<string, string> = {
-      "indigo-600": "bg-indigo-600 hover:bg-indigo-700",
-      "indigo-500": "bg-indigo-500 hover:bg-indigo-600",
-      "blue-600": "bg-blue-600 hover:bg-blue-700",
-      "blue-500": "bg-blue-500 hover:bg-blue-600",
-    };
-    return colorMap[color] || "bg-indigo-600 hover:bg-indigo-700";
+  // Alternating colors for visual variety
+  const getColorClasses = (index: number) => {
+    const colors = [
+      "bg-indigo-600 hover:bg-indigo-700",
+      "bg-blue-500 hover:bg-blue-600",
+      "bg-indigo-500 hover:bg-indigo-600",
+      "bg-blue-600 hover:bg-blue-700",
+    ];
+    return colors[index % colors.length];
   };
+
+  // Split trainings into rows of 5 and 4 alternating
+  const createRows = (items: Training[]) => {
+    const rows: Training[][] = [];
+    let i = 0;
+    let rowSize = 5;
+    while (i < items.length) {
+      rows.push(items.slice(i, i + rowSize));
+      i += rowSize;
+      rowSize = rowSize === 5 ? 4 : 5; // alternate between 5 and 4
+    }
+    return rows;
+  };
+
+  const rows = createRows(trainings);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4 relative overflow-hidden">
@@ -139,19 +129,23 @@ export default function Welcome() {
 
       {/* Game Buttons - Alternating rows of 5 and 4 */}
       <div className="z-10 flex flex-col items-center space-y-3">
-        {rows.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex gap-3 justify-center flex-wrap">
-            {row.map((game) => (
-              <Link key={game.path} href={game.path}>
-                <button
-                  className={`px-6 py-3 ${getColorClasses(game.color)} text-white rounded-full font-bold shadow-md transition-all whitespace-nowrap text-lg`}
-                >
-                  {game.name}
-                </button>
-              </Link>
-            ))}
-          </div>
-        ))}
+        {isLoading ? (
+          <div className="text-gray-400">Загрузка...</div>
+        ) : (
+          rows.map((row, rowIndex) => (
+            <div key={rowIndex} className="flex gap-3 justify-center flex-wrap">
+              {row.map((training, gameIndex) => (
+                <Link key={training.id} href={training.path}>
+                  <button
+                    className={`px-6 py-3 ${getColorClasses(rowIndex * 5 + gameIndex)} text-white rounded-full font-bold shadow-md transition-all whitespace-nowrap text-lg`}
+                  >
+                    {training.name}
+                  </button>
+                </Link>
+              ))}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

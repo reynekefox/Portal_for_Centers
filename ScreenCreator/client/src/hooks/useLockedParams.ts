@@ -204,6 +204,10 @@ function getTrainingPath(trainingId: string): string {
         'animal-sound-test': '/animal-sound-test',
         'anagram-picture-test': '/anagram-picture-test',
         'n-back-picture': '/n-back-picture',
+        'fast-numbers': '/fast-numbers',
+        'fast-syllables': '/fast-syllables',
+        'syllable-picture': '/syllable-picture',
+        'memory-cards': '/memory-cards',
     };
     return pathMap[trainingId] || '/';
 }

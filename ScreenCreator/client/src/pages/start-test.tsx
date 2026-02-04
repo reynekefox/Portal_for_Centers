@@ -441,7 +441,7 @@ export default function Attention66Test() {
                                 <ArrowLeft size={24} />
                             </button>
                         </Link>
-                        <h1 className="text-xl font-bold text-gray-800">Start-тест</h1>
+                        <h1 className="text-xl font-bold text-gray-800">Start-контроль</h1>
                     </div>
 
                     {/* RIGHT: Timer Display - Absolutely positioned */}

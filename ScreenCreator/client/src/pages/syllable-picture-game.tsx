@@ -83,25 +83,33 @@ export default function SyllablePictureGame() {
             'РО': 'роо',
             'СО': 'соо',
             'ТО': 'тоо',
+            'РЫ': 'рыы',  // Extend Ы sound
+            'ГУ': 'гуу',  // Extend У sound
         };
         return corrections[syllable.toUpperCase()] || syllable.toLowerCase();
     };
 
-    // Speak a syllable
+    // Play syllable audio from pre-generated MP3 files
     const speakSyllable = (syllable: string): Promise<void> => {
         return new Promise((resolve) => {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const phoneticText = getPhoneticText(syllable);
-                const utterance = new SpeechSynthesisUtterance(phoneticText);
-                utterance.lang = 'ru-RU';
-                utterance.rate = 0.7;
-                utterance.onend = () => resolve();
-                utterance.onerror = () => resolve();
-                window.speechSynthesis.speak(utterance);
-            } else {
-                resolve();
-            }
+            const audio = new Audio(`/syllables/${syllable.toLowerCase()}.mp3`);
+            audio.onended = () => resolve();
+            audio.onerror = () => {
+                // Fallback to speech synthesis if MP3 not found
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const phoneticText = getPhoneticText(syllable);
+                    const utterance = new SpeechSynthesisUtterance(phoneticText);
+                    utterance.lang = 'ru-RU';
+                    utterance.rate = 0.7;
+                    utterance.onend = () => resolve();
+                    utterance.onerror = () => resolve();
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    resolve();
+                }
+            };
+            audio.play().catch(() => resolve());
         });
     };
 
@@ -247,7 +255,7 @@ export default function SyllablePictureGame() {
         : 0;
 
     // Check if passed
-    const requiredAccuracy = requiredResult ? Number(requiredResult) : 80;
+    const requiredAccuracy = requiredResult?.minValue ? Number(requiredResult.minValue) : 80;
     const passed = accuracy >= requiredAccuracy;
 
     const isPlaying = phase !== 'idle' && phase !== 'finished';
@@ -263,7 +271,7 @@ export default function SyllablePictureGame() {
                                 <ArrowLeft size={24} />
                             </button>
                         </Link>
-                        <h1 className="text-xl font-bold text-gray-800">Слоги и картинки</h1>
+                        <h1 className="text-xl font-bold text-gray-800">Слоги с картинками</h1>
                     </div>
                     <button
                         onClick={() => setShowHelp(true)}

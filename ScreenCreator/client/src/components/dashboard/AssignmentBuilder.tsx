@@ -509,7 +509,7 @@ export function AssignmentBuilder({
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <div className="flex bg-gray-100 p-1 rounded-lg">
+                                                <div className={`grid gap-1 bg-gray-100 p-1 rounded-lg ${param.options?.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
                                                     {param.options?.map((opt) => (
                                                         <button
                                                             key={String(opt.value)}
@@ -518,7 +518,7 @@ export function AssignmentBuilder({
                                                                 ...currentExercise,
                                                                 parameters: { ...currentExercise.parameters, [param.key]: isNaN(Number(opt.value)) ? opt.value : Number(opt.value) }
                                                             })}
-                                                            className={`flex-1 py-2 px-3 rounded-md text-sm font-bold transition-all ${(currentExercise.parameters[param.key] ?? param.default) === opt.value
+                                                            className={`py-2 px-2 rounded-md text-sm font-bold transition-all text-center ${(currentExercise.parameters[param.key] ?? param.default) === opt.value
                                                                 ? 'bg-white shadow text-blue-600'
                                                                 : 'text-gray-500 hover:text-gray-700'
                                                                 }`}

@@ -66,13 +66,27 @@ export default function FlyTest() {
 
     const speak = (text: string) => {
         if (!speechEnabledRef.current) return;
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ru-RU';
-            utterance.rate = 0.9;
-            speechRef.current = utterance;
-            window.speechSynthesis.speak(utterance);
+        // Map direction names to audio files
+        const directionMap: Record<string, string> = {
+            'Вверх': 'up',
+            'Вниз': 'down',
+            'Влево': 'left',
+            'Вправо': 'right'
+        };
+        const audioFile = directionMap[text];
+        if (audioFile) {
+            const audio = new Audio(`/audio/directions/${audioFile}.mp3`);
+            audio.play().catch(() => {
+                // Fallback to speech synthesis
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'ru-RU';
+                    utterance.rate = 0.9;
+                    speechRef.current = utterance;
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
         }
     };
 

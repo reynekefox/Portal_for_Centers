@@ -480,11 +480,11 @@ export default function SchoolDashboard() {
     };
 
     const tabs: { id: TabType; label: string; icon: typeof Users }[] = [
-        { id: 'students', label: '???????', icon: Users },
-        { id: 'trainings', label: '????????', icon: BookOpen },
-        { id: 'assignments', label: '???????', icon: Calendar },
-        { id: 'courses', label: '?????', icon: Folder },
-        { id: 'progress', label: '????????', icon: BarChart2 },
+        { id: 'students', label: 'Ученики', icon: Users },
+        { id: 'trainings', label: 'Тренинги', icon: BookOpen },
+        { id: 'assignments', label: 'Занятия', icon: Calendar },
+        { id: 'courses', label: 'Курсы', icon: Folder },
+        { id: 'progress', label: 'Прогресс', icon: BarChart2 },
     ];
 
     return (
@@ -499,7 +499,7 @@ export default function SchoolDashboard() {
                             </button>
                         </Link>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-800">?????? ??????? ?????</h1>
+                            <h1 className="text-xl font-bold text-gray-800">Панель управления школы</h1>
                             <p className="text-sm text-gray-500">{user?.name}</p>
                         </div>
                     </div>
@@ -508,7 +508,7 @@ export default function SchoolDashboard() {
                         className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
                     >
                         <LogOut size={18} />
-                        ?????
+                        Выход
                     </button>
                 </div>
             </header>

@@ -34,6 +34,10 @@ const TRAININGS = [
     { id: 'animal-sound-test', name: 'Звуки Животных', path: '/animal-sound-test' },
     { id: 'anagram-picture-test', name: 'Анаграммы 2', path: '/anagram-picture-test' },
     { id: 'n-back-picture', name: 'N-back 2', path: '/n-back-picture' },
+    { id: 'fast-numbers', name: 'Быстрые числа', path: '/fast-numbers' },
+    { id: 'fast-syllables', name: 'Быстрые слоги', path: '/fast-syllables' },
+    { id: 'syllable-picture', name: 'Слоги с картинками', path: '/syllable-picture' },
+    { id: 'memory-cards', name: 'Карточки памяти', path: '/memory-cards' },
 ];
 
 router.get("/trainings", (_req: Request, res: Response) => {

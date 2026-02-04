@@ -261,8 +261,7 @@ export const TRAINING_CONFIG: Record<string, TrainingConfig> = {
     'fast-syllables': {
         params: [
             { key: 'rounds', label: 'Количество кругов', type: 'number', default: 3, min: 1, max: 10, step: 1 },
-            { key: 'gridSize', label: 'Слогов на экране', type: 'number', default: 9, min: 4, max: 16, step: 1 },
-            { key: 'shuffle', label: 'Вразнобой', type: 'toggle', default: false }
+            { key: 'gridSize', label: 'Слогов на экране', type: 'number', default: 9, min: 4, max: 16, step: 1 }
         ],
         successCriteria: { type: 'min_accuracy', label: 'Мин. точность', unit: '%', default: 80, min: 50, max: 100 }
     },
@@ -276,5 +275,54 @@ export const TRAINING_CONFIG: Record<string, TrainingConfig> = {
             }
         ],
         successCriteria: { type: 'min_accuracy', label: 'Мин. точность', unit: '%', default: 80, min: 50, max: 100 }
+    },
+    'anagram-picture-test': {
+        params: [
+            { key: 'anagramCount', label: 'Количество слов', type: 'number', default: 10, min: 5, max: 30, step: 1 },
+            { key: 'maxWordLength', label: 'Макс. букв в слове', type: 'number', default: 5, min: 3, max: 8, step: 1 }
+        ],
+        successCriteria: { type: 'min_accuracy', label: 'Мин. точность', unit: '%', default: 80, min: 50, max: 100 }
+    },
+    'n-back-picture': {
+        params: [
+            { key: 'n', label: 'Уровень N', type: 'number', default: 2, min: 1, max: 5, step: 1 },
+            { key: 'duration', label: 'Время', type: 'number', default: 120, min: 30, max: 300, step: 30, unit: 'сек' },
+            { key: 'intervalMs', label: 'Скорость', type: 'number', default: 2500, min: 1000, max: 5000, step: 500, unit: 'мс' },
+            { key: 'positionEnabled', label: 'Позиция', type: 'toggle', default: true },
+            { key: 'colorEnabled', label: 'Цвет', type: 'toggle', default: true },
+            { key: 'soundEnabled', label: 'Звук', type: 'toggle', default: false }
+        ],
+        successCriteria: { type: 'min_accuracy', label: 'Мин. точность', unit: '%', default: 70, min: 50, max: 100 }
+    },
+    'memory-cards': {
+        params: [
+            {
+                key: 'gridSize', label: 'Размер поля', type: 'select', default: '3x4', options: [
+                    { value: '2x3', label: '2×3' },
+                    { value: '2x4', label: '2×4' },
+                    { value: '3x4', label: '3×4' },
+                    { value: '4x4', label: '4×4' },
+                    { value: '4x5', label: '4×5' }
+                ]
+            },
+            {
+                key: 'displayMode', label: 'Режим', type: 'select', default: 'images', options: [
+                    { value: 'images', label: 'Картинки' },
+                    { value: 'syllables', label: 'Слоги' }
+                ]
+            },
+            {
+                key: 'category', label: 'Категория', type: 'select', default: 'animals', options: [
+                    { value: 'animals', label: 'Животные' },
+                    { value: 'food', label: 'Еда' },
+                    { value: 'items', label: 'Предметы' },
+                    { value: 'nature', label: 'Природа' },
+                    { value: 'transport', label: 'Транспорт' },
+                    { value: 'clothes', label: 'Одежда' },
+                    { value: 'family', label: 'Семья' }
+                ]
+            }
+        ],
+        successCriteria: { type: 'max_time', label: 'Макс. время', unit: 'сек', default: 60, min: 30, max: 300 }
     }
 };

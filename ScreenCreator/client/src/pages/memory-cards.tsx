@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowLeft, Play, HelpCircle, X, RotateCcw, Settings, Square, Trophy, Image, Type } from "lucide-react";
 import { WordEntry, WordCategory, CATEGORY_LABELS, getWordsByCategory, getCategoriesWithCounts } from "@/lib/word-dictionary";
+import { useLockedParams } from "@/hooks/useLockedParams";
 
 // 2-letter syllables for syllable mode
 const SYLLABLES = [
@@ -57,7 +58,18 @@ interface AttemptRecord {
     mode: string;
 }
 
+// Map gridSize string to index
+const GRID_SIZE_MAP: Record<string, number> = {
+    '2x3': 0,
+    '2x4': 1,
+    '3x4': 2,
+    '4x4': 3,
+    '4x5': 4
+};
+
 export default function MemoryCards() {
+    const { isLocked, lockedParameters, backPath, completeExercise: lockedCompleteExercise, hasNextExercise, getNextPath } = useLockedParams('memory-cards');
+
     const [phase, setPhase] = useState<Phase>('idle');
     const [cards, setCards] = useState<Card[]>([]);
     const [flippedCards, setFlippedCards] = useState<number[]>([]);
@@ -97,6 +109,23 @@ export default function MemoryCards() {
     // Get words for selected category (only used in images mode)
     const categoryWords = getWordsByCategory(selectedCategory);
     const hasEnoughWords = displayMode === 'syllables' || categoryWords.length >= totalPairs;
+
+    // Apply locked parameters
+    useEffect(() => {
+        if (isLocked && lockedParameters) {
+            if (lockedParameters.gridSize !== undefined) {
+                const index = GRID_SIZE_MAP[String(lockedParameters.gridSize)];
+                if (index !== undefined) setGridConfigIndex(index);
+            }
+            if (lockedParameters.displayMode !== undefined) {
+                setDisplayMode(lockedParameters.displayMode as DisplayMode);
+            }
+            if (lockedParameters.category !== undefined) {
+                setSelectedCategory(lockedParameters.category as WordCategory);
+            }
+        }
+    }, [isLocked, lockedParameters]);
+
 
     // Play card flip sound using Web Audio API
     const playFlipSound = () => {
@@ -341,7 +370,7 @@ export default function MemoryCards() {
                                 <ArrowLeft size={24} />
                             </button>
                         </Link>
-                        <h1 className="text-xl font-bold text-gray-800">Парные карточки</h1>
+                        <h1 className="text-xl font-bold text-gray-800">Карточки памяти</h1>
                     </div>
                     <button
                         onClick={() => setShowHelp(true)}
@@ -389,71 +418,73 @@ export default function MemoryCards() {
                         </div>
                     )}
 
-                    {/* Settings */}
-                    <div className={`bg-gray-50 rounded-lg p-3 flex-1 ${phase === 'playing' ? 'opacity-50 pointer-events-none' : ''}`}>
-                        <div className="flex items-center gap-1.5 mb-2">
-                            <Settings size={14} className="text-gray-500" />
-                            <span className="font-medium text-gray-700 text-sm">Настройки</span>
-                        </div>
+                    {/* Settings - hidden in locked mode */}
+                    {!isLocked && (
+                        <div className={`bg-gray-50 rounded-lg p-3 flex-1 ${phase === 'playing' ? 'opacity-50 pointer-events-none' : ''}`}>
+                            <div className="flex items-center gap-1.5 mb-2">
+                                <Settings size={14} className="text-gray-500" />
+                                <span className="font-medium text-gray-700 text-sm">Настройки</span>
+                            </div>
 
-                        {/* Syllables Toggle */}
-                        <div
-                            onClick={() => setDisplayMode(displayMode === 'syllables' ? 'images' : 'syllables')}
-                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all mb-2 ${displayMode === 'syllables'
-                                ? 'bg-indigo-50 border border-indigo-200'
-                                : 'bg-white border border-gray-200 hover:border-gray-300'
-                                }`}
-                        >
-                            <span className={`text-xs font-medium flex items-center gap-1.5 ${displayMode === 'syllables' ? 'text-indigo-700' : 'text-gray-700'}`}>
-                                <Type size={14} />
-                                Слоги
-                            </span>
-                            <div className={`w-8 h-5 rounded-full p-0.5 transition-all ${displayMode === 'syllables' ? 'bg-indigo-600' : 'bg-gray-300'}`}>
-                                <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${displayMode === 'syllables' ? 'translate-x-3' : 'translate-x-0'}`} />
+                            {/* Syllables Toggle */}
+                            <div
+                                onClick={() => setDisplayMode(displayMode === 'syllables' ? 'images' : 'syllables')}
+                                className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all mb-2 ${displayMode === 'syllables'
+                                    ? 'bg-indigo-50 border border-indigo-200'
+                                    : 'bg-white border border-gray-200 hover:border-gray-300'
+                                    }`}
+                            >
+                                <span className={`text-xs font-medium flex items-center gap-1.5 ${displayMode === 'syllables' ? 'text-indigo-700' : 'text-gray-700'}`}>
+                                    <Type size={14} />
+                                    Слоги
+                                </span>
+                                <div className={`w-8 h-5 rounded-full p-0.5 transition-all ${displayMode === 'syllables' ? 'bg-indigo-600' : 'bg-gray-300'}`}>
+                                    <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${displayMode === 'syllables' ? 'translate-x-3' : 'translate-x-0'}`} />
+                                </div>
+                            </div>
+
+                            {/* Category Selection - compact grid */}
+                            <div className={`mb-2 transition-all ${displayMode === 'syllables' ? 'opacity-40 pointer-events-none' : ''}`}>
+                                <label className="text-xs text-gray-500 block mb-1">Категория</label>
+                                <div className="grid grid-cols-2 gap-1">
+                                    {categories.map(cat => (
+                                        <div
+                                            key={cat.category}
+                                            onClick={() => setSelectedCategory(cat.category)}
+                                            className={`flex items-center justify-between px-2 py-1.5 rounded cursor-pointer transition-all text-xs ${selectedCategory === cat.category
+                                                ? 'bg-indigo-100 text-indigo-700 font-medium'
+                                                : 'bg-white text-gray-600 hover:bg-gray-100'
+                                                }`}
+                                        >
+                                            <span className="truncate">{cat.label}</span>
+                                            <span className={`ml-1 ${selectedCategory === cat.category ? 'text-indigo-500' : 'text-gray-400'}`}>
+                                                {cat.count}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Grid Size */}
+                            <div>
+                                <label className="text-xs text-gray-500 block mb-1">Поле</label>
+                                <div className="flex items-center justify-between bg-white rounded-lg border border-gray-200">
+                                    <button
+                                        onClick={() => setGridConfigIndex(Math.max(0, gridConfigIndex - 1))}
+                                        disabled={gridConfigIndex <= 0 || phase !== 'idle'}
+                                        className="p-1.5 text-gray-500 disabled:opacity-50 text-sm"
+                                    >−</button>
+                                    <span className="font-bold text-gray-800 text-sm">{currentGrid.label}</span>
+                                    <button
+                                        onClick={() => setGridConfigIndex(Math.min(gridConfigs.length - 1, gridConfigIndex + 1))}
+                                        disabled={gridConfigIndex >= gridConfigs.length - 1 || phase !== 'idle'}
+                                        className="p-1.5 text-gray-500 disabled:opacity-50 text-sm"
+                                    >+</button>
+                                </div>
+                                <p className="text-xs text-gray-400 mt-0.5 text-center">{totalPairs} пар</p>
                             </div>
                         </div>
-
-                        {/* Category Selection - compact grid */}
-                        <div className={`mb-2 transition-all ${displayMode === 'syllables' ? 'opacity-40 pointer-events-none' : ''}`}>
-                            <label className="text-xs text-gray-500 block mb-1">Категория</label>
-                            <div className="grid grid-cols-2 gap-1">
-                                {categories.map(cat => (
-                                    <div
-                                        key={cat.category}
-                                        onClick={() => setSelectedCategory(cat.category)}
-                                        className={`flex items-center justify-between px-2 py-1.5 rounded cursor-pointer transition-all text-xs ${selectedCategory === cat.category
-                                            ? 'bg-indigo-100 text-indigo-700 font-medium'
-                                            : 'bg-white text-gray-600 hover:bg-gray-100'
-                                            }`}
-                                    >
-                                        <span className="truncate">{cat.label}</span>
-                                        <span className={`ml-1 ${selectedCategory === cat.category ? 'text-indigo-500' : 'text-gray-400'}`}>
-                                            {cat.count}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Grid Size */}
-                        <div>
-                            <label className="text-xs text-gray-500 block mb-1">Поле</label>
-                            <div className="flex items-center justify-between bg-white rounded-lg border border-gray-200">
-                                <button
-                                    onClick={() => setGridConfigIndex(Math.max(0, gridConfigIndex - 1))}
-                                    disabled={gridConfigIndex <= 0 || phase !== 'idle'}
-                                    className="p-1.5 text-gray-500 disabled:opacity-50 text-sm"
-                                >−</button>
-                                <span className="font-bold text-gray-800 text-sm">{currentGrid.label}</span>
-                                <button
-                                    onClick={() => setGridConfigIndex(Math.min(gridConfigs.length - 1, gridConfigIndex + 1))}
-                                    disabled={gridConfigIndex >= gridConfigs.length - 1 || phase !== 'idle'}
-                                    className="p-1.5 text-gray-500 disabled:opacity-50 text-sm"
-                                >+</button>
-                            </div>
-                            <p className="text-xs text-gray-400 mt-0.5 text-center">{totalPairs} пар</p>
-                        </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Center - Game Area */}
@@ -546,11 +577,24 @@ export default function MemoryCards() {
                                     <RotateCcw size={18} />
                                     Ещё раз
                                 </button>
-                                <Link href="/">
-                                    <button className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all">
-                                        На главную
-                                    </button>
-                                </Link>
+                                {isLocked ? (
+                                    <Link href={getNextPath()}>
+                                        <button
+                                            onClick={() => {
+                                                lockedCompleteExercise({ moves, totalPairs }, true);
+                                            }}
+                                            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center gap-2"
+                                        >
+                                            {hasNextExercise ? 'К следующему →' : 'Готово ✓'}
+                                        </button>
+                                    </Link>
+                                ) : (
+                                    <Link href="/">
+                                        <button className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all">
+                                            На главную
+                                        </button>
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     )}

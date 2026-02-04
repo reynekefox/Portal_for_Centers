@@ -400,18 +400,12 @@ export default function StudentDashboard() {
                                                                         </div>
                                                                     </div>
 
-                                                                    {assignment.status !== 'completed' && (
-                                                                        <button
-                                                                            onClick={() => startAssignment(assignment)}
-                                                                            disabled={!isToday}
-                                                                            className={`px-4 py-2 rounded-lg transition-all ${isToday
-                                                                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                                                                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
-                                                                            title={!isToday ? 'Доступно только в день занятия' : undefined}
-                                                                        >
-                                                                            {completed > 0 ? 'Продолжить' : 'Начать'}
-                                                                        </button>
-                                                                    )}
+                                                                    <button
+                                                                        onClick={() => startAssignment(assignment)}
+                                                                        className="px-4 py-2 rounded-lg transition-all bg-indigo-600 hover:bg-indigo-700 text-white"
+                                                                    >
+                                                                        {completed >= assignment.exercises.length ? 'Повторить' : completed > 0 ? 'Продолжить' : 'Начать'}
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         );

@@ -22,21 +22,22 @@ interface GameRecord {
 }
 
 // Simple Russian syllables (consonant + vowel)
+// Removed: БУ, ВО, ГУ, ЛА, НЕ, НИ, РА, РО, СО, ТИ
 const SYLLABLES = [
-    'БА', 'БО', 'БУ', 'БЫ', 'БИ', 'БЕ',
-    'ВА', 'ВО', 'ВУ', 'ВЫ', 'ВИ', 'ВЕ',
-    'ГА', 'ГО', 'ГУ', 'ГИ', 'ГЕ',
+    'БА', 'БО', 'БЫ', 'БИ', 'БЕ',
+    'ВА', 'ВУ', 'ВЫ', 'ВИ', 'ВЕ',
+    'ГА', 'ГО', 'ГИ', 'ГЕ',
     'ДА', 'ДО', 'ДУ', 'ДЫ', 'ДИ', 'ДЕ',
     'ЖА', 'ЖО', 'ЖУ', 'ЖИ', 'ЖЕ',
     'ЗА', 'ЗО', 'ЗУ', 'ЗЫ', 'ЗИ', 'ЗЕ',
     'КА', 'КО', 'КУ', 'КИ', 'КЕ',
-    'ЛА', 'ЛО', 'ЛУ', 'ЛЫ', 'ЛИ', 'ЛЕ',
+    'ЛО', 'ЛУ', 'ЛЫ', 'ЛИ', 'ЛЕ',
     'МА', 'МО', 'МУ', 'МЫ', 'МИ', 'МЕ',
-    'НА', 'НО', 'НУ', 'НЫ', 'НИ', 'НЕ',
+    'НА', 'НО', 'НУ', 'НЫ',
     'ПА', 'ПО', 'ПУ', 'ПЫ', 'ПИ', 'ПЕ',
-    'РА', 'РО', 'РУ', 'РЫ', 'РИ', 'РЕ',
-    'СА', 'СО', 'СУ', 'СЫ', 'СИ', 'СЕ',
-    'ТА', 'ТО', 'ТУ', 'ТЫ', 'ТИ', 'ТЕ',
+    'РУ', 'РЫ', 'РИ', 'РЕ',
+    'СА', 'СУ', 'СЫ', 'СИ', 'СЕ',
+    'ТА', 'ТО', 'ТУ', 'ТЫ', 'ТЕ',
     'ФА', 'ФО', 'ФУ', 'ФИ', 'ФЕ',
     'ХА', 'ХО', 'ХУ', 'ХИ', 'ХЕ',
     'ША', 'ШО', 'ШУ', 'ШИ', 'ШЕ',
@@ -122,20 +123,24 @@ export default function FastSyllables() {
         }
     }, [isLocked, lockedParameters]);
 
-    // Speak a syllable
+    // Play syllable audio from pre-generated MP3 files
     const speak = (syllable: string, gender: 'male' | 'female') => {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(syllable.toLowerCase());
-            utterance.lang = 'ru-RU';
-            utterance.rate = 0.8;
-            utterance.pitch = gender === 'female' ? 1.3 : 0.8;
+        const audio = new Audio(`/syllables/${syllable.toLowerCase()}.mp3`);
+        audio.play().catch(() => {
+            // Fallback to speech synthesis if MP3 not found
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(syllable.toLowerCase());
+                utterance.lang = 'ru-RU';
+                utterance.rate = 0.8;
+                utterance.pitch = gender === 'female' ? 1.3 : 0.8;
 
-            const voice = getVoice(gender);
-            if (voice) utterance.voice = voice;
+                const voice = getVoice(gender);
+                if (voice) utterance.voice = voice;
 
-            window.speechSynthesis.speak(utterance);
-        }
+                window.speechSynthesis.speak(utterance);
+            }
+        });
     };
 
     // Fisher-Yates shuffle
@@ -290,7 +295,7 @@ export default function FastSyllables() {
         : 0;
 
     // Check if passed (for locked mode)
-    const requiredAccuracy = requiredResult ? Number(requiredResult) : 80;
+    const requiredAccuracy = requiredResult?.minValue ? Number(requiredResult.minValue) : 80;
     const passed = accuracy >= requiredAccuracy;
 
     // Grid columns based on size
