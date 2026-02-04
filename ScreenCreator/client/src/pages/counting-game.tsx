@@ -360,7 +360,7 @@ export default function CountingGame() {
             <div className="p-4 border-t border-gray-100 bg-gray-50 rounded-b-3xl">
               <button
                 onClick={() => setShowRules(false)}
-                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg active:scale-[0.98]"
+                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg active:scale-[0.98]"
               >
                 Понятно, поехали! 🚀
               </button>
@@ -382,7 +382,7 @@ export default function CountingGame() {
             {gameState !== 'playing' ? (
               <button
                 onClick={handleStart}
-                className="w-full px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className="w-full px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
               >
                 <Play size={18} fill="currentColor" /> Начать тест
               </button>
@@ -497,7 +497,7 @@ export default function CountingGame() {
                             completed: true
                           }, true);
                         }}
-                        className="mt-6 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 mx-auto"
+                        className="mt-6 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 mx-auto"
                       >
                         {hasNextExercise ? 'К следующему упражнению' : 'Завершить занятие'}
                         <ArrowRight size={20} />
@@ -513,7 +513,7 @@ export default function CountingGame() {
                       </Link>
                       <button
                         onClick={handleStart}
-                        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                        className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2"
                       >
                         <RotateCcw size={18} />
                         Ещё раз
@@ -549,7 +549,7 @@ export default function CountingGame() {
                   className={cn(
                     "aspect-square rounded-xl text-3xl font-black transition-all shadow-sm border-2 flex items-center justify-center hover:scale-105 active:scale-95",
                     selected.includes(cell.id)
-                      ? "bg-blue-600 text-white border-blue-700 scale-105 shadow-md"
+                      ? "bg-indigo-600 text-white border-blue-700 scale-105 shadow-md"
                       : "bg-white text-gray-800 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
                   )}
                 >

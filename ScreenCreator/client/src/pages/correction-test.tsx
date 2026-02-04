@@ -392,7 +392,7 @@ export default function CorrectionTest() {
                             onClick={isRunning ? () => handleStop() : handleStart}
                             className={`flex items-center justify-center gap-2 px-6 py-2 text-sm text-white rounded-full font-bold transition-all shadow-md hover:shadow-lg ${isRunning
                                 ? "bg-red-500 hover:bg-red-600"
-                                : "bg-blue-600 hover:bg-blue-700"
+                                : "bg-indigo-600 hover:bg-indigo-700"
                                 }`}
                         >
                             {isRunning ? <Square size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
@@ -529,7 +529,7 @@ export default function CorrectionTest() {
                                                 foundCount: savedResult?.found ?? 0,
                                                 totalTargets: savedResult?.total ?? 0
                                             }, true)}
-                                            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                            className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                                         >
                                             {hasNextExercise ? 'К следующему упражнению →' : 'Готово ✓'}
                                         </button>

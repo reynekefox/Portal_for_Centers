@@ -202,6 +202,8 @@ function getTrainingPath(trainingId: string): string {
         'start-test': '/start-test',
         'attention-test': '/attention-test',
         'animal-sound-test': '/animal-sound-test',
+        'anagram-picture-test': '/anagram-picture-test',
+        'n-back-picture': '/n-back-picture',
     };
     return pathMap[trainingId] || '/';
 }

@@ -287,7 +287,7 @@ export default function SequenceTest() {
                                 onClick={phase === 'idle' ? startTest : stopTest}
                                 className={`h-[42px] px-6 text-sm font-bold rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none flex items-center justify-center gap-2 ${phase !== 'idle'
                                     ? "bg-red-500 hover:bg-red-600 text-white"
-                                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                                    : "bg-indigo-600 hover:bg-indigo-700 text-white"
                                     }`}
                             >
                                 {phase !== 'idle' ? (
@@ -392,7 +392,7 @@ export default function SequenceTest() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Понятно
                             </button>
@@ -434,7 +434,7 @@ export default function SequenceTest() {
                                 </div>
                                 <button
                                     onClick={startTest}
-                                    className="w-48 h-14 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-lg shadow-lg transition-all"
+                                    className="w-48 h-14 rounded-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-lg shadow-lg transition-all"
                                 >
                                     НАЧАТЬ ТЕСТ
                                 </button>
@@ -448,7 +448,7 @@ export default function SequenceTest() {
                                 />
                                 <button
                                     onClick={startTest}
-                                    className="w-48 h-14 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-lg shadow-lg transition-all"
+                                    className="w-48 h-14 rounded-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-lg shadow-lg transition-all"
                                 >
                                     НАЧАТЬ ТЕСТ
                                 </button>
@@ -543,7 +543,7 @@ export default function SequenceTest() {
                                 <Link href={getNextPath()}>
                                     <button
                                         onClick={() => completeLockedExercise({ totalCorrect, totalErrors, accuracy }, true)}
-                                        className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                        className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                                     >
                                         {hasNextExercise ? 'К следующему упражнению →' : 'Готово ✓'}
                                     </button>

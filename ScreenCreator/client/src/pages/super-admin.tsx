@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { useAuth, authApi } from "@/lib/auth-store";
-import { ArrowLeft, Plus, Pencil, Trash2, LogOut, School, AlertTriangle, Settings, Check, Key, ChevronDown, ChevronUp, Users, BookOpen, Target, TrendingUp, Clock, Award } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, LogOut, School, AlertTriangle, Settings, Check, Key, ChevronDown, ChevronUp, Users, BookOpen, Target, TrendingUp, Clock, Award, RefreshCw } from "lucide-react";
 
 interface Training {
     id: string;
@@ -65,6 +65,10 @@ export default function SuperAdmin() {
     const [expandedSchool, setExpandedSchool] = useState<number | null>(null);
     const [schoolStats, setSchoolStats] = useState<Record<number, SchoolStatistics>>({});
     const [loadingStats, setLoadingStats] = useState<number | null>(null);
+
+    // Sync trainings state
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [syncResult, setSyncResult] = useState<{ schools: number; students: number } | null>(null);
 
     useEffect(() => {
         if (authLoading) return;
@@ -215,6 +219,25 @@ export default function SuperAdmin() {
         }
     };
 
+    const handleSyncTrainings = async () => {
+        setIsSyncing(true);
+        setSyncResult(null);
+        try {
+            const response = await fetch('/api/sync-trainings', { method: 'POST' });
+            const data = await response.json();
+            if (data.success) {
+                setSyncResult({ schools: data.schoolsUpdated, students: data.studentsUpdated });
+                await loadData();
+                // Hide result after 3 seconds
+                setTimeout(() => setSyncResult(null), 3000);
+            }
+        } catch (error) {
+            console.error('Sync error:', error);
+        } finally {
+            setIsSyncing(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
@@ -229,6 +252,20 @@ export default function SuperAdmin() {
                         <h1 className="text-xl font-bold text-gray-800">Панель администратора</h1>
                     </div>
                     <div className="flex items-center gap-2">
+                        {syncResult && (
+                            <span className="text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                                ✓ Обновлено: {syncResult.schools} школ, {syncResult.students} учеников
+                            </span>
+                        )}
+                        <button
+                            onClick={handleSyncTrainings}
+                            disabled={isSyncing}
+                            className="flex items-center gap-2 px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-all disabled:opacity-50"
+                            title="Дать всем школам и ученикам доступ ко всем тренингам"
+                        >
+                            <RefreshCw size={18} className={isSyncing ? 'animate-spin' : ''} />
+                            {isSyncing ? 'Синхронизация...' : 'Синхронизировать доступ'}
+                        </button>
                         <button
                             onClick={() => setShowPasswordModal(true)}
                             className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
@@ -254,7 +291,7 @@ export default function SuperAdmin() {
                     <h2 className="text-2xl font-bold text-gray-800">Школы</h2>
                     <button
                         onClick={() => { setShowForm(true); setEditingId(null); setFormData({ title: '', login: '', password: '', allowedTrainings: trainings.map(t => t.id) }); }}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all"
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-all"
                     >
                         <Plus size={18} />
                         Добавить школу
@@ -310,7 +347,7 @@ export default function SuperAdmin() {
                                     <button
                                         type="submit"
                                         disabled={isSaving}
-                                        className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-all"
+                                        className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded-lg transition-all"
                                     >
                                         {isSaving ? 'Сохранение...' : 'Сохранить'}
                                     </button>
@@ -333,7 +370,7 @@ export default function SuperAdmin() {
                                     }`}
                             >
                                 <div className={`w-5 h-5 rounded flex items-center justify-center ${selectedTrainings.length === trainings.length
-                                    ? 'bg-blue-600'
+                                    ? 'bg-indigo-600'
                                     : 'border-2 border-gray-300'
                                     }`}>
                                     {selectedTrainings.length === trainings.length && (
@@ -358,7 +395,7 @@ export default function SuperAdmin() {
                                             }`}
                                     >
                                         <div className={`w-5 h-5 rounded flex items-center justify-center ${selectedTrainings.includes(training.id)
-                                            ? 'bg-blue-600'
+                                            ? 'bg-indigo-600'
                                             : 'border-2 border-gray-300'
                                             }`}>
                                             {selectedTrainings.includes(training.id) && (
@@ -387,7 +424,7 @@ export default function SuperAdmin() {
                                 </button>
                                 <button
                                     onClick={handleSaveTrainings}
-                                    className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all"
+                                    className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-all"
                                 >
                                     Сохранить
                                 </button>
@@ -474,7 +511,7 @@ export default function SuperAdmin() {
                                 <button
                                     onClick={handleChangePassword}
                                     disabled={isChangingPassword}
-                                    className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-all"
+                                    className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded-lg transition-all"
                                 >
                                     {isChangingPassword ? 'Сохранение...' : 'Сохранить'}
                                 </button>

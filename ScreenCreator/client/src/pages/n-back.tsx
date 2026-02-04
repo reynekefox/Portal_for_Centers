@@ -295,7 +295,7 @@ export default function NBack() {
                         onClick={isRunning ? stopGame : startGame}
                         className={`w-full flex items-center justify-center gap-2 px-6 py-2 text-sm text-white rounded-full font-bold transition-all shadow-md hover:shadow-lg ${isRunning
                             ? "bg-red-500 hover:bg-red-600"
-                            : "bg-blue-600 hover:bg-blue-700"
+                            : "bg-indigo-600 hover:bg-indigo-700"
                             }`}
                     >
                         {isRunning ? <Square size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
@@ -476,7 +476,7 @@ export default function NBack() {
                             onClick={isRunning ? handleMatchClick : startGame}
                             disabled={isRunning && (currentIndex < n || hasResponded)}
                             className={`w-full py-6 rounded-xl text-2xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 ${!isRunning
-                                ? "bg-blue-600 text-white hover:bg-blue-700 active:scale-95"
+                                ? "bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95"
                                 : "bg-green-500 text-white hover:bg-green-600 active:scale-95"
                                 }`}
                         >
@@ -595,7 +595,7 @@ export default function NBack() {
                                     </button>
                                     <button
                                         onClick={() => { closeResult(); startGame(); }}
-                                        className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2"
+                                        className="flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2"
                                     >
                                         <RotateCcw size={18} />
                                         Ещё раз

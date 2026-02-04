@@ -35,7 +35,7 @@ export default function Experiments() {
           </button>
           <button
             onClick={() => setShowSpecialistChat(true)}
-            className="w-full py-4 bg-blue-600 text-white rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
+            className="w-full py-4 bg-indigo-600 text-white rounded-full text-lg font-semibold shadow-lg hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
           >
             <Send size={20} />
             Чат со специалистом
@@ -49,7 +49,7 @@ export default function Experiments() {
           </button>
           <Link href="/stroop-test" className="w-full">
             <button
-              className="w-full py-4 bg-blue-600 text-white rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition-all"
+              className="w-full py-4 bg-indigo-600 text-white rounded-full text-lg font-semibold shadow-lg hover:bg-indigo-700 transition-all"
               data-testid="button-stroop-test"
             >
               Тест Струпа
@@ -298,7 +298,7 @@ export default function Experiments() {
             <div className="border-t border-cyan-200 p-4">
               <button
                 onClick={() => setShowEEG(false)}
-                className="w-full px-4 py-2 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all"
+                className="w-full px-4 py-2 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all"
               >
                 Закрыть
               </button>

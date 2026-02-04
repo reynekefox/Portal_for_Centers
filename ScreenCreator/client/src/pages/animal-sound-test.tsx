@@ -224,7 +224,7 @@ export default function AnimalSoundTest() {
                     <button
                         onClick={isPlaying ? stopGame : startGame}
                         className={`w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${!isPlaying
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
                             : 'bg-red-500 hover:bg-red-600 text-white'
                             }`}
                     >
@@ -244,7 +244,7 @@ export default function AnimalSoundTest() {
                                 <label className="text-sm text-gray-500">Скрыть названия</label>
                                 <button
                                     onClick={() => setHideName(!hideName)}
-                                    className={`w-10 h-5 rounded-full transition-all ${hideName ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                    className={`w-10 h-5 rounded-full transition-all ${hideName ? 'bg-indigo-600' : 'bg-gray-300'}`}
                                 >
                                     <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${hideName ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                 </button>
@@ -365,7 +365,7 @@ export default function AnimalSoundTest() {
                         {isLocked ? (
                             <Button
                                 onClick={() => setLocation(getNextPath())}
-                                className="rounded-full px-6 bg-blue-600 hover:bg-blue-700"
+                                className="rounded-full px-6 bg-indigo-600 hover:bg-indigo-700"
                             >
                                 Продолжить
                             </Button>
@@ -374,7 +374,7 @@ export default function AnimalSoundTest() {
                                 <Button variant="outline" onClick={() => setShowResults(false)} className="rounded-full px-6">
                                     Закрыть
                                 </Button>
-                                <Button onClick={startGame} className="rounded-full px-6 bg-blue-600 hover:bg-blue-700">
+                                <Button onClick={startGame} className="rounded-full px-6 bg-indigo-600 hover:bg-indigo-700">
                                     <RotateCcw className="mr-2 h-4 w-4" />
                                     Ещё раз
                                 </Button>
@@ -406,7 +406,7 @@ export default function AnimalSoundTest() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Понятно
                             </button>

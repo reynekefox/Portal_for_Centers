@@ -173,7 +173,7 @@ export default function Admin() {
                         }}
                         className="p-6 bg-white border rounded-3xl shadow-sm hover:shadow-md transition-all text-left flex flex-col gap-2 group"
                     >
-                        <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                             <Settings size={24} />
                         </div>
                         <span className="text-xl font-bold text-gray-800">Создать профиль</span>
@@ -182,7 +182,7 @@ export default function Admin() {
 
                     <Link href="/select-profile">
                         <button className="w-full p-6 bg-white border rounded-3xl shadow-sm hover:shadow-md transition-all text-left flex flex-col gap-2 group">
-                            <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                                 <FileText size={24} />
                             </div>
                             <span className="text-xl font-bold text-gray-800">Выбор профиля</span>
@@ -248,7 +248,7 @@ export default function Admin() {
                         </div>
                         <div className="border-t border-cyan-200 p-6 flex gap-3">
                             <button onClick={() => { setShowPromptModal(false); setShowPromptsMenu(true); }} className="flex-1 px-6 py-3 bg-gray-400 text-white rounded-full font-medium hover:bg-gray-500 transition-all">Отмена</button>
-                            <button onClick={handleSavePrompt} className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all">Сохранить</button>
+                            <button onClick={handleSavePrompt} className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all">Сохранить</button>
                         </div>
                     </div>
                 </div>
@@ -273,7 +273,7 @@ export default function Admin() {
                         </div>
                         <div className="border-t border-cyan-200 p-6 flex gap-3">
                             <button onClick={() => { setShowChatPromptModal(false); setShowPromptsMenu(true); }} className="flex-1 px-6 py-3 bg-gray-400 text-white rounded-full font-medium hover:bg-gray-500 transition-all">Отмена</button>
-                            <button onClick={handleSaveChatPrompt} className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all">Сохранить</button>
+                            <button onClick={handleSaveChatPrompt} className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all">Сохранить</button>
                         </div>
                     </div>
                 </div>
@@ -301,7 +301,7 @@ export default function Admin() {
                         </div>
                         <div className="border-t border-cyan-200 p-6 flex gap-3">
                             <button onClick={() => { setShowCodeModal(false); setCode(""); }} className="flex-1 px-6 py-3 bg-gray-400 text-white rounded-full font-medium hover:bg-gray-500 transition-all">Отмена</button>
-                            <button onClick={handleCodeSubmit} className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all">Ввод</button>
+                            <button onClick={handleCodeSubmit} className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all">Ввод</button>
                         </div>
                     </div>
                 </div>
@@ -317,9 +317,9 @@ export default function Admin() {
                             </button>
                         </div>
                         <div className="p-6 space-y-3">
-                            <button onClick={() => { handleOpenPromptModal(); setShowPromptsMenu(false); }} className="w-full py-3 bg-blue-500 text-white rounded-full text-base font-medium shadow-md hover:bg-blue-600 transition-all flex items-center justify-center gap-2"><Settings size={18} />Системный промпт</button>
-                            <button onClick={() => { handleOpenChatPromptModal(); setShowPromptsMenu(false); }} className="w-full py-3 bg-blue-500 text-white rounded-full text-base font-medium shadow-md hover:bg-blue-600 transition-all flex items-center justify-center gap-2"><Settings size={18} />СП для чата</button>
-                            <button onClick={() => { setShowChatLogs(true); setShowPromptsMenu(false); }} className="w-full py-3 bg-blue-500 text-white rounded-full text-base font-medium shadow-md hover:bg-blue-600 transition-all flex items-center justify-center gap-2"><FileText size={18} />Логи</button>
+                            <button onClick={() => { handleOpenPromptModal(); setShowPromptsMenu(false); }} className="w-full py-3 bg-blue-500 text-white rounded-full text-base font-medium shadow-md hover:bg-indigo-600 transition-all flex items-center justify-center gap-2"><Settings size={18} />Системный промпт</button>
+                            <button onClick={() => { handleOpenChatPromptModal(); setShowPromptsMenu(false); }} className="w-full py-3 bg-blue-500 text-white rounded-full text-base font-medium shadow-md hover:bg-indigo-600 transition-all flex items-center justify-center gap-2"><Settings size={18} />СП для чата</button>
+                            <button onClick={() => { setShowChatLogs(true); setShowPromptsMenu(false); }} className="w-full py-3 bg-blue-500 text-white rounded-full text-base font-medium shadow-md hover:bg-indigo-600 transition-all flex items-center justify-center gap-2"><FileText size={18} />Логи</button>
                         </div>
                     </div>
                 </div>

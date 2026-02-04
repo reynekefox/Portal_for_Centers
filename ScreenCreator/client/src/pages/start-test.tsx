@@ -478,7 +478,7 @@ export default function Attention66Test() {
                                 onClick={phase === 'idle' ? startTraining : () => window.location.reload()}
                                 className={`h-[42px] px-6 text-sm font-bold rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none flex items-center justify-center gap-2 ${phase !== 'idle'
                                     ? "bg-red-500 hover:bg-red-600 text-white"
-                                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                                    : "bg-indigo-600 hover:bg-indigo-700 text-white"
                                     }`}
                             >
                                 {phase !== 'idle' ? (
@@ -601,7 +601,7 @@ export default function Attention66Test() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Понятно
                             </button>
@@ -613,7 +613,7 @@ export default function Attention66Test() {
             {/* Game Area */}
             <div className="flex-1 flex flex-col items-center justify-center gap-8 p-8">
                 {/* Circle Display */}
-                <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full bg-blue-600 flex items-center justify-center shadow-lg">
+                <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg">
                     {/* Yellow Cover */}
                     {showYellowCover && (
                         <div className="absolute inset-2 rounded-full bg-yellow-400" />
@@ -625,7 +625,7 @@ export default function Attention66Test() {
                             {[0, 1, 2].map(i => (
                                 <div
                                     key={i}
-                                    className={`w-4 h-4 rounded-full transition-opacity ${dotsVisible[i] ? 'bg-blue-600 opacity-100' : 'bg-gray-400 opacity-30'
+                                    className={`w-4 h-4 rounded-full transition-opacity ${dotsVisible[i] ? 'bg-indigo-600 opacity-100' : 'bg-gray-400 opacity-30'
                                         }`}
                                 />
                             ))}
@@ -657,7 +657,7 @@ export default function Attention66Test() {
                 {/* Action Button */}
                 <button
                     onClick={phase === 'idle' ? startTraining : handleClick}
-                    className="w-48 h-16 md:w-64 md:h-20 rounded-2xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xl shadow-lg transition-all transform active:scale-95"
+                    className="w-48 h-16 md:w-64 md:h-20 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-xl shadow-lg transition-all transform active:scale-95"
                 >
                     {phase === 'idle' ? 'НАЧАТЬ ТЕСТ' : 'НАЖАТЬ'}
                 </button>
@@ -682,7 +682,7 @@ export default function Attention66Test() {
                             <div className="border-t border-gray-200 p-6">
                                 <button
                                     onClick={startTraining}
-                                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
+                                    className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Play size={20} /> Начать
                                 </button>
@@ -710,7 +710,7 @@ export default function Attention66Test() {
                             <div className="border-t border-gray-200 p-6">
                                 <button
                                     onClick={restartTraining}
-                                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                    className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                                 >
                                     Начать заново
                                 </button>
@@ -737,7 +737,7 @@ export default function Attention66Test() {
                                 </button>
                                 <button
                                     onClick={repeatTraining}
-                                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                    className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                                 >
                                     Нет, попрактиковаться
                                 </button>
@@ -784,7 +784,7 @@ export default function Attention66Test() {
                                     <Link href={getNextPath()}>
                                         <button
                                             onClick={() => lockedCompleteExercise({ correctClicks, errors, accuracyPercent, avgRT }, true)}
-                                            className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold shadow-lg transition-all flex items-center justify-center gap-2"
+                                            className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-bold shadow-lg transition-all flex items-center justify-center gap-2"
                                         >
                                             {hasNextExercise ? 'К следующему упражнению →' : 'Готово ✓'}
                                             <ArrowRight size={18} />

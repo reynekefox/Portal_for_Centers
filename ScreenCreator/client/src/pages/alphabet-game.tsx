@@ -170,7 +170,7 @@ export default function AlphabetGame() {
                         onClick={toggleGame}
                         className={`ml-4 px-6 py-2 text-sm font-bold rounded-full transition-all shadow-md hover:shadow-lg focus:outline-none flex items-center justify-center gap-2 ${isRunning
                             ? "bg-red-500 hover:bg-red-600 text-white"
-                            : "bg-blue-600 hover:bg-blue-700 text-white"
+                            : "bg-indigo-600 hover:bg-indigo-700 text-white"
                             }`}
                     >
                         {isRunning ? (

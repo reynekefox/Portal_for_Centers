@@ -354,7 +354,7 @@ export default function ReactionTest() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Понятно
                             </button>
@@ -372,7 +372,7 @@ export default function ReactionTest() {
                         onClick={phase === 'idle' ? startTest : stopTest}
                         className={`w-full px-6 py-3 text-sm font-bold rounded-full transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${phase !== 'idle'
                             ? "bg-red-500 hover:bg-red-600 text-white"
-                            : "bg-blue-600 hover:bg-blue-700 text-white"
+                            : "bg-indigo-600 hover:bg-indigo-700 text-white"
                             }`}
                     >
                         {phase !== 'idle' ? (
@@ -508,7 +508,7 @@ export default function ReactionTest() {
                             ) : (
                                 <button
                                     onClick={startTest}
-                                    className="w-48 h-14 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-lg shadow-lg transition-all transform active:scale-95"
+                                    className="w-48 h-14 rounded-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-lg shadow-lg transition-all transform active:scale-95"
                                 >
                                     НАЧАТЬ ТЕСТ
                                 </button>
@@ -519,7 +519,7 @@ export default function ReactionTest() {
                             onClick={handleClick}
                             className={`w-full max-w-md px-8 py-4 rounded-full font-bold text-xl shadow-lg transition-all transform active:scale-95 ${buttonPressed
                                 ? "bg-green-500 text-white"
-                                : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white"
+                                : "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white"
                                 }`}
                         >
                             НАЖАТЬ
@@ -623,7 +623,7 @@ export default function ReactionTest() {
                                         <Link href={getNextPath()}>
                                             <button
                                                 onClick={() => lockedCompleteExercise({ correct, errors, accuracy, avgReactionTime: avgReaction }, true)}
-                                                className="w-full px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center justify-center gap-2"
+                                                className="w-full px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center justify-center gap-2"
                                             >
                                                 {hasNextExercise ? 'К следующему упражнению' : 'Вернуться в меню'}
                                                 <ArrowRight size={20} />
@@ -631,7 +631,7 @@ export default function ReactionTest() {
                                         </Link>
                                     ) : (
                                         <Link href={backPath}>
-                                            <button className="w-full px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all">
+                                            <button className="w-full px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all">
                                                 Вернуться в меню
                                             </button>
                                         </Link>

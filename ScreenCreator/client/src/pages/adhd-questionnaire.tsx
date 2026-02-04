@@ -125,7 +125,7 @@ export default function ADHDQuestionnaire() {
         <div className="flex items-center gap-4">
           <button
             onClick={handleClose}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-indigo-600 transition-all"
             data-testid="button-back-questionnaire"
           >
             <ArrowLeft size={18} />
@@ -181,7 +181,7 @@ export default function ADHDQuestionnaire() {
         </button>
         <button
           onClick={handleSave}
-          className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all"
+          className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all"
           data-testid="button-save-questionnaire"
         >
           Сохранить

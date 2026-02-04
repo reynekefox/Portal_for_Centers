@@ -281,7 +281,7 @@ export default function StudentDashboard() {
                                             }));
                                             setLocation(getTrainingPath(exercise.trainingId));
                                         }}
-                                        className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-lg font-medium transition-all"
+                                        className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-lg font-medium transition-all"
                                     >
                                         <Play size={20} className="inline mr-2" />
                                         Начать
@@ -308,7 +308,7 @@ export default function StudentDashboard() {
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${activeTab === tab.id
-                                            ? 'bg-blue-600 text-white'
+                                            ? 'bg-indigo-600 text-white'
                                             : 'text-gray-600 hover:bg-gray-100'
                                             }`}
                                     >
@@ -405,7 +405,7 @@ export default function StudentDashboard() {
                                                                             onClick={() => startAssignment(assignment)}
                                                                             disabled={!isToday}
                                                                             className={`px-4 py-2 rounded-lg transition-all ${isToday
-                                                                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
                                                                                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
                                                                             title={!isToday ? 'Доступно только в день занятия' : undefined}
                                                                         >
@@ -432,7 +432,7 @@ export default function StudentDashboard() {
                                                     <p className="text-sm text-gray-400 mt-2">Школа ещё не назначила вам тренинги</p>
                                                 </div>
                                             ) : (
-                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                                     {trainings.map((training) => (
                                                         <div
                                                             key={training.id}

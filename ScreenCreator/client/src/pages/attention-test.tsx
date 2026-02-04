@@ -413,7 +413,7 @@ export default function AttentionTest() {
             <div className="p-6 border-t border-gray-200">
               <button
                 onClick={() => setShowHelp(false)}
-                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
               >
                 Понятно
               </button>
@@ -431,7 +431,7 @@ export default function AttentionTest() {
             onClick={phase === "idle" ? startTest : () => window.location.reload()}
             className={`w-full px-6 py-3 text-sm font-bold rounded-full transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${phase !== "idle"
               ? "bg-red-500 hover:bg-red-600 text-white"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
+              : "bg-indigo-600 hover:bg-indigo-700 text-white"
               }`}
           >
             <Play size={18} fill="currentColor" />
@@ -574,7 +574,7 @@ export default function AttentionTest() {
               ) : (
                 <button
                   onClick={startTest}
-                  className="w-48 h-14 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-lg shadow-lg transition-all transform active:scale-95"
+                  className="w-48 h-14 rounded-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-lg shadow-lg transition-all transform active:scale-95"
                 >
                   НАЧАТЬ ТЕСТ
                 </button>
@@ -692,7 +692,7 @@ export default function AttentionTest() {
                       const passed = accuracy >= (requiredResult?.minValue || 0);
                       lockedCompleteExercise({ hits, misses, commissions, accuracy, avgRt }, passed);
                     }}
-                    className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold shadow-lg transition-all flex items-center justify-center gap-2"
+                    className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-bold shadow-lg transition-all flex items-center justify-center gap-2"
                   >
                     {hasNextExercise ? 'К следующему упражнению →' : 'Готово ✓'}
                     <ArrowRight size={18} />

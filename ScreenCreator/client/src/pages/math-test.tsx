@@ -269,7 +269,7 @@ export default function MathTest() {
                             onClick={phase === 'playing' ? stopGame : startGame}
                             className={`w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${phase === 'playing'
                                 ? 'bg-red-500 hover:bg-red-600 text-white'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                                 }`}
                         >
                             {phase === 'playing' ? <Square size={18} /> : <Play size={18} />}
@@ -468,7 +468,7 @@ export default function MathTest() {
                             <button
                                 onClick={checkAnswer}
                                 disabled={!userInput.trim()}
-                                className="px-10 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold rounded-full transition-all"
+                                className="px-10 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white font-bold rounded-full transition-all"
                             >
                                 Далее
                             </button>
@@ -569,7 +569,7 @@ export default function MathTest() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Понятно
                             </button>

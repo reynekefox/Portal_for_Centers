@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowLeft, Play, HelpCircle, X, Square, Settings, ArrowRight, RotateCcw, Trophy, Volume2 } from "lucide-react";
 import { useLockedParams } from "@/hooks/useLockedParams";
-import { WORD_DICTIONARY, getDistractors, WordEntry } from "@/lib/word-dictionary";
+import { WORD_DICTIONARY, getDistractors, getWordsBySyllableCount, WordEntry } from "@/lib/word-dictionary";
 
 type Phase = 'idle' | 'speaking' | 'choosing' | 'correct' | 'wrong' | 'finished';
 
@@ -64,7 +64,27 @@ export default function SyllablePictureGame() {
 
     // Filter words by syllable count
     const getFilteredWords = (): WordEntry[] => {
-        return WORD_DICTIONARY.filter(w => w.syllables.length === syllableCount);
+        return getWordsBySyllableCount(syllableCount);
+    };
+
+    // Phonetic corrections for Web Speech API pronunciation issues
+    const getPhoneticText = (syllable: string): string => {
+        const corrections: Record<string, string> = {
+            'ПО': 'пoо',  // Stress the 'О' sound
+            'БО': 'боо',
+            'ВО': 'воо',
+            'ГО': 'гоо',
+            'ДО': 'доо',
+            'ЗО': 'зоо',
+            'КО': 'коо',
+            'ЛО': 'лоо',
+            'МО': 'моо',
+            'НО': 'ноо',
+            'РО': 'роо',
+            'СО': 'соо',
+            'ТО': 'тоо',
+        };
+        return corrections[syllable.toUpperCase()] || syllable.toLowerCase();
     };
 
     // Speak a syllable
@@ -72,7 +92,8 @@ export default function SyllablePictureGame() {
         return new Promise((resolve) => {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(syllable.toLowerCase());
+                const phoneticText = getPhoneticText(syllable);
+                const utterance = new SpeechSynthesisUtterance(phoneticText);
                 utterance.lang = 'ru-RU';
                 utterance.rate = 0.7;
                 utterance.onend = () => resolve();
@@ -261,7 +282,7 @@ export default function SyllablePictureGame() {
                     <button
                         onClick={isPlaying ? stopGame : startGame}
                         className={`w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${!isPlaying
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
                             : 'bg-red-500 hover:bg-red-600 text-white'
                             }`}
                     >
@@ -338,7 +359,7 @@ export default function SyllablePictureGame() {
                             </p>
                             <button
                                 onClick={startGame}
-                                className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                className="px-10 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                             >
                                 НАЧАТЬ ИГРУ
                             </button>
@@ -379,14 +400,21 @@ export default function SyllablePictureGame() {
                                 {phase === 'wrong' && '❌ Попробуйте ещё раз'}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-6">
+                            {/* Grid takes 80% of available height, maintains square cards */}
+                            <div
+                                className="grid grid-cols-2 gap-4"
+                                style={{
+                                    width: 'min(70vh, 80vw)',
+                                    height: 'min(70vh, 80vw)'
+                                }}
+                            >
                                 {options.map((option, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => handleOptionClick(option)}
                                         disabled={phase !== 'choosing'}
                                         className={`
-                                            w-40 h-40 rounded-2xl overflow-hidden transition-all shadow-lg
+                                            aspect-square rounded-2xl overflow-hidden transition-all shadow-lg bg-white
                                             ${phase === 'choosing'
                                                 ? 'hover:scale-105 hover:shadow-xl cursor-pointer border-4 border-transparent hover:border-blue-400'
                                                 : 'cursor-default'}
@@ -450,7 +478,7 @@ export default function SyllablePictureGame() {
                                             onClick={() => {
                                                 lockedCompleteExercise({ correctCount, totalAttempts: roundResults.length, accuracy, avgReactionTime }, true);
                                             }}
-                                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center gap-2"
+                                            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center gap-2"
                                         >
                                             {hasNextExercise ? 'К следующему →' : 'Готово ✓'}
                                             <ArrowRight size={18} />
@@ -537,7 +565,7 @@ export default function SyllablePictureGame() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Понятно
                             </button>

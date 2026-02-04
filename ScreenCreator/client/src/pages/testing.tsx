@@ -300,7 +300,7 @@ export default function Testing() {
               <button
                 onClick={() => setTestingTimerActive(true)}
                 disabled={testingTimerActive}
-                className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 disabled:bg-gray-400 transition-all"
+                className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 disabled:bg-gray-400 transition-all"
                 data-testid="button-start-stage-1"
               >
                 Старт
@@ -354,7 +354,7 @@ export default function Testing() {
               <button
                 onClick={() => setTestingTimerActive(true)}
                 disabled={testingTimerActive}
-                className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 disabled:bg-gray-400 transition-all"
+                className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 disabled:bg-gray-400 transition-all"
                 data-testid="button-start-stage-2"
               >
                 Старт
@@ -415,7 +415,7 @@ export default function Testing() {
                       setGameCountdown(300);
                     }}
                     disabled={gameActive}
-                    className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 disabled:bg-gray-400 transition-all"
+                    className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 disabled:bg-gray-400 transition-all"
                     data-testid="button-start-game"
                   >
                     Старт
@@ -530,7 +530,7 @@ export default function Testing() {
                       setGameActive(false);
                       setGameFinished(true);
                     }}
-                    className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all"
+                    className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all"
                     data-testid="button-finish-game"
                   >
                     Завершить
@@ -566,7 +566,7 @@ export default function Testing() {
                     setGameCountdown(300);
                     setCurrentShape(null);
                   }}
-                  className="w-full px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all"
+                  className="w-full px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all"
                   data-testid="button-restart-game"
                 >
                   Начать заново

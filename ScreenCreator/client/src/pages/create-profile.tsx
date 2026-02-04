@@ -471,7 +471,7 @@ ${checkedItemsText.map(text => `- ${text}`).join("\n")}
                       : Object.values(answers).some(v => v)
                         ? "bg-yellow-400 text-white hover:bg-yellow-500"
                         : formData.complaint === "adhd"
-                          ? "bg-blue-500 text-white hover:bg-blue-600"
+                          ? "bg-blue-500 text-white hover:bg-indigo-600"
                           : "bg-gray-400 text-gray-200 cursor-not-allowed"
                     }`}
                 >
@@ -490,7 +490,7 @@ ${checkedItemsText.map(text => `- ${text}`).join("\n")}
                     ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                     : eegReportReady
                       ? "bg-green-500 text-white hover:bg-green-600"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
+                      : "bg-indigo-600 text-white hover:bg-indigo-700"
                     }`}
                 >
                   <Zap size={16} />
@@ -506,7 +506,7 @@ ${checkedItemsText.map(text => `- ${text}`).join("\n")}
               <button
                 onClick={handleGetReport}
                 disabled={reportGenerating}
-                className="w-full py-3 px-6 bg-blue-600 text-white rounded-2xl text-sm font-medium hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 animate-in fade-in slide-in-from-bottom-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 px-6 bg-indigo-600 text-white rounded-2xl text-sm font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-blue-200 animate-in fade-in slide-in-from-bottom-4 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Сформировать отчет ИИ
               </button>
@@ -546,12 +546,12 @@ ${checkedItemsText.map(text => `- ${text}`).join("\n")}
             Сохранить
           </button>
           {reportGenerating ? (
-            <button disabled className="w-full py-3 px-6 bg-blue-600 text-white rounded-full text-sm font-medium opacity-50 cursor-not-allowed shadow-lg shadow-blue-200">
+            <button disabled className="w-full py-3 px-6 bg-indigo-600 text-white rounded-full text-sm font-medium opacity-50 cursor-not-allowed shadow-lg shadow-blue-200">
               Назад
             </button>
           ) : (
             <Link href="/">
-              <button className="w-full py-3 px-6 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
+              <button className="w-full py-3 px-6 bg-indigo-600 text-white rounded-full text-sm font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-blue-200">
                 Назад
               </button>
             </Link>
@@ -626,7 +626,7 @@ ${checkedItemsText.map(text => `- ${text}`).join("\n")}
               <p className="text-sm text-gray-600 mb-6">{errorMessage}</p>
               <button
                 onClick={() => setErrorDialog(false)}
-                className="w-full px-8 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all"
+                className="w-full px-8 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all"
               >
                 Закрыть
               </button>

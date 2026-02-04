@@ -237,7 +237,7 @@ export default function ProfileView() {
           <p className="text-sm text-gray-600 mb-6">Выбранный профиль не существует или был удален.</p>
           <button
             onClick={() => setLocation("/select-profile")}
-            className="w-full px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all"
+            className="w-full px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all"
           >
             Вернуться к профилям
           </button>
@@ -511,7 +511,7 @@ ${checkedItems.map(text => `- ${text}`).join("\n")}
                 : reportGenerating || reportFetched
                   ? "bg-yellow-400 text-white hover:bg-yellow-500"
                   : profile.checklist && Object.keys(profile.checklist as Record<string, boolean>).length > 0
-                    ? "bg-blue-500 text-white hover:bg-blue-600"
+                    ? "bg-blue-500 text-white hover:bg-indigo-600"
                     : "bg-purple-500 text-white hover:bg-purple-600"
                 }`}
               data-testid="button-questionnaire-status"
@@ -541,7 +541,7 @@ ${checkedItems.map(text => `- ${text}`).join("\n")}
                 }}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${eegReportReady
                   ? "bg-green-500 text-white hover:bg-green-600"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700"
                   }`}
               >
                 <Zap size={16} />
@@ -570,7 +570,7 @@ ${checkedItems.map(text => `- ${text}`).join("\n")}
               <div className="border-t border-cyan-200 p-6">
                 <button
                   onClick={() => setReportDialog(false)}
-                  className="w-full px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all"
+                  className="w-full px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all"
                 >
                   Закрыть
                 </button>
@@ -621,7 +621,7 @@ ${checkedItems.map(text => `- ${text}`).join("\n")}
               <div className="border-t border-cyan-200 p-6">
                 <button
                   onClick={() => setShowQuestionnaireModal(false)}
-                  className="w-full px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all"
+                  className="w-full px-6 py-3 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all"
                 >
                   Закрыть
                 </button>
@@ -750,7 +750,7 @@ ${checkedItems.map(text => `- ${text}`).join("\n")}
               <div className="border-t border-cyan-200 p-4">
                 <button
                   onClick={() => setShowEEG(false)}
-                  className="w-full px-4 py-2 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-all"
+                  className="w-full px-4 py-2 bg-blue-500 text-white rounded-full font-medium hover:bg-indigo-600 transition-all"
                 >
                   Закрыть
                 </button>

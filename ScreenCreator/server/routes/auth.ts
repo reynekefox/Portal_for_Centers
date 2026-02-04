@@ -32,11 +32,16 @@ const TRAININGS = [
     { id: 'magic-forest', name: 'Волшебный лес', path: '/magic-forest' },
     { id: 'start-test', name: 'Start-контроль', path: '/start-test' },
     { id: 'animal-sound-test', name: 'Звуки Животных', path: '/animal-sound-test' },
+    { id: 'anagram-picture-test', name: 'Анаграммы 2', path: '/anagram-picture-test' },
+    { id: 'n-back-picture', name: 'N-back 2', path: '/n-back-picture' },
 ];
 
 router.get("/trainings", (_req: Request, res: Response) => {
     res.json(TRAININGS);
 });
+
+// All training IDs for default access
+const ALL_TRAINING_IDS = TRAININGS.map(t => t.id);
 
 // ==================== ADMIN AUTH ====================
 router.post("/auth/admin", async (req: Request, res: Response) => {
@@ -136,7 +141,8 @@ router.post("/schools", async (req: Request, res: Response) => {
         title,
         login,
         password,
-        allowedTrainings: allowedTrainings || []
+        // Default to ALL trainings if not specified
+        allowedTrainings: allowedTrainings ?? ALL_TRAINING_IDS
     }).returning();
     res.json(newSchool);
 });
@@ -163,6 +169,31 @@ router.delete("/schools/:id", async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
     await db.delete(schools).where(eq(schools.id, id));
     res.json({ success: true });
+});
+
+// ==================== SYNC ALL TRAININGS ====================
+// This endpoint updates all existing schools and students to have access to all trainings
+router.post("/sync-trainings", async (_req: Request, res: Response) => {
+    try {
+        // Update all schools to have all trainings
+        const updatedSchools = await db.update(schools)
+            .set({ allowedTrainings: ALL_TRAINING_IDS })
+            .returning();
+
+        // Update all students to have all trainings
+        const updatedStudents = await db.update(students)
+            .set({ allowedGames: ALL_TRAINING_IDS })
+            .returning();
+
+        res.json({
+            success: true,
+            schoolsUpdated: updatedSchools.length,
+            studentsUpdated: updatedStudents.length,
+            trainingsCount: ALL_TRAINING_IDS.length
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: String(error) });
+    }
 });
 
 // ==================== SCHOOL STATISTICS ====================
@@ -289,7 +320,8 @@ router.post("/students", async (req: Request, res: Response) => {
         lastName: last_name,
         login,
         password,
-        allowedGames: allowed_games || []
+        // Default to ALL trainings if not specified
+        allowedGames: allowed_games ?? ALL_TRAINING_IDS
     }).returning();
 
     res.json({
@@ -598,7 +630,7 @@ router.post("/courses/:id/apply", async (req: Request, res: Response) => {
                 studentId,
                 title: assignmentDate.toLocaleDateString('ru-RU'),
                 scheduledDate: assignmentDate.toISOString().split('T')[0],
-                exercises: day.exercises || [],
+                exercises: (day.exercises || []) as Array<{ trainingId: string; parameters: Record<string, unknown>; requiredResult: { type: string; minValue?: number } }>,
                 status: "pending"
             }).returning();
 

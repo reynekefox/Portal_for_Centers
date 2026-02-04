@@ -419,7 +419,7 @@ export default function MagicForest() {
                             )}
                             <button
                                 onClick={restartLevel}
-                                className="px-8 py-3 bg-blue-500 text-white text-lg rounded-full font-bold hover:bg-blue-600 transition-all shadow-lg"
+                                className="px-8 py-3 bg-blue-500 text-white text-lg rounded-full font-bold hover:bg-indigo-600 transition-all shadow-lg"
                             >
                                 Переиграть
                             </button>

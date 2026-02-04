@@ -261,7 +261,7 @@ export default function SpeedReading() {
                                 disabled={words.length === 0}
                                 className={`h-[42px] px-6 text-sm font-bold rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none flex items-center justify-center gap-2 ${isRunning
                                     ? "bg-red-500 hover:bg-red-600 text-white"
-                                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                                    : "bg-indigo-600 hover:bg-indigo-700 text-white"
                                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                                 data-testid="button-toggle-reading"
                             >

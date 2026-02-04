@@ -17,6 +17,7 @@ interface GameRecord {
     rounds: number;
     accuracy: number; // %
     avgReactionTime: number; // ms
+    errors: number;
     timestamp: Date;
 }
 
@@ -70,6 +71,9 @@ export default function FastSyllables() {
     // Refs
     const digitStartTimeRef = useRef<number>(0);
     const voicesLoadedRef = useRef<boolean>(false);
+
+    // Error flash state
+    const [errorFlashSyllable, setErrorFlashSyllable] = useState<string | null>(null);
 
     // Get available voices
     const getVoice = (gender: 'male' | 'female'): SpeechSynthesisVoice | null => {
@@ -182,6 +186,7 @@ export default function FastSyllables() {
                     rounds,
                     accuracy,
                     avgReactionTime,
+                    errors: totalAttempts - correctCount,
                     timestamp: new Date()
                 };
                 setGameHistory(prev => [...prev, gameRecord]);
@@ -232,7 +237,10 @@ export default function FastSyllables() {
                 sayNextSyllable(newRemaining);
             }, 1000);
         } else {
-            // Wrong answer - repeat the same syllable with male voice
+            // Wrong answer - flash red and repeat the same syllable with male voice
+            setErrorFlashSyllable(syllable);
+            setTimeout(() => setErrorFlashSyllable(null), 300);
+
             setTimeout(() => {
                 speak(currentSyllable, 'male');
                 digitStartTimeRef.current = Date.now();
@@ -318,7 +326,7 @@ export default function FastSyllables() {
                     <button
                         onClick={phase === 'playing' ? stopGame : startGame}
                         className={`w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${phase !== 'playing'
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
                             : 'bg-red-500 hover:bg-red-600 text-white'
                             }`}
                     >
@@ -396,7 +404,7 @@ export default function FastSyllables() {
                             </p>
                             <button
                                 onClick={startGame}
-                                className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                className="px-10 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                             >
                                 НАЧАТЬ ТЕСТ
                             </button>
@@ -415,9 +423,10 @@ export default function FastSyllables() {
                                         onClick={() => handleCellClick(syllable)}
                                         className={`
                       w-28 h-28 rounded-2xl text-4xl font-bold transition-all
-                      bg-white border-2 border-gray-200 
-                      hover:border-blue-400 hover:bg-blue-50 hover:scale-105
-                      active:scale-95 active:bg-blue-100
+                      ${errorFlashSyllable === syllable
+                                                ? 'bg-red-500 border-2 border-red-600 text-white scale-95'
+                                                : 'bg-white border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 hover:scale-105'}
+                      active:scale-95
                       shadow-md hover:shadow-lg
                     `}
                                     >
@@ -446,17 +455,23 @@ export default function FastSyllables() {
                                 <h2 className="text-3xl font-bold text-gray-800 mb-2">
                                     {passed ? "Отлично!" : "Хорошая попытка!"}
                                 </h2>
-                                <p className="text-xl text-gray-600">
-                                    Точность: <span className="font-bold text-blue-600">{accuracy}%</span>
+                                <div className="grid grid-cols-3 gap-4 mt-4 mb-4">
+                                    <div className="bg-blue-50 rounded-xl p-4 text-center">
+                                        <p className="text-sm text-blue-600">Точность</p>
+                                        <p className="text-2xl font-bold text-blue-700">{accuracy}%</p>
+                                    </div>
+                                    <div className="bg-red-50 rounded-xl p-4 text-center">
+                                        <p className="text-sm text-red-600">Ошибок</p>
+                                        <p className="text-2xl font-bold text-red-700">{totalAttempts - correctCount}</p>
+                                    </div>
+                                    <div className="bg-purple-50 rounded-xl p-4 text-center">
+                                        <p className="text-sm text-purple-600">Реакция</p>
+                                        <p className="text-2xl font-bold text-purple-700">{avgReactionTime} мс</p>
+                                    </div>
+                                </div>
+                                <p className="text-gray-500">
+                                    {correctCount} правильных из {totalAttempts} попыток за {rounds} круг{rounds > 1 ? 'а' : ''}
                                 </p>
-                                <p className="text-gray-500 mt-2">
-                                    {correctCount} правильных из {totalAttempts} попыток
-                                </p>
-                                {avgReactionTime > 0 && (
-                                    <p className="text-gray-500">
-                                        Среднее время реакции: <span className="font-bold">{avgReactionTime} мс</span>
-                                    </p>
-                                )}
                             </div>
 
                             <div className="flex gap-3 justify-center">
@@ -473,7 +488,7 @@ export default function FastSyllables() {
                                             onClick={() => {
                                                 lockedCompleteExercise({ correctCount, totalAttempts, accuracy, avgReactionTime }, true);
                                             }}
-                                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center gap-2"
+                                            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center gap-2"
                                         >
                                             {hasNextExercise ? 'К следующему →' : 'Готово ✓'}
                                             <ArrowRight size={18} />
@@ -520,7 +535,11 @@ export default function FastSyllables() {
                                             <span className="font-medium">{game.rounds}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Ср. время:</span>
+                                            <span>Ошибок:</span>
+                                            <span className="font-medium text-red-600">{game.errors}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Реакция:</span>
                                             <span className="font-medium">{game.avgReactionTime} мс</span>
                                         </div>
                                     </div>
@@ -556,7 +575,7 @@ export default function FastSyllables() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Понятно
                             </button>

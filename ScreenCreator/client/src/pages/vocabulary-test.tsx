@@ -103,6 +103,13 @@ export default function VocabularyTest() {
 
     const handleAnswer = (letter: string) => {
         if (!isAnswering || !currentQuestion) return;
+
+        // Check if we've already reached the word count limit
+        if (totalAttempts >= wordCount) {
+            stopTest();
+            return;
+        }
+
         setIsAnswering(false);
         setSelectedLetter(letter);
 
@@ -128,9 +135,10 @@ export default function VocabularyTest() {
         setIsAnswering(true);
 
         const nextIndex = currentQuestionIndex + 1;
+        // totalAttempts is already updated by handleAnswer before this runs
         const newTotalAttempts = correctAnswers + wrongAnswers;
 
-        // End when reached word count or ran out of questions
+        // End when reached word count (already answered) or ran out of questions
         if (newTotalAttempts >= wordCount || nextIndex >= shuffledQuestions.length) {
             stopTest();
         } else {
@@ -190,7 +198,7 @@ export default function VocabularyTest() {
                             onClick={phase === 'idle' ? startTest : stopTest}
                             className={`px-6 py-2 text-sm font-bold rounded-full transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${phase === 'running'
                                 ? "bg-red-500 hover:bg-red-600 text-white"
-                                : "bg-blue-600 hover:bg-blue-700 text-white"
+                                : "bg-indigo-600 hover:bg-indigo-700 text-white"
                                 }`}
                         >
                             <Play size={18} fill="currentColor" />
@@ -268,7 +276,7 @@ export default function VocabularyTest() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Понятно
                             </button>
@@ -287,7 +295,7 @@ export default function VocabularyTest() {
                         </div>
                         <button
                             onClick={startTest}
-                            className="px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-full shadow-lg transition-all transform hover:scale-105"
+                            className="px-12 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-full shadow-lg transition-all transform hover:scale-105"
                         >
                             НАЧАТЬ ТЕСТ
                         </button>
@@ -343,7 +351,7 @@ export default function VocabularyTest() {
                         <div className="border-t border-gray-200 p-6">
                             <button
                                 onClick={nextQuestion}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Далее
                             </button>
@@ -373,7 +381,7 @@ export default function VocabularyTest() {
                                 <Link href={getNextPath()}>
                                     <button
                                         onClick={() => lockedCompleteExercise({ accuracy, correctAnswers, wrongAnswers }, true)}
-                                        className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                        className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                                     >
                                         {hasNextExercise ? 'К следующему упражнению →' : 'Готово ✓'}
                                     </button>
@@ -394,7 +402,7 @@ export default function VocabularyTest() {
                             ) : (
                                 <button
                                     onClick={() => window.location.reload()}
-                                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                    className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                                 >
                                     Пройти ещё раз
                                 </button>

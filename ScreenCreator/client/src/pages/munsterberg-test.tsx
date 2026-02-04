@@ -288,7 +288,7 @@ export default function MunsterbergTest() {
                             onClick={isRunning ? handleStop : handleStart}
                             className={`flex items-center justify-center gap-2 px-6 py-2 text-sm text-white rounded-full font-bold transition-all shadow-md hover:shadow-lg ${isRunning
                                 ? "bg-red-500 hover:bg-red-600"
-                                : "bg-blue-600 hover:bg-blue-700"
+                                : "bg-indigo-600 hover:bg-indigo-700"
                                 }`}
                         >
                             {isRunning ? <Square size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
@@ -483,7 +483,7 @@ export default function MunsterbergTest() {
                                     <Link href={getNextPath()}>
                                         <button
                                             onClick={() => lockedCompleteExercise({ completed: true, wordsFound: foundWords.size, totalWords: currentWords.length }, true)}
-                                            className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center justify-center gap-2"
+                                            className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center justify-center gap-2"
                                         >
                                             {hasNextExercise ? 'К следующему упражнению' : 'Вернуться в меню'}
                                             <ArrowRight size={18} />

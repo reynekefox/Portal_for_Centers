@@ -10,6 +10,66 @@ export default function Welcome() {
     logout();
   };
 
+  // Games organized in alternating rows of 5 and 4
+  const rows = [
+    // Row 1 - 5 items
+    [
+      { path: "/stroop-test", name: "Тест Струпа", color: "indigo-600" },
+      { path: "/schulte-table", name: "Таблица Шульте", color: "blue-500" },
+      { path: "/munsterberg-test", name: "Тест Мюнстенберга", color: "indigo-600" },
+      { path: "/alphabet-game", name: "Алфавит", color: "indigo-500" },
+      { path: "/n-back", name: "N-back", color: "blue-500" },
+    ],
+    // Row 2 - 4 items
+    [
+      { path: "/correction-test", name: "Корректурная проба", color: "indigo-600" },
+      { path: "/calcudoku", name: "Калькудоку", color: "blue-500" },
+      { path: "/counting-game", name: "Считалка", color: "indigo-500" },
+      { path: "/magic-forest", name: "Волшебный лес", color: "blue-600" },
+    ],
+    // Row 3 - 5 items
+    [
+      { path: "/speed-reading", name: "Турбочтение", color: "indigo-600" },
+      { path: "/start-test", name: "Start-контроль", color: "blue-500" },
+      { path: "/attention-test", name: "Тест на внимание", color: "indigo-600" },
+      { path: "/reaction-test", name: "Тест реакции", color: "blue-600" },
+      { path: "/flexibility-test", name: "Когнитивная гибкость", color: "indigo-500" },
+    ],
+    // Row 4 - 4 items
+    [
+      { path: "/sequence-test", name: "Последовательность", color: "blue-500" },
+      { path: "/tower-of-hanoi", name: "Ханойская башня", color: "indigo-600" },
+      { path: "/vocabulary-test", name: "Словарный запас", color: "blue-500" },
+      { path: "/auditory-test", name: "Понимание на слух", color: "indigo-500" },
+    ],
+    // Row 5 - 5 items
+    [
+      { path: "/animal-sound-test", name: "Звуки животных", color: "blue-600" },
+      { path: "/visual-memory-test", name: "Цепочки", color: "indigo-600" },
+      { path: "/pairs-test", name: "Пары", color: "blue-500" },
+      { path: "/fly-test", name: "Муха", color: "indigo-500" },
+      { path: "/anagram-test", name: "Анаграммы", color: "blue-600" },
+    ],
+    // Row 6 - 5 items
+    [
+      { path: "/math-test", name: "Математика", color: "indigo-600" },
+      { path: "/fast-numbers", name: "Быстрые цифры", color: "blue-500" },
+      { path: "/fast-syllables", name: "Быстрые слоги", color: "indigo-500" },
+      { path: "/syllable-picture", name: "Слоги и картинки", color: "blue-600" },
+      { path: "/memory-cards", name: "Парные карточки", color: "indigo-600" },
+    ],
+  ];
+
+  const getColorClasses = (color: string) => {
+    const colorMap: Record<string, string> = {
+      "indigo-600": "bg-indigo-600 hover:bg-indigo-700",
+      "indigo-500": "bg-indigo-500 hover:bg-indigo-600",
+      "blue-600": "bg-blue-600 hover:bg-blue-700",
+      "blue-500": "bg-blue-500 hover:bg-blue-600",
+    };
+    return colorMap[color] || "bg-indigo-600 hover:bg-indigo-700";
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4 relative overflow-hidden">
       {/* Header - Login/User Info */}
@@ -43,7 +103,7 @@ export default function Welcome() {
             {/* Dashboard link for students */}
             {isStudent() && (
               <Link href="/student-dashboard">
-                <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full font-medium text-sm transition-all">
+                <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-medium text-sm transition-all">
                   Мои занятия
                 </button>
               </Link>
@@ -60,7 +120,7 @@ export default function Welcome() {
           </>
         ) : (
           <Link href="/login">
-            <button className="flex items-center gap-2 px-5 py-2 bg-blue-500 text-white rounded-full font-bold shadow-md hover:bg-blue-600 transition-all">
+            <button className="flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white rounded-full font-bold shadow-md hover:bg-indigo-700 transition-all">
               <LogIn size={18} />
               Вход
             </button>
@@ -77,174 +137,21 @@ export default function Welcome() {
         />
       </div>
 
-      {/* Game Buttons */}
-      <div className="z-10 flex flex-col items-center space-y-4">
-        {/* First row - 3 buttons */}
-        <div className="flex gap-3 flex-wrap justify-center">
-          <Link href="/stroop-test">
-            <button className="px-12 py-3 bg-indigo-600 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Тест Струпа
-            </button>
-          </Link>
-          <Link href="/schulte-table">
-            <button className="px-12 py-3 bg-blue-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Таблица Шульте
-            </button>
-          </Link>
-          <Link href="/munsterberg-test">
-            <button className="px-10 py-3 bg-blue-600 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Тест Мюнстенберга
-            </button>
-          </Link>
-        </div>
-
-        {/* Second row - 2 buttons */}
-        <div className="flex gap-3 flex-wrap justify-center">
-          <Link href="/alphabet-game">
-            <button className="px-12 py-3 bg-indigo-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[180px]">
-              Алфавит
-            </button>
-          </Link>
-          <Link href="/n-back">
-            <button className="px-12 py-3 bg-blue-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[180px]">
-              N-back
-            </button>
-          </Link>
-        </div>
-
-        {/* Third row - 4 buttons */}
-        <div className="flex gap-3 flex-wrap justify-center">
-          <Link href="/correction-test">
-            <button className="px-10 py-3 bg-indigo-600 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Корректурная проба
-            </button>
-          </Link>
-          <Link href="/calcudoku">
-            <button className="px-12 py-3 bg-blue-600 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[180px]">
-              Калькудоку
-            </button>
-          </Link>
-          <Link href="/counting-game">
-            <button className="px-12 py-3 bg-indigo-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[180px]">
-              Считалка
-            </button>
-          </Link>
-          <Link href="/magic-forest">
-            <button className="px-12 py-3 bg-green-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[180px]">
-              Волшебный лес
-            </button>
-          </Link>
-        </div>
-
-        {/* Fourth row - Speed Reading */}
-        <div className="flex gap-3 flex-wrap justify-center">
-          <Link href="/speed-reading">
-            <button className="px-10 py-3 bg-purple-600 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Турбочтение
-            </button>
-          </Link>
-        </div>
-
-        {/* Fifth row - New Games (3 buttons) */}
-        <div className="flex gap-3 flex-wrap justify-center mt-4">
-          <Link href="/start-test">
-            <button className="px-8 py-3 bg-orange-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Start-контроль
-            </button>
-          </Link>
-          <Link href="/attention-test">
-            <button className="px-8 py-3 bg-orange-600 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Тест на внимание
-            </button>
-          </Link>
-          <Link href="/reaction-test">
-            <button className="px-8 py-3 bg-red-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Тест реакции
-            </button>
-          </Link>
-        </div>
-
-        {/* Sixth row - New Games (3 buttons) */}
-        <div className="flex gap-3 flex-wrap justify-center">
-          <Link href="/flexibility-test">
-            <button className="px-8 py-3 bg-teal-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Когнитивная гибкость
-            </button>
-          </Link>
-          <Link href="/sequence-test">
-            <button className="px-8 py-3 bg-cyan-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Последовательность
-            </button>
-          </Link>
-        </div>
-
-        {/* Seventh row - New Games (3 buttons) */}
-        <div className="flex gap-3 flex-wrap justify-center">
-          <Link href="/tower-of-hanoi">
-            <button className="px-8 py-3 bg-amber-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Ханойская башня
-            </button>
-          </Link>
-          <Link href="/vocabulary-test">
-            <button className="px-8 py-3 bg-amber-600 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Словарный запас
-            </button>
-          </Link>
-          <Link href="/auditory-test">
-            <button className="px-8 py-3 bg-pink-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Понимание на слух
-            </button>
-          </Link>
-          <Link href="/animal-sound-test">
-            <button className="px-8 py-3 bg-pink-600 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Звуки животных
-            </button>
-          </Link>
-        </div>
-
-        {/* Eighth row - Visual Memory, Pairs & Fly */}
-        <div className="flex gap-3 flex-wrap justify-center">
-          <Link href="/visual-memory-test">
-            <button className="px-8 py-3 bg-violet-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Цепочки
-            </button>
-          </Link>
-          <Link href="/pairs-test">
-            <button className="px-8 py-3 bg-fuchsia-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Пары
-            </button>
-          </Link>
-          <Link href="/fly-test">
-            <button className="px-8 py-3 bg-lime-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Муха
-            </button>
-          </Link>
-          <Link href="/anagram-test">
-            <button className="px-8 py-3 bg-emerald-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Анаграммы
-            </button>
-          </Link>
-          <Link href="/math-test">
-            <button className="px-8 py-3 bg-rose-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Математика
-            </button>
-          </Link>
-          <Link href="/fast-numbers">
-            <button className="px-8 py-3 bg-sky-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Быстрые цифры
-            </button>
-          </Link>
-          <Link href="/fast-syllables">
-            <button className="px-8 py-3 bg-violet-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Быстрые слоги
-            </button>
-          </Link>
-          <Link href="/syllable-picture">
-            <button className="px-8 py-3 bg-pink-500 text-white rounded-full font-bold shadow-md hover:opacity-90 transition-all text-lg min-w-[200px]">
-              Слоги и картинки
-            </button>
-          </Link>
-        </div>
+      {/* Game Buttons - Alternating rows of 5 and 4 */}
+      <div className="z-10 flex flex-col items-center space-y-3">
+        {rows.map((row, rowIndex) => (
+          <div key={rowIndex} className="flex gap-3 justify-center flex-wrap">
+            {row.map((game) => (
+              <Link key={game.path} href={game.path}>
+                <button
+                  className={`px-6 py-3 ${getColorClasses(game.color)} text-white rounded-full font-bold shadow-md transition-all whitespace-nowrap text-lg`}
+                >
+                  {game.name}
+                </button>
+              </Link>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );

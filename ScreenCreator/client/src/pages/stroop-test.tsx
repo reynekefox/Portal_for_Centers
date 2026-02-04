@@ -263,7 +263,7 @@ export default function StroopTest() {
             onClick={isRunning ? handleStop : handleStart}
             className={`w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${isRunning
               ? 'bg-red-500 hover:bg-red-600 text-white'
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
+              : 'bg-indigo-600 hover:bg-indigo-700 text-white'
               }`}
           >
             {isRunning ? <Square size={18} /> : <Play size={18} />}
@@ -433,7 +433,7 @@ export default function StroopTest() {
                   <Link href={getNextPath()}>
                     <button
                       onClick={() => completeExercise({ time: duration || time }, true)}
-                      className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                      className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                     >
                       {hasNextExercise ? 'К следующему упражнению →' : 'Готово ✓'}
                     </button>
@@ -444,7 +444,7 @@ export default function StroopTest() {
                       setIsCompleted(false);
                       setTime(0);
                     }}
-                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                    className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                   >
                     Начать заново
                   </button>
@@ -498,7 +498,7 @@ export default function StroopTest() {
             <div className="p-6 border-t border-gray-200">
               <button
                 onClick={() => setShowHelp(false)}
-                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
               >
                 Понятно
               </button>

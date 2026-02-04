@@ -30,6 +30,7 @@ export default function FlyTest() {
     const [gridSize, setGridSize] = useState(5);
     const [attempts, setAttempts] = useState(5);
     const [hiddenMode, setHiddenMode] = useState(false);
+    const [speechEnabled, setSpeechEnabled] = useState(true);
     const [stepCount, setStepCount] = useState(5);
     const [stepSpeed, setStepSpeed] = useState(3);
 
@@ -51,8 +52,20 @@ export default function FlyTest() {
     // Timer ref
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
+    const isStoppedRef = useRef(false);
+    const speechEnabledRef = useRef(true);
+
+    // Keep ref in sync with state
+    useEffect(() => {
+        speechEnabledRef.current = speechEnabled;
+        // Cancel any ongoing speech when disabled
+        if (!speechEnabled && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+    }, [speechEnabled]);
 
     const speak = (text: string) => {
+        if (!speechEnabledRef.current) return;
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
@@ -110,6 +123,9 @@ export default function FlyTest() {
     };
 
     const startGame = () => {
+        // Reset stopped flag
+        isStoppedRef.current = false;
+
         // Random start position
         const startX = Math.floor(Math.random() * gridSize);
         const startY = Math.floor(Math.random() * gridSize);
@@ -155,6 +171,11 @@ export default function FlyTest() {
     };
 
     const playNextMove = (index: number, moves: Direction[]) => {
+        // Check if game was stopped using ref (not state - state is stale in closure)
+        if (isStoppedRef.current) {
+            return;
+        }
+
         if (index >= moves.length) {
             setShowCurrentDirection(null);
             setPhase('answering');
@@ -172,7 +193,11 @@ export default function FlyTest() {
     };
 
     const stopGame = () => {
-        if (timerRef.current) clearTimeout(timerRef.current);
+        isStoppedRef.current = true;
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
         window.speechSynthesis.cancel();
         setPhase('idle');
         setAttemptHistory([]);
@@ -256,7 +281,7 @@ export default function FlyTest() {
                     <button
                         onClick={phase === 'idle' ? startGame : stopGame}
                         className={`w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${phase === 'idle'
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
                             : 'bg-red-500 hover:bg-red-600 text-white'
                             }`}
                     >
@@ -265,76 +290,89 @@ export default function FlyTest() {
                     </button>
 
                     {/* Settings - Hidden when locked */}
-                    {!isLocked && phase === 'idle' && (
+                    {!isLocked && (
                         <div className="bg-gray-50 rounded-xl p-4">
                             <div className="flex items-center gap-2 mb-4">
                                 <Settings size={16} className="text-gray-500" />
                                 <span className="font-medium text-gray-700">Настройки</span>
                             </div>
 
-                            {/* Grid Size */}
-                            <div className="mb-4">
-                                <label className="text-sm text-gray-500 block mb-2">Поле</label>
-                                <div className="flex items-center justify-between bg-white rounded-lg border border-gray-200">
+                            {/* Game settings - visible but disabled during game */}
+                            <div className={phase !== 'idle' ? 'opacity-50 pointer-events-none' : ''}>
+                                {/* Grid Size */}
+                                <div className="mb-4">
+                                    <label className="text-sm text-gray-500 block mb-2">Поле</label>
+                                    <div className="flex items-center justify-between bg-white rounded-lg border border-gray-200">
+                                        <button
+                                            onClick={() => setGridSize(Math.max(3, gridSize - 1))}
+                                            disabled={gridSize <= 3 || phase !== 'idle'}
+                                            className="p-2 text-gray-500 disabled:opacity-50"
+                                        >−</button>
+                                        <span className="font-bold text-gray-800">{gridSize}×{gridSize}</span>
+                                        <button
+                                            onClick={() => setGridSize(Math.min(10, gridSize + 1))}
+                                            disabled={gridSize >= 10 || phase !== 'idle'}
+                                            className="p-2 text-gray-500 disabled:opacity-50"
+                                        >+</button>
+                                    </div>
+                                </div>
+
+                                {/* Step Count */}
+                                <div className="mb-4">
+                                    <label className="text-sm text-gray-500 block mb-2">Число шагов</label>
+                                    <div className="flex items-center justify-between bg-white rounded-lg border border-gray-200">
+                                        <button
+                                            onClick={() => setStepCount(Math.max(2, stepCount - 1))}
+                                            disabled={stepCount <= 2 || phase !== 'idle'}
+                                            className="p-2 text-gray-500 disabled:opacity-50"
+                                        >−</button>
+                                        <span className="font-bold text-gray-800">{stepCount}</span>
+                                        <button
+                                            onClick={() => setStepCount(Math.min(20, stepCount + 1))}
+                                            disabled={stepCount >= 20 || phase !== 'idle'}
+                                            className="p-2 text-gray-500 disabled:opacity-50"
+                                        >+</button>
+                                    </div>
+                                </div>
+
+                                {/* Step Speed */}
+                                <div className="mb-4">
+                                    <label className="text-sm text-gray-500 block mb-2">Скорость (сек)</label>
+                                    <div className="flex items-center justify-between bg-white rounded-lg border border-gray-200">
+                                        <button
+                                            onClick={() => setStepSpeed(Math.max(1, stepSpeed - 1))}
+                                            disabled={stepSpeed <= 1 || phase !== 'idle'}
+                                            className="p-2 text-gray-500 disabled:opacity-50"
+                                        >−</button>
+                                        <span className="font-bold text-gray-800">{stepSpeed}</span>
+                                        <button
+                                            onClick={() => setStepSpeed(Math.min(10, stepSpeed + 1))}
+                                            disabled={stepSpeed >= 10 || phase !== 'idle'}
+                                            className="p-2 text-gray-500 disabled:opacity-50"
+                                        >+</button>
+                                    </div>
+                                </div>
+
+                                {/* Hidden Mode Toggle */}
+                                <div className="flex items-center justify-between mb-3">
+                                    <label className="text-sm text-gray-500">Закрыто</label>
                                     <button
-                                        onClick={() => setGridSize(Math.max(3, gridSize - 1))}
-                                        disabled={phase !== 'idle' || gridSize <= 3}
-                                        className="p-2 text-gray-500 disabled:opacity-50"
-                                    >−</button>
-                                    <span className="font-bold text-gray-800">{gridSize}×{gridSize}</span>
-                                    <button
-                                        onClick={() => setGridSize(Math.min(10, gridSize + 1))}
-                                        disabled={phase !== 'idle' || gridSize >= 10}
-                                        className="p-2 text-gray-500 disabled:opacity-50"
-                                    >+</button>
+                                        onClick={() => phase === 'idle' && setHiddenMode(!hiddenMode)}
+                                        className={`w-10 h-5 rounded-full transition-all ${hiddenMode ? 'bg-indigo-600' : 'bg-gray-300'}`}
+                                    >
+                                        <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${hiddenMode ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                                    </button>
                                 </div>
                             </div>
 
-                            {/* Step Count */}
-                            <div className="mb-4">
-                                <label className="text-sm text-gray-500 block mb-2">Число шагов</label>
-                                <div className="flex items-center justify-between bg-white rounded-lg border border-gray-200">
-                                    <button
-                                        onClick={() => setStepCount(Math.max(2, stepCount - 1))}
-                                        disabled={phase !== 'idle' || stepCount <= 2}
-                                        className="p-2 text-gray-500 disabled:opacity-50"
-                                    >−</button>
-                                    <span className="font-bold text-gray-800">{stepCount}</span>
-                                    <button
-                                        onClick={() => setStepCount(Math.min(20, stepCount + 1))}
-                                        disabled={phase !== 'idle' || stepCount >= 20}
-                                        className="p-2 text-gray-500 disabled:opacity-50"
-                                    >+</button>
-                                </div>
-                            </div>
-
-                            {/* Step Speed */}
-                            <div className="mb-4">
-                                <label className="text-sm text-gray-500 block mb-2">Скорость (сек)</label>
-                                <div className="flex items-center justify-between bg-white rounded-lg border border-gray-200">
-                                    <button
-                                        onClick={() => setStepSpeed(Math.max(1, stepSpeed - 1))}
-                                        disabled={phase !== 'idle' || stepSpeed <= 1}
-                                        className="p-2 text-gray-500 disabled:opacity-50"
-                                    >−</button>
-                                    <span className="font-bold text-gray-800">{stepSpeed}</span>
-                                    <button
-                                        onClick={() => setStepSpeed(Math.min(10, stepSpeed + 1))}
-                                        disabled={phase !== 'idle' || stepSpeed >= 10}
-                                        className="p-2 text-gray-500 disabled:opacity-50"
-                                    >+</button>
-                                </div>
-                            </div>
-
-                            {/* Hidden Mode Toggle */}
+                            {/* Speech Toggle - always available */}
                             <div className="flex items-center justify-between">
-                                <label className="text-sm text-gray-500">Закрыто</label>
+                                <label className="text-sm text-gray-500">Проговаривание</label>
                                 <button
-                                    onClick={() => setHiddenMode(!hiddenMode)}
-                                    disabled={phase !== 'idle'}
-                                    className={`w-10 h-5 rounded-full transition-all ${hiddenMode ? 'bg-blue-600' : 'bg-gray-300'} disabled:opacity-50`}
+                                    onClick={() => setSpeechEnabled(!speechEnabled)}
+                                    className={`w-10 h-5 rounded-full transition-all ${speechEnabled ? 'bg-indigo-600' : 'bg-gray-300'}`}
                                 >
-                                    <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${hiddenMode ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                                    <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${speechEnabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                 </button>
                             </div>
                         </div>
@@ -351,7 +389,7 @@ export default function FlyTest() {
                             </div>
                             <button
                                 onClick={startGame}
-                                className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                className="px-10 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                             >
                                 НАЧАТЬ ТЕСТ
                             </button>
@@ -364,7 +402,7 @@ export default function FlyTest() {
                             {/* Fixed height header area for direction or prompt */}
                             <div className="h-12 flex items-center justify-center">
                                 {phase === 'playing' && showCurrentDirection && (
-                                    <div className="text-2xl font-bold text-blue-600 animate-pulse">
+                                    <div className="text-3xl font-bold text-blue-600">
                                         {DIRECTION_NAMES[showCurrentDirection]}
                                     </div>
                                 )}
@@ -376,14 +414,14 @@ export default function FlyTest() {
                                 {phase === 'result' && <div className="h-6" />}
                             </div>
 
-                            {/* Grid - fixed size container */}
+                            {/* Grid - responsive square container at 80% */}
                             <div className="flex-1 flex items-center justify-center py-4">
                                 <div
                                     className="grid gap-1 bg-gray-200 p-3 rounded-xl"
                                     style={{
-                                        gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
-                                        width: Math.min(500, gridSize * 60),
-                                        height: Math.min(500, gridSize * 60)
+                                        gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+                                        width: 'min(60vh, 60vw)',
+                                        height: 'min(60vh, 60vw)'
                                     }}
                                 >
                                     {Array.from({ length: gridSize * gridSize }).map((_, idx) => {
@@ -449,7 +487,7 @@ export default function FlyTest() {
                                                     </div>
                                                     <button
                                                         onClick={startGame}
-                                                        className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                                        className="px-10 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                                                     >
                                                         Ещё раз
                                                     </button>
@@ -515,7 +553,7 @@ export default function FlyTest() {
                                             onClick={() => {
                                                 lockedCompleteExercise({ correctCount, attempts, accuracy }, true);
                                             }}
-                                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center gap-2"
+                                            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center gap-2"
                                         >
                                             {hasNextExercise ? 'К следующему →' : 'Готово ✓'}
                                             <ArrowRight size={18} />
@@ -581,7 +619,7 @@ export default function FlyTest() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Понятно
                             </button>

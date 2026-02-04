@@ -17,6 +17,7 @@ interface GameRecord {
     rounds: number;
     accuracy: number; // %
     avgReactionTime: number; // ms
+    errors: number;
     timestamp: Date;
 }
 
@@ -122,6 +123,7 @@ export default function FastNumbers() {
                     rounds,
                     accuracy,
                     avgReactionTime,
+                    errors: totalAttempts - correctCount,
                     timestamp: new Date()
                 };
                 setGameHistory(prev => [...prev, gameRecord]);
@@ -253,7 +255,7 @@ export default function FastNumbers() {
                     <button
                         onClick={phase === 'playing' ? stopGame : startGame}
                         className={`w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${phase !== 'playing'
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
                             : 'bg-red-500 hover:bg-red-600 text-white'
                             }`}
                     >
@@ -292,7 +294,7 @@ export default function FastNumbers() {
                                 <label className="text-sm text-gray-500">Вразнобой</label>
                                 <button
                                     onClick={() => setShuffle(!shuffle)}
-                                    className={`w-10 h-5 rounded-full transition-all ${shuffle ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                    className={`w-10 h-5 rounded-full transition-all ${shuffle ? 'bg-indigo-600' : 'bg-gray-300'}`}
                                 >
                                     <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${shuffle ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                 </button>
@@ -324,7 +326,7 @@ export default function FastNumbers() {
                             </p>
                             <button
                                 onClick={startGame}
-                                className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                className="px-10 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                             >
                                 НАЧАТЬ ТЕСТ
                             </button>
@@ -382,17 +384,23 @@ export default function FastNumbers() {
                                 <h2 className="text-3xl font-bold text-gray-800 mb-2">
                                     {passed ? "Отлично!" : "Хорошая попытка!"}
                                 </h2>
-                                <p className="text-xl text-gray-600">
-                                    Точность: <span className="font-bold text-blue-600">{accuracy}%</span>
+                                <div className="grid grid-cols-3 gap-4 mt-4 mb-4">
+                                    <div className="bg-blue-50 rounded-xl p-4 text-center">
+                                        <p className="text-sm text-blue-600">Точность</p>
+                                        <p className="text-2xl font-bold text-blue-700">{accuracy}%</p>
+                                    </div>
+                                    <div className="bg-red-50 rounded-xl p-4 text-center">
+                                        <p className="text-sm text-red-600">Ошибок</p>
+                                        <p className="text-2xl font-bold text-red-700">{totalAttempts - correctCount}</p>
+                                    </div>
+                                    <div className="bg-purple-50 rounded-xl p-4 text-center">
+                                        <p className="text-sm text-purple-600">Реакция</p>
+                                        <p className="text-2xl font-bold text-purple-700">{avgReactionTime} мс</p>
+                                    </div>
+                                </div>
+                                <p className="text-gray-500">
+                                    {correctCount} правильных из {totalAttempts} попыток за {rounds} круг{rounds > 1 ? 'а' : ''}
                                 </p>
-                                <p className="text-gray-500 mt-2">
-                                    {correctCount} правильных из {totalAttempts} попыток
-                                </p>
-                                {avgReactionTime > 0 && (
-                                    <p className="text-gray-500">
-                                        Среднее время реакции: <span className="font-bold">{avgReactionTime} мс</span>
-                                    </p>
-                                )}
                             </div>
 
                             <div className="flex gap-3 justify-center">
@@ -409,7 +417,7 @@ export default function FastNumbers() {
                                             onClick={() => {
                                                 lockedCompleteExercise({ correctCount, totalAttempts, accuracy, avgReactionTime }, true);
                                             }}
-                                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center gap-2"
+                                            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all flex items-center gap-2"
                                         >
                                             {hasNextExercise ? 'К следующему →' : 'Готово ✓'}
                                             <ArrowRight size={18} />
@@ -456,7 +464,11 @@ export default function FastNumbers() {
                                             <span className="font-medium">{game.rounds}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Ср. время:</span>
+                                            <span>Ошибок:</span>
+                                            <span className="font-medium text-red-600">{game.errors}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Реакция:</span>
                                             <span className="font-medium">{game.avgReactionTime} мс</span>
                                         </div>
                                     </div>
@@ -492,7 +504,7 @@ export default function FastNumbers() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Понятно
                             </button>

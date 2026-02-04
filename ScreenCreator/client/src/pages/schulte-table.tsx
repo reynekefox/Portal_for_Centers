@@ -393,7 +393,7 @@ export default function SchulteTable() {
               onClick={isRunning ? handleStop : handleStart}
               className={`px-6 py-2 text-sm font-bold rounded-full transition-all shadow-md hover:shadow-lg w-full flex items-center justify-center gap-2 ${isRunning
                 ? "bg-red-500 hover:bg-red-600 text-white"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-indigo-600 hover:bg-indigo-700 text-white"
                 }`}
             >
               {isRunning ? <Square size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}

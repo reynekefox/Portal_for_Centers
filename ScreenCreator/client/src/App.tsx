@@ -15,6 +15,7 @@ import ADHDQuestionnaire from "@/pages/adhd-questionnaire";
 import Testing from "@/pages/testing";
 import MunsterbergTest from "@/pages/munsterberg-test";
 import NBack from "@/pages/n-back";
+import NBackPicture from "@/pages/n-back-picture";
 import AlphabetGame from "@/pages/alphabet-game";
 import CorrectionTest from "@/pages/correction-test";
 import MagicForest from "@/pages/magic-forest";
@@ -36,11 +37,13 @@ import VisualMemoryTest from "@/pages/visual-memory-test";
 import PairsTest from "@/pages/pairs-test";
 import FlyTest from "@/pages/fly-test";
 import AnagramTest from "@/pages/anagram-test";
+import AnagramPictureTest from "@/pages/anagram-picture-test";
 import MathTest from "@/pages/math-test";
 import AnimalSoundTest from "@/pages/animal-sound-test"; // New
 import FastNumbers from "@/pages/fast-numbers";
 import FastSyllables from "@/pages/fast-syllables";
 import SyllablePictureGame from "@/pages/syllable-picture-game";
+import MemoryCards from "@/pages/memory-cards";
 // Login system
 import LoginPage from "@/pages/login";
 import SuperAdmin from "@/pages/super-admin";
@@ -76,6 +79,7 @@ function Router() {
         <Route path="/schulte-table" component={SchulteTable} />
         <Route path="/munsterberg-test" component={MunsterbergTest} />
         <Route path="/n-back" component={NBack} />
+        <Route path="/n-back-picture" component={NBackPicture} />
         <Route path="/alphabet-game" component={AlphabetGame} />
         <Route path="/correction-test" component={CorrectionTest} />
         <Route path="/magic-forest" component={MagicForest} />
@@ -107,6 +111,8 @@ function Router() {
         <Route path="/fast-numbers" component={FastNumbers} />
         <Route path="/fast-syllables" component={FastSyllables} />
         <Route path="/syllable-picture" component={SyllablePictureGame} />
+        <Route path="/memory-cards" component={MemoryCards} />
+        <Route path="/anagram-picture-test" component={AnagramPictureTest} />
         <Route component={NotFound} />
       </Switch>
     </>

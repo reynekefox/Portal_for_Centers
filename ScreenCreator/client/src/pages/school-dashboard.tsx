@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { useAuth, authApi } from "@/lib/auth-store";
 import { ArrowLeft, LogOut, Users, BookOpen, Calendar, BarChart2, Folder } from "lucide-react";
@@ -243,7 +243,7 @@ export default function SchoolDashboard() {
                             assignmentTitle: assignment.title,
                             exerciseIndex: res.exerciseIndex,
                             trainingId: exercise?.trainingId || '',
-                            trainingName: training?.name || 'Неизвестный тренинг',
+                            trainingName: training?.name || '??????????? ???????',
                             parameters: exercise?.parameters || {},
                             result: res.result || {},
                             passed: res.passed,
@@ -471,7 +471,7 @@ export default function SchoolDashboard() {
 
     const getStudentName = (studentId: number) => {
         const student = students.find(s => s.id === studentId);
-        return student ? `${student.first_name} ${student.last_name}` : 'Неизвестный';
+        return student ? `${student.first_name} ${student.last_name}` : '???????????';
     };
 
     const getTrainingName = (trainingId: string) => {
@@ -480,11 +480,11 @@ export default function SchoolDashboard() {
     };
 
     const tabs: { id: TabType; label: string; icon: typeof Users }[] = [
-        { id: 'students', label: 'Ученики', icon: Users },
-        { id: 'trainings', label: 'Тренинги', icon: BookOpen },
-        { id: 'assignments', label: 'Занятия', icon: Calendar },
-        { id: 'courses', label: 'Курсы', icon: Folder },
-        { id: 'progress', label: 'Прогресс', icon: BarChart2 },
+        { id: 'students', label: '???????', icon: Users },
+        { id: 'trainings', label: '????????', icon: BookOpen },
+        { id: 'assignments', label: '???????', icon: Calendar },
+        { id: 'courses', label: '?????', icon: Folder },
+        { id: 'progress', label: '????????', icon: BarChart2 },
     ];
 
     return (
@@ -499,7 +499,7 @@ export default function SchoolDashboard() {
                             </button>
                         </Link>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-800">Личный кабинет школы</h1>
+                            <h1 className="text-xl font-bold text-gray-800">?????? ??????? ?????</h1>
                             <p className="text-sm text-gray-500">{user?.name}</p>
                         </div>
                     </div>
@@ -508,7 +508,7 @@ export default function SchoolDashboard() {
                         className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
                     >
                         <LogOut size={18} />
-                        Выйти
+                        ?????
                     </button>
                 </div>
             </header>
@@ -521,7 +521,7 @@ export default function SchoolDashboard() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${activeTab === tab.id
-                                ? 'bg-blue-600 text-white'
+                                ? 'bg-indigo-600 text-white'
                                 : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
@@ -533,7 +533,7 @@ export default function SchoolDashboard() {
 
                 {/* Tab Content */}
                 {isLoading ? (
-                    <div className="text-gray-500 text-center py-12">Загрузка...</div>
+                    <div className="text-gray-500 text-center py-12">????????...</div>
                 ) : (
                     <>
                         {/* Students Tab */}

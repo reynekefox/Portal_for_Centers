@@ -241,7 +241,7 @@ export default function VisualMemoryTest() {
                     <button
                         onClick={phase === 'idle' ? startGame : stopGame}
                         className={`w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${phase === 'idle'
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
                             : 'bg-red-500 hover:bg-red-600 text-white'
                             }`}
                     >
@@ -304,7 +304,7 @@ export default function VisualMemoryTest() {
                                 <button
                                     onClick={() => setWordMode(!wordMode)}
                                     disabled={phase !== 'idle'}
-                                    className={`w-10 h-5 rounded-full transition-all ${wordMode ? 'bg-blue-600' : 'bg-gray-300'} disabled:opacity-50`}
+                                    className={`w-10 h-5 rounded-full transition-all ${wordMode ? 'bg-indigo-600' : 'bg-gray-300'} disabled:opacity-50`}
                                 >
                                     <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${wordMode ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                 </button>
@@ -316,7 +316,7 @@ export default function VisualMemoryTest() {
                                 <button
                                     onClick={() => setSequentialMode(!sequentialMode)}
                                     disabled={phase !== 'idle'}
-                                    className={`w-10 h-5 rounded-full transition-all ${sequentialMode ? 'bg-blue-600' : 'bg-gray-300'} disabled:opacity-50`}
+                                    className={`w-10 h-5 rounded-full transition-all ${sequentialMode ? 'bg-indigo-600' : 'bg-gray-300'} disabled:opacity-50`}
                                 >
                                     <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${sequentialMode ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                 </button>
@@ -346,7 +346,7 @@ export default function VisualMemoryTest() {
                                     </div>
                                     <button
                                         onClick={startGame}
-                                        className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all"
+                                        className="px-10 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all"
                                     >
                                         НАЧАТЬ ТЕСТ
                                     </button>
@@ -379,7 +379,7 @@ export default function VisualMemoryTest() {
                                     </div>
                                     <button
                                         onClick={handleNextItem}
-                                        className="px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-full shadow-lg transition-all"
+                                        className="px-12 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-full shadow-lg transition-all"
                                     >
                                         Далее
                                     </button>
@@ -591,7 +591,7 @@ export default function VisualMemoryTest() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all"
                             >
                                 Понятно
                             </button>

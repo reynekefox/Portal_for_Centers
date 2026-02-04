@@ -451,7 +451,7 @@ export default function AuditoryTest() {
                         onClick={phase === 'idle' ? startGame : stopGame}
                         disabled={filteredItems.length < choiceCount}
                         className={`w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${phase === 'idle'
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
                             : 'bg-red-500 hover:bg-red-600 text-white'
                             } disabled:bg-gray-400`}
                     >
@@ -547,7 +547,7 @@ export default function AuditoryTest() {
                                 <button
                                     onClick={() => setShowWord(!showWord)}
                                     disabled={phase !== 'idle'}
-                                    className={`w-10 h-5 rounded-full transition-all ${showWord ? 'bg-blue-600' : 'bg-gray-300'
+                                    className={`w-10 h-5 rounded-full transition-all ${showWord ? 'bg-indigo-600' : 'bg-gray-300'
                                         } disabled:opacity-50`}
                                 >
                                     <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${showWord ? 'translate-x-5' : 'translate-x-0.5'
@@ -584,7 +584,7 @@ export default function AuditoryTest() {
                                     <button
                                         onClick={startGame}
                                         disabled={filteredItems.length < choiceCount}
-                                        className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition-all disabled:bg-gray-400"
+                                        className="px-10 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-all disabled:bg-gray-400"
                                     >
                                         НАЧАТЬ ТЕСТ
                                     </button>
@@ -649,7 +649,7 @@ export default function AuditoryTest() {
                                         {waitingForNext && (
                                             <button
                                                 onClick={goToNextTrial}
-                                                className="px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold rounded-full shadow-lg transition-all transform hover:scale-105"
+                                                className="px-12 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xl font-bold rounded-full shadow-lg transition-all transform hover:scale-105"
                                             >
                                                 Далее
                                             </button>
@@ -758,7 +758,7 @@ export default function AuditoryTest() {
                         <div className="p-6 border-t border-gray-200">
                             <button
                                 onClick={() => setShowHelp(false)}
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700"
+                                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700"
                             >
                                 Понятно
                             </button>

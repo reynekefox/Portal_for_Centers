@@ -165,7 +165,7 @@ export default function SelectProfile() {
           </Link>
           <button
             disabled={!filteredProfiles.length}
-            className="flex-1 py-3 bg-blue-500 text-white rounded-full text-base font-medium hover:bg-blue-600 transition-all disabled:bg-gray-400"
+            className="flex-1 py-3 bg-blue-500 text-white rounded-full text-base font-medium hover:bg-indigo-600 transition-all disabled:bg-gray-400"
           >
             Выбрать
           </button>
