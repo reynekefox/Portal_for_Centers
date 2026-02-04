@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
 import {
     ArrowLeft, Play, Square, RotateCcw, Settings, HelpCircle, X,
-    Timer, ArrowRight, ToggleLeft, ToggleRight
+    Timer, ArrowRight, Eye
 } from "lucide-react";
 import { useLockedParams } from "@/hooks/useLockedParams";
 
@@ -12,6 +12,8 @@ interface Stimulus {
     position: number;      // 0-8 for 3x3 grid
     color: string;         // hex color
     sound: string;         // letter
+    soundFile: string;     // audio filename
+    shape: number;         // shape index
 }
 
 interface GameStats {
@@ -24,6 +26,9 @@ interface GameStats {
     soundHits: number;
     soundMisses: number;
     soundFalseAlarms: number;
+    shapeHits: number;
+    shapeMisses: number;
+    shapeFalseAlarms: number;
 }
 
 const COLORS = [
@@ -37,7 +42,46 @@ const COLORS = [
     '#F97316', // orange
 ];
 
-const LETTERS = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦ';
+// Geometric shapes as SVG paths (viewBox 0 0 100 100)
+const SHAPES = [
+    { name: 'square', path: 'M10,10 L90,10 L90,90 L10,90 Z' },
+    { name: 'circle', path: 'M50,5 A45,45 0 1,1 50,95 A45,45 0 1,1 50,5' },
+    { name: 'triangle', path: 'M50,5 L95,90 L5,90 Z' },
+    { name: 'diamond', path: 'M50,5 L95,50 L50,95 L5,50 Z' },
+    { name: 'pentagon', path: 'M50,5 L95,38 L77,90 L23,90 L5,38 Z' },
+    { name: 'hexagon', path: 'M25,10 L75,10 L95,50 L75,90 L25,90 L5,50 Z' },
+    { name: 'star', path: 'M50,5 L61,35 L95,35 L68,55 L79,90 L50,70 L21,90 L32,55 L5,35 L39,35 Z' },
+    { name: 'heart', path: 'M50,88 C20,60 5,40 5,25 A20,20 0 0,1 50,25 A20,20 0 0,1 95,25 C95,40 80,60 50,88 Z' },
+    { name: 'cross', path: 'M35,10 L65,10 L65,35 L90,35 L90,65 L65,65 L65,90 L35,90 L35,65 L10,65 L10,35 L35,35 Z' },
+    { name: 'arrow', path: 'M50,5 L90,45 L65,45 L65,95 L35,95 L35,45 L10,45 Z' },
+    { name: 'oval', path: 'M50,10 A35,40 0 1,1 50,90 A35,40 0 1,1 50,10' },
+];
+
+// Letter to filename mapping for audio playback
+const LETTERS: { letter: string; file: string }[] = [
+    { letter: 'А', file: 'a' },
+    { letter: 'Б', file: 'b' },
+    { letter: 'В', file: 'v' },
+    { letter: 'Г', file: 'g' },
+    { letter: 'Д', file: 'd' },
+    { letter: 'Е', file: 'e' },
+    { letter: 'Ж', file: 'zh' },
+    { letter: 'З', file: 'z' },
+    { letter: 'И', file: 'i' },
+    { letter: 'К', file: 'k' },
+    { letter: 'Л', file: 'l' },
+    { letter: 'М', file: 'm' },
+    { letter: 'Н', file: 'n' },
+    { letter: 'О', file: 'o' },
+    { letter: 'П', file: 'p' },
+    { letter: 'Р', file: 'r' },
+    { letter: 'С', file: 's' },
+    { letter: 'Т', file: 't' },
+    { letter: 'У', file: 'u' },
+    { letter: 'Ф', file: 'f' },
+    { letter: 'Х', file: 'h' },
+    { letter: 'Ц', file: 'ts' },
+];
 
 export default function NBackPicture() {
     const { isLocked, requiredResult, lockedParameters, backPath, completeExercise: lockedCompleteExercise, hasNextExercise, getNextPath } = useLockedParams('n-back-picture');
@@ -51,6 +95,7 @@ export default function NBackPicture() {
     const [positionEnabled, setPositionEnabled] = useState(true);
     const [colorEnabled, setColorEnabled] = useState(true);
     const [soundEnabled, setSoundEnabled] = useState(false);
+    const [shapeEnabled, setShapeEnabled] = useState(false);
 
     // Game state
     const [phase, setPhase] = useState<Phase>('idle');
@@ -62,16 +107,18 @@ export default function NBackPicture() {
         positionHits: 0, positionMisses: 0, positionFalseAlarms: 0,
         colorHits: 0, colorMisses: 0, colorFalseAlarms: 0,
         soundHits: 0, soundMisses: 0, soundFalseAlarms: 0,
+        shapeHits: 0, shapeMisses: 0, shapeFalseAlarms: 0,
     });
 
     // Track button presses per stimulus
     const [responded, setResponded] = useState({
-        position: false, color: false, sound: false
+        position: false, color: false, sound: false, shape: false
     });
 
     // Refs
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
 
     // Modals
     const [showHelp, setShowHelp] = useState(false);
@@ -88,52 +135,89 @@ export default function NBackPicture() {
         }
     }, [isLocked, lockedParameters]);
 
-    // Speak letter using Web Speech API
-    const speakLetter = (letter: string) => {
+    // Play letter audio from pre-recorded files
+    const playLetterAudio = (letterFile: string) => {
         if (!soundEnabled) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(letter);
-        utterance.lang = 'ru-RU';
-        utterance.rate = 0.8;
-        window.speechSynthesis.speak(utterance);
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+        }
+        audioRef.current = new Audio(`/audio/letters/${letterFile}.mp3`);
+        audioRef.current.play().catch(console.error);
     };
 
     // Generate next stimulus
     const generateStimulus = useCallback((): Stimulus => {
-        const shouldMatchPosition = Math.random() < 0.3 && sequence.length >= n;
-        const shouldMatchColor = Math.random() < 0.3 && sequence.length >= n;
-        const shouldMatchSound = Math.random() < 0.3 && sequence.length >= n;
+        const shouldMatchPosition = positionEnabled && Math.random() < 0.3 && sequence.length >= n;
+        const shouldMatchColor = colorEnabled && Math.random() < 0.3 && sequence.length >= n;
+        const shouldMatchSound = soundEnabled && Math.random() < 0.3 && sequence.length >= n;
+        const shouldMatchShape = shapeEnabled && Math.random() < 0.3 && sequence.length >= n;
 
-        let position = Math.floor(Math.random() * 9);
-        let color = COLORS[Math.floor(Math.random() * COLORS.length)];
-        let sound = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+        // Use fixed values when mode is disabled
+        let position = positionEnabled ? Math.floor(Math.random() * 9) : 4; // center
+        let color = colorEnabled ? COLORS[Math.floor(Math.random() * COLORS.length)] : '#3B82F6'; // blue
+        let soundItem = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+        let sound = soundItem.letter;
+        let soundFile = soundItem.file;
+        let shape = shapeEnabled ? Math.floor(Math.random() * SHAPES.length) : 0; // square
 
         if (sequence.length >= n) {
             const nBack = sequence[sequence.length - n];
 
-            if (shouldMatchPosition) {
-                position = nBack.position;
-            } else if (position === nBack.position) {
-                position = (position + 1) % 9;
+            if (positionEnabled) {
+                if (shouldMatchPosition) {
+                    position = nBack.position;
+                } else if (position === nBack.position) {
+                    position = (position + 1) % 9;
+                }
             }
+        }
 
-            if (shouldMatchColor) {
-                color = nBack.color;
-            } else if (color === nBack.color) {
-                const otherColors = COLORS.filter(c => c !== nBack.color);
-                color = otherColors[Math.floor(Math.random() * otherColors.length)];
+        // Prevent position from repeating on consecutive moves (only if enabled)
+        if (positionEnabled && sequence.length > 0) {
+            const lastStimulus = sequence[sequence.length - 1];
+            if (position === lastStimulus.position) {
+                // Pick a different position
+                const availablePositions = Array.from({ length: 9 }, (_, i) => i).filter(p => p !== lastStimulus.position);
+                position = availablePositions[Math.floor(Math.random() * availablePositions.length)];
+            }
+        }
+
+        if (sequence.length >= n) {
+            const nBack = sequence[sequence.length - n];
+
+            if (colorEnabled) {
+                if (shouldMatchColor) {
+                    color = nBack.color;
+                } else if (color === nBack.color) {
+                    const otherColors = COLORS.filter(c => c !== nBack.color);
+                    color = otherColors[Math.floor(Math.random() * otherColors.length)];
+                }
             }
 
             if (shouldMatchSound) {
                 sound = nBack.sound;
+                soundFile = LETTERS.find(l => l.letter === sound)?.file || soundFile;
             } else if (sound === nBack.sound) {
-                const otherSounds = LETTERS.split('').filter(l => l !== nBack.sound);
-                sound = otherSounds[Math.floor(Math.random() * otherSounds.length)];
+                const otherSounds = LETTERS.filter(l => l.letter !== nBack.sound);
+                const picked = otherSounds[Math.floor(Math.random() * otherSounds.length)];
+                sound = picked.letter;
+                soundFile = picked.file;
+            }
+
+            // Shape matching (only if enabled)
+            if (shapeEnabled) {
+                if (shouldMatchShape) {
+                    shape = nBack.shape;
+                } else if (shape === nBack.shape) {
+                    const otherShapes = Array.from({ length: SHAPES.length }, (_, i) => i).filter(s => s !== nBack.shape);
+                    shape = otherShapes[Math.floor(Math.random() * otherShapes.length)];
+                }
             }
         }
 
-        return { position, color, sound };
-    }, [n, sequence]);
+        return { position, color, sound, soundFile, shape };
+    }, [n, sequence, positionEnabled, colorEnabled, soundEnabled, shapeEnabled]);
 
     // Check misses for previous stimulus
     const checkMisses = useCallback(() => {
@@ -151,10 +235,13 @@ export default function NBackPicture() {
         if (soundEnabled && !responded.sound && current.sound === nBack.sound) {
             setStats(prev => ({ ...prev, soundMisses: prev.soundMisses + 1 }));
         }
-    }, [currentIndex, n, sequence, responded, positionEnabled, colorEnabled, soundEnabled]);
+        if (shapeEnabled && !responded.shape && current.shape === nBack.shape) {
+            setStats(prev => ({ ...prev, shapeMisses: prev.shapeMisses + 1 }));
+        }
+    }, [currentIndex, n, sequence, responded, positionEnabled, colorEnabled, soundEnabled, shapeEnabled]);
 
     // Handle button clicks
-    const handleClick = (mode: 'position' | 'color' | 'sound') => {
+    const handleClick = (mode: 'position' | 'color' | 'sound' | 'shape') => {
         if (phase !== 'playing' || currentIndex < n || responded[mode]) return;
 
         setResponded(prev => ({ ...prev, [mode]: true }));
@@ -188,6 +275,14 @@ export default function NBackPicture() {
                     setStats(prev => ({ ...prev, soundFalseAlarms: prev.soundFalseAlarms + 1 }));
                 }
                 break;
+            case 'shape':
+                isMatch = current.shape === nBack.shape;
+                if (isMatch) {
+                    setStats(prev => ({ ...prev, shapeHits: prev.shapeHits + 1 }));
+                } else {
+                    setStats(prev => ({ ...prev, shapeFalseAlarms: prev.shapeFalseAlarms + 1 }));
+                }
+                break;
         }
     };
 
@@ -201,8 +296,9 @@ export default function NBackPicture() {
             positionHits: 0, positionMisses: 0, positionFalseAlarms: 0,
             colorHits: 0, colorMisses: 0, colorFalseAlarms: 0,
             soundHits: 0, soundMisses: 0, soundFalseAlarms: 0,
+            shapeHits: 0, shapeMisses: 0, shapeFalseAlarms: 0,
         });
-        setResponded({ position: false, color: false, sound: false });
+        setResponded({ position: false, color: false, sound: false, shape: false });
         setPhase('playing');
     };
 
@@ -254,10 +350,10 @@ export default function NBackPicture() {
             setSequence(prev => [...prev, newStimulus]);
             setCurrentStimulus(newStimulus);
             setCurrentIndex(prev => prev + 1);
-            setResponded({ position: false, color: false, sound: false });
+            setResponded({ position: false, color: false, sound: false, shape: false });
 
-            if (soundEnabled) {
-                speakLetter(newStimulus.sound);
+            if (soundEnabled && newStimulus.soundFile) {
+                playLetterAudio(newStimulus.soundFile);
             }
         };
 
@@ -281,6 +377,7 @@ export default function NBackPicture() {
                 case 'KeyA': handleClick('position'); break;
                 case 'KeyS': handleClick('color'); break;
                 case 'KeyL': handleClick('sound'); break;
+                case 'KeyD': handleClick('shape'); break;
             }
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -302,6 +399,10 @@ export default function NBackPicture() {
             totalHits += stats.soundHits;
             totalEvents += stats.soundHits + stats.soundMisses + stats.soundFalseAlarms;
         }
+        if (shapeEnabled) {
+            totalHits += stats.shapeHits;
+            totalEvents += stats.shapeHits + stats.shapeMisses + stats.shapeFalseAlarms;
+        }
         return totalEvents > 0 ? Math.round((totalHits / totalEvents) * 100) : 0;
     };
 
@@ -310,8 +411,8 @@ export default function NBackPicture() {
     const passed = accuracy >= requiredAccuracy;
 
     // Count enabled modes
-    const enabledModes = [positionEnabled, colorEnabled, soundEnabled].filter(Boolean).length;
-    const modeLabel = enabledModes === 1 ? 'Single' : enabledModes === 2 ? 'Dual' : enabledModes === 3 ? 'Triple' : 'N';
+    const enabledModes = [positionEnabled, colorEnabled, soundEnabled, shapeEnabled].filter(Boolean).length;
+    const modeLabel = enabledModes === 1 ? 'Single' : enabledModes === 2 ? 'Dual' : enabledModes === 3 ? 'Triple' : enabledModes === 4 ? 'Quad' : 'N';
 
     // Format time
     const formatTime = (seconds: number) => {
@@ -320,17 +421,17 @@ export default function NBackPicture() {
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
-    // Toggle component
+    // Toggle component - standard slider style
     const Toggle = ({ enabled, onToggle, label, disabled = false }: { enabled: boolean; onToggle: () => void; label: string; disabled?: boolean }) => (
-        <button
-            onClick={onToggle}
-            disabled={disabled}
-            className={`flex items-center justify-between w-full p-3 rounded-xl transition-all ${enabled ? 'bg-indigo-100 border-2 border-indigo-500' : 'bg-gray-100 border-2 border-gray-200'
-                } ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'}`}
+        <div
+            className={`flex items-center justify-between w-full py-2 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            onClick={disabled ? undefined : onToggle}
         >
-            <span className={`font-medium ${enabled ? 'text-indigo-700' : 'text-gray-600'}`}>{label}</span>
-            {enabled ? <ToggleRight className="text-indigo-600" size={24} /> : <ToggleLeft className="text-gray-400" size={24} />}
-        </button>
+            <span className="text-gray-700">{label}</span>
+            <div className={`relative w-12 h-7 rounded-full transition-all ${enabled ? 'bg-indigo-500' : 'bg-gray-300'}`}>
+                <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow transition-all ${enabled ? 'left-5' : 'left-0.5'}`} />
+            </div>
+        </div>
     );
 
     return (
@@ -436,6 +537,7 @@ export default function NBackPicture() {
                                 <Toggle enabled={positionEnabled} onToggle={() => setPositionEnabled(!positionEnabled)} label="Позиция (A)" />
                                 <Toggle enabled={colorEnabled} onToggle={() => setColorEnabled(!colorEnabled)} label="Цвет (S)" />
                                 <Toggle enabled={soundEnabled} onToggle={() => setSoundEnabled(!soundEnabled)} label="Звук (L)" />
+                                <Toggle enabled={shapeEnabled} onToggle={() => setShapeEnabled(!shapeEnabled)} label="Фигура (D)" />
                             </div>
                         </div>
                     )}
@@ -468,6 +570,11 @@ export default function NBackPicture() {
                                             }`}
                                         style={i === currentStimulus.position ? { backgroundColor: colorEnabled ? currentStimulus.color : '#3B82F6' } : {}}
                                     >
+                                        {i === currentStimulus.position && shapeEnabled && (
+                                            <svg viewBox="0 0 100 100" className="w-16 h-16">
+                                                <path d={SHAPES[currentStimulus.shape].path} fill="white" />
+                                            </svg>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -511,6 +618,19 @@ export default function NBackPicture() {
                                     >
                                         ЗВУК
                                         <div className="text-xs opacity-70">(L)</div>
+                                    </button>
+                                )}
+                                {shapeEnabled && (
+                                    <button
+                                        onClick={() => handleClick('shape')}
+                                        disabled={currentIndex < n || responded.shape}
+                                        className={`py-4 px-2 rounded-xl font-bold text-sm transition-all ${responded.shape
+                                            ? 'bg-gray-300 text-gray-500'
+                                            : 'bg-green-500 hover:bg-green-600 text-white active:scale-95'
+                                            }`}
+                                    >
+                                        ФИГУРА
+                                        <div className="text-xs opacity-70">(D)</div>
                                     </button>
                                 )}
                             </div>

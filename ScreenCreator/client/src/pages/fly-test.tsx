@@ -202,7 +202,11 @@ export default function FlyTest() {
         speak(DIRECTION_NAMES[direction]);
 
         timerRef.current = setTimeout(() => {
-            playNextMove(index + 1, moves);
+            // Hide direction for 0.5 seconds before showing next
+            setShowCurrentDirection(null);
+            timerRef.current = setTimeout(() => {
+                playNextMove(index + 1, moves);
+            }, 500);
         }, stepSpeed * 1000);
     };
 
@@ -460,9 +464,6 @@ export default function FlyTest() {
                                                 `}
                                             >
                                                 {isFlyHere && !isHidden && (phase === 'playing' || phase === 'answering') && (
-                                                    <span className="text-3xl">🪰</span>
-                                                )}
-                                                {isHidden && isFlyHere && phase === 'playing' && showCurrentDirection === null && (
                                                     <span className="text-3xl">🪰</span>
                                                 )}
                                                 {phase === 'result' && isTarget && (
